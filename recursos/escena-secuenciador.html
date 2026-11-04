@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DrumLab VR — Escena 2: Secuenciador 4x4 (Plano Operativo)</title>
+  <!-- Framework WebXR A-Frame 1.6.0 Oficial -->
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <!-- Módulos de Sonido y Lógica de Componentes -->
+  <script src="js/drum-pad.js"></script>
+  <script src="js/step-sequencer.js"></script>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #060913;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    /* HUD overlay superior con feedback contextual */
+    .hud-sequencer {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      z-index: 100;
+      color: #f0f6fc;
+      background: rgba(10, 13, 20, 0.82);
+      backdrop-filter: blur(8px);
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 229, 255, 0.35);
+      font-size: 13px;
+      line-height: 1.45;
+      pointer-events: none;
+    }
+    .hud-sequencer strong {
+      color: #00e5ff;
+    }
+    .hud-badge {
+      display: inline-block;
+      background: #1e293b;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 11px;
+      color: #38bdf8;
+      margin-top: 3px;
+    }
+  </style>
+</head>
+<body>
+  <!-- HUD 2D informativo -->
+  <div class="hud-sequencer">
+    <strong>Nivel 2: Secuenciador 4&times;4 Operativo</strong><br>
+    Haz clic en los pads para programar pasos. Pulsa <span class="hud-badge">Espacio</span> para Play/Stop.<br>
+    Teclado isomórfico activo: <span class="hud-badge">1-4</span> Crash · <span class="hud-badge">Q-R</span> Hi-Hat · <span class="hud-badge">A-F</span> Snare · <span class="hud-badge">Z-V</span> Kick
+  </div>
+
+  <a-scene 
+    embedded
+    loading-screen="dotsColor: #00e5ff; backgroundColor: #0a0d14"
+    renderer="antialias: true; colorManagement: true; physicallyCorrectLights: true"
+    vr-mode-ui="enabled: true">
+
+    <!-- Iluminación de Estudio y Enfoque Directo sobre el Pad -->
+    <a-light type="ambient" color="#141c2c" intensity="0.8"></a-light>
+    <a-light type="directional" color="#f8fafc" intensity="1.1" position="0 4 2" target="#drumpad-controller"></a-light>
+    <a-light type="point" color="#00e5ff" intensity="2.2" distance="4" position="0 2 0"></a-light>
+    <a-light type="point" color="#ff2a85" intensity="1.2" distance="5" position="0 1.5 -1.5"></a-light>
+
+    <!-- Atmósfera Sintética de Fondo -->
+    <a-sky color="#060913"></a-sky>
+
+    <!-- Suelo con cuadrícula reflectante -->
+    <a-plane 
+      position="0 0 0" 
+      rotation="-90 0 0" 
+      width="16" 
+      height="16" 
+      color="#0b0f19" 
+      roughness="0.7" 
+      metalness="0.4">
+    </a-plane>
+
+    <!-- Mesa Soporte del Controlador -->
+    <a-box 
+      position="0 0.44 0" 
+      width="1.6" 
+      height="0.88" 
+      depth="1.3" 
+      color="#0e1320" 
+      roughness="0.6">
+    </a-box>
+
+    <!-- ====================================================================
+         CONTROLADOR OVERSIZED DRUM PAD (JERARQUÍA COMPLETA DE OBJETOS)
+         ==================================================================== -->
+    <a-entity 
+      id="drumpad-controller" 
+      position="0 0.9 0" 
+      rotation="-14 0 0"
+      step-sequencer="bpm: 120; isPlaying: false; tempoLedsSelector: .tempo-led">
+
+      <!-- 1. Chasis Base del Controlador -->
+      <a-box 
+        position="0 0 0" 
+        width="1.34" 
+        height="0.08" 
+        depth="0.96" 
+        color="#151b28" 
+        metalness="0.6" 
+        roughness="0.35">
+      </a-box>
+
+      <!-- Bisel frontal y embellecedores LED laterales -->
+      <a-box position="0 -0.01 0.47" width="1.32" height="0.02" depth="0.03" 
+             material="color: #00e5ff; emissive: #00e5ff; emissiveIntensity: 0.7"></a-box>
+      <a-box position="-0.66 -0.01 0" width="0.02" height="0.02" depth="0.94" 
+             material="color: #ff2a85; emissive: #ff2a85; emissiveIntensity: 0.6"></a-box>
+      <a-box position="0.66 -0.01 0" width="0.02" height="0.02" depth="0.94" 
+             material="color: #ff2a85; emissive: #ff2a85; emissiveIntensity: 0.6"></a-box>
+
+      <!-- Tipografía y Marca del Controlador -->
+      <a-text 
+        value="DRUMLAB VR // 4x4 MATRIX SEQUENCER" 
+        align="left" 
+        position="-0.58 0.046 -0.42" 
+        rotation="-90 0 0" 
+        scale="0.22 0.22 0.22" 
+        color="#00e5ff">
+      </a-text>
+
+      <a-text 
+        value="WEB AUDIO ENGINE < 15MS" 
+        align="right" 
+        position="0.58 0.046 -0.42" 
+        rotation="-90 0 0" 
+        scale="0.16 0.16 0.16" 
+        color="#64748b">
+      </a-text>
+
+      <!-- ==================================================================
+           2. BOTONES SUPERIORES DE TRANSPORTE 3D
+           ================================================================== -->
+      <a-entity id="transport-controls" position="0 0.045 -0.34">
+        <!-- Botón Play/Stop -->
+        <a-box 
+          id="btn-play-stop" 
+          class="interactable" 
+          position="-0.38 0 0" 
+          width="0.22" 
+          height="0.035" 
+          depth="0.09" 
+          material="color: #00f59b; emissive: #00f59b; emissiveIntensity: 0.7; roughness: 0.3">
+          <a-text 
+            id="text-play-val" 
+            value="PLAY" 
+            align="center" 
+            position="0 0.02 0" 
+            rotation="-90 0 0" 
+            scale="0.26 0.26 0.26" 
+            color="#050912">
+          </a-text>
+        </a-box>
+
+        <!-- Selector de BPM (90 / 120 / 140) -->
+        <a-box 
+          id="btn-bpm" 
+          class="interactable" 
+          position="0 0 0" 
+          width="0.28" 
+          height="0.035" 
+          depth="0.09" 
+          material="color: #1e293b; emissive: #0284c7; emissiveIntensity: 0.5; roughness: 0.4">
+          <a-text 
+            id="text-bpm-val" 
+            value="120 BPM" 
+            align="center" 
+            position="0 0.02 0" 
+            rotation="-90 0 0" 
+            scale="0.24 0.24 0.24" 
+            color="#00e5ff">
+          </a-text>
+        </a-box>
+
+        <!-- Botón Clear (Borrar Patrón) -->
+        <a-box 
+          id="btn-clear" 
+          class="interactable" 
+          position="0.38 0 0" 
+          width="0.22" 
+          height="0.035" 
+          depth="0.09" 
+          material="color: #334155; emissive: #ef4444; emissiveIntensity: 0.4; roughness: 0.4">
+          <a-text 
+            value="CLEAR" 
+            align="center" 
+            position="0 0.02 0" 
+            rotation="-90 0 0" 
+            scale="0.24 0.24 0.24" 
+            color="#f8fafc">
+          </a-text>
+        </a-box>
+      </a-entity>
+
+      <!-- ==================================================================
+           3. CABECERA DE COLUMNAS (TIEMPOS 1 A 4) Y LEDS DE TEMPO
+           ================================================================== -->
+      <a-entity id="tempo-header" position="0 0.045 -0.23">
+        <!-- Columna 0: Tiempo 1 -->
+        <a-entity position="-0.36 0 0">
+          <a-cylinder 
+            class="tempo-led" 
+            data-col="0" 
+            radius="0.022" 
+            height="0.015" 
+            material="color: #1a2234; emissive: #000000; emissiveIntensity: 0">
+          </a-cylinder>
+          <a-text value="TIEMPO 1" align="center" position="0 0.012 -0.04" rotation="-90 0 0" scale="0.17 0.17 0.17" color="#94a3b8"></a-text>
+        </a-entity>
+
+        <!-- Columna 1: Tiempo 2 -->
+        <a-entity position="-0.12 0 0">
+          <a-cylinder 
+            class="tempo-led" 
+            data-col="1" 
+            radius="0.022" 
+            height="0.015" 
+            material="color: #1a2234; emissive: #000000; emissiveIntensity: 0">
+          </a-cylinder>
+          <a-text value="TIEMPO 2" align="center" position="0 0.012 -0.04" rotation="-90 0 0" scale="0.17 0.17 0.17" color="#94a3b8"></a-text>
+        </a-entity>
+
+        <!-- Columna 2: Tiempo 3 -->
+        <a-entity position="0.12 0 0">
+          <a-cylinder 
+            class="tempo-led" 
+            data-col="2" 
+            radius="0.022" 
+            height="0.015" 
+            material="color: #1a2234; emissive: #000000; emissiveIntensity: 0">
+          </a-cylinder>
+          <a-text value="TIEMPO 3" align="center" position="0 0.012 -0.04" rotation="-90 0 0" scale="0.17 0.17 0.17" color="#94a3b8"></a-text>
+        </a-entity>
+
+        <!-- Columna 3: Tiempo 4 -->
+        <a-entity position="0.36 0 0">
+          <a-cylinder 
+            class="tempo-led" 
+            data-col="3" 
+            radius="0.022" 
+            height="0.015" 
+            material="color: #1a2234; emissive: #000000; emissiveIntensity: 0">
+          </a-cylinder>
+          <a-text value="TIEMPO 4" align="center" position="0 0.012 -0.04" rotation="-90 0 0" scale="0.17 0.17 0.17" color="#94a3b8"></a-text>
+        </a-entity>
+      </a-entity>
+
+      <!-- ==================================================================
+           4. ETIQUETAS DE FILAS / VOCES TÍMBRICAS (LATERAL IZQUIERDO)
+           ================================================================== -->
+      <a-entity id="row-labels" position="-0.58 0.045 0">
+        <!-- Fila 0: Crash -->
+        <a-text value="CRASH [1-4]" position="0 0 -0.14" rotation="-90 0 0" scale="0.19 0.19 0.19" color="#ffb703"></a-text>
+        <!-- Fila 1: Hi-Hat -->
+        <a-text value="HI-HAT [Q-R]" position="0 0 -0.01" rotation="-90 0 0" scale="0.19 0.19 0.19" color="#00f59b"></a-text>
+        <!-- Fila 2: Snare -->
+        <a-text value="SNARE [A-F]" position="0 0 0.12" rotation="-90 0 0" scale="0.19 0.19 0.19" color="#00e5ff"></a-text>
+        <!-- Fila 3: Kick -->
+        <a-text value="KICK [Z-V]" position="0 0 0.25" rotation="-90 0 0" scale="0.19 0.19 0.19" color="#ff2a85"></a-text>
+      </a-entity>
+
+      <!-- ==================================================================
+           5. MATRIZ DE 4 × 4 DRUM PADS INTERACTIVOS (.drum-pad, .interactable)
+           Micro-compresión física Z y cambio emisivo gestionado por drum-pad.js
+           ================================================================== -->
+      <a-entity id="matrix-pads" position="0 0.045 0">
+
+        <!-- FILA 0: PLATO CRASH (Ámbar) — Z = -0.14 -->
+        <a-box 
+          class="drum-pad interactable" 
+          drum-pad="row: 0; col: 0; voice: crash; label: Crash 1; shortcutKey: 1" 
+          position="-0.36 0 -0.14" width="0.18" height="0.03" depth="0.10">
+          <a-text value="1" align="center" position="0 0.016 0" rotation="-90 0 0" scale="0.18 0.18 0.18" color="#f8fafc"></a-text>
+        </a-box>
+
+        <a-box 
+          class="drum-pad interactable" 
+          drum-pad="row: 0; col: 1; voice: crash; label: Crash 2; shortcutKey: 2" 
+          position="-0.12 0 -0.14" width="0.18" height="0.03" depth="0.10">
+          <a-text value="2" align="center" position="0 0.016 0" rotation="-90 0 0" scale="0.18 0.18 0.18" color="#f8fafc"></a-text>
+        </a-box>
+
+        <a-box 
+          class="drum-pad interactable" 
+          drum-pad="row: 0; col: 2; voice: crash; label: Crash 3; shortcutKey: 3" 
+          position="0.12 0 -0.14" width="0.18" height="0.03" depth="0.10">
+          <a-text value="3" align="center" position="0 0.016 0" rotation="-90 0 0" scale="0.18 0.18 0.18" color="#f8fafc"></a-text>
+        </a-box>
+
+        <a-box 
+          class="drum-pad interactable" 
+          drum-pad="row: 0; col: 3; voice: crash; label: Crash 4; shortcutKey: 4" 
+          position="0.36 0 -0.14" width="0.18" height="0.03" depth="0.10">
+          <a-text value="4" align="center" position="0 0.016 0" rotation="-90 0 0" scale="0.18 0.18 0.18" color="#f8fafc"></a-text>
+        </a-box>
+
+
+        <!-- FILA 1: CHARLES / HI-HAT (Esmeralda) — Z = -0.01 -->
+        <a-box 
+          class="drum-pad interactable" 
+          drum-pad="row: 1; col: 0; voice: hihat; label: HiHat 1; shortcutKey: q" 
+          position="-0.36 0 -0.01" width="0.18" height="0.03" depth="0.10">
+          <a-text value="Q" align="center" position="0 0.016 0" rotation="-90 0 0" scale="0.18 0.18 0.18" color="#f8fafc"></a-text>
+        </a-box>
+
+        <a-box 
+          class="drum-pad interactable" 
+          drum-pad="row: 1; col: 1; voice: hihat; label: HiHat 2; shortcutKey: w" 
+          position="-0.12 0 -0.01" width="0.18" height="0.03" depth="0.10">
+          <a-text value="W" align="center" position="0 0.016 0" rotation="-90 0 0" scale="0.18 0.18 0.18" color="#f8fafc"></a-text>
+        </a-box>
+
+        <a-box 
+          class="drum-pad interactable" 
+          drum-pad="row: 1; col: 2; voice: hihat; label: HiHat 3; shortcutKey: e" 
+          position="0.12 0 -0.01" width="0.18" height="0.03" depth="0.10">
+          <a-text value="E" align="center" position="0 0.016 0" rotation="-90 0 0" scale="0.18 0.18 0.18" color="#f8fafc"></a-text>
+        </a-box>
+
+        <a-box 
+          class="drum-pad interactable" 
+          drum-pad="row: 1; col: 3; voice: hihat; label: HiHat 4; shortcutKey: r" 
+          position="0.36 0 -0.01" width="0.18" height="0.03" depth="0.10">
+          <a-text value="R" align="center" position="0 0.016 0" rotation="-90 0 0" scale="0.18 0.18 0.18" color="#f8fafc"></a-text>
+        </a-box>
+
+
+        <!-- FILA 2: CAJA / SNARE (Cian Eléctrico) — Z = 0.12 -->
+        <a-box 
+          class="drum-pad interactable" 
+          drum-pad="row: 2; col: 0; voice: snare; label: Snare 1; shortcutKey: a" 
+          position="-0.36 0 0.12" width="0.18" height="0.03" depth="0.10">
+          <a-text value="A" align="center" position="0 0.016 0" rotation="-90 0 0" scale="0.18 0.18 0.18" color="#f8fafc"></a-text>
+        </a-box>
+
+        <a-box 
+          class="drum-pad interactable" 
+          drum-pad="row: 2; col: 1; voice: snare; label: Snare 2; shortcutKey: s" 
+          position="-0.12 0 0.12" width="0.18" height="0.03" depth="0.10">
+          <a-text value="S" align="center" position="0 0.016 0" rotation="-90 0 0" scale="0.18 0.18 0.18" color="#f8fafc"></a-text>
+        </a-box>
+
+        <a-box 
+          class="drum-pad interactable" 
+          drum-pad="row: 2; col: 2; voice: snare; label: Snare 3; shortcutKey: d" 
+          position="0.12 0 0.12" width="0.18" height="0.03" depth="0.10">
+          <a-text value="D" align="center" position="0 0.016 0" rotation="-90 0 0" scale="0.18 0.18 0.18" color="#f8fafc"></a-text>
+        </a-box>
+
+        <a-box 
+          class="drum-pad interactable" 
+          drum-pad="row: 2; col: 3; voice: snare; label: Snare 4; shortcutKey: f" 
+          position="0.36 0 0.12" width="0.18" height="0.03" depth="0.10">
+          <a-text value="F" align="center" position="0 0.016 0" rotation="-90 0 0" scale="0.18 0.18 0.18" color="#f8fafc"></a-text>
+        </a-box>
+
+
+        <!-- FILA 3: BOMBO / KICK (Magenta) — Z = 0.25 -->
+        <a-box 
+          class="drum-pad interactable" 
+          drum-pad="row: 3; col: 0; voice: kick; label: Kick 1; shortcutKey: z" 
+          position="-0.36 0 0.25" width="0.18" height="0.03" depth="0.10">
+          <a-text value="Z" align="center" position="0 0.016 0" rotation="-90 0 0" scale="0.18 0.18 0.18" color="#f8fafc"></a-text>
+        </a-box>
+
+        <a-box 
+          class="drum-pad interactable" 
+          drum-pad="row: 3; col: 1; voice: kick; label: Kick 2; shortcutKey: x" 
+          position="-0.12 0 0.25" width="0.18" height="0.03" depth="0.10">
+          <a-text value="X" align="center" position="0 0.016 0" rotation="-90 0 0" scale="0.18 0.18 0.18" color="#f8fafc"></a-text>
+        </a-box>
+
+        <a-box 
+          class="drum-pad interactable" 
+          drum-pad="row: 3; col: 2; voice: kick; label: Kick 3; shortcutKey: c" 
+          position="0.12 0 0.25" width="0.18" height="0.03" depth="0.10">
+          <a-text value="C" align="center" position="0 0.016 0" rotation="-90 0 0" scale="0.18 0.18 0.18" color="#f8fafc"></a-text>
+        </a-box>
+
+        <a-box 
+          class="drum-pad interactable" 
+          drum-pad="row: 3; col: 3; voice: kick; label: Kick 4; shortcutKey: v" 
+          position="0.36 0 0.25" width="0.18" height="0.03" depth="0.10">
+          <a-text value="V" align="center" position="0 0.016 0" rotation="-90 0 0" scale="0.18 0.18 0.18" color="#f8fafc"></a-text>
+        </a-box>
+
+      </a-entity>
+    </a-entity>
+
+    <!-- ====================================================================
+         BOTÓN 3D LATERAL: VOLVER A LA ESCENA DE ESTUDIO
+         ==================================================================== -->
+    <a-entity 
+      id="btn-back-studio" 
+      class="interactable" 
+      position="-0.85 1.05 -0.2" 
+      rotation="0 25 0">
+      
+      <a-box 
+        width="0.38" 
+        height="0.1" 
+        depth="0.04" 
+        material="color: #1e293b; emissive: #ff2a85; emissiveIntensity: 0.5; roughness: 0.4">
+        <a-text 
+          value="< VOLVER AL ESTUDIO" 
+          align="center" 
+          position="0 0 0.025" 
+          scale="0.2 0.2 0.2" 
+          color="#f8fafc">
+        </a-text>
+      </a-box>
+    </a-entity>
+
+    <!-- ====================================================================
+         CÁMARA: PLANO PICADO ERGONÓMICO FRENTE AL CONTROLADOR
+         ==================================================================== -->
+    <a-entity id="rig" position="0 1.85 0.72">
+      <a-camera 
+        id="camera" 
+        rotation="-50 0 0" 
+        look-controls="pointerLockEnabled: false" 
+        wasd-controls="enabled: false">
+        <!-- Raycaster de ratón interactivo -->
+        <a-entity 
+          cursor="rayOrigin: mouse"
+          raycaster="objects: .interactable; interval: 40">
+        </a-entity>
+      </a-camera>
+    </a-entity>
+  </a-scene>
+
+  <!-- Script para la navegación de retorno al estudio -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const btnBack = document.getElementById('btn-back-studio');
+      if (!btnBack) return;
+
+      btnBack.addEventListener('mouseenter', () => {
+        document.body.style.cursor = 'pointer';
+      });
+
+      btnBack.addEventListener('mouseleave', () => {
+        document.body.style.cursor = 'default';
+      });
+
+      btnBack.addEventListener('click', (e) => {
+        e.stopPropagation();
+        window.location.href = 'escena-estudio.html';
+      });
+    });
+  </script>
+</body>
+</html>

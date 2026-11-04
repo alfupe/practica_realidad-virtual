@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DrumLab VR — Secuenciador Rítmico Espacial 4/4 (WebXR)</title>
+  <meta name="description" content="DrumLab VR: Aplicación interactiva de experimentación rítmica y secuenciación espacial en compás 4/4 construida con HTML5, BEM, WebXR (A-Frame) y Web Audio API.">
+  <link rel="stylesheet" href="recursos/css/styles.css">
+</head>
+<body>
+  <!-- Accesibilidad: Enlace de salto al contenido principal -->
+  <a href="#main-content" class="c-skip-link">Saltar al contenido principal</a>
+
+  <!-- Cabecera de Navegación Común -->
+  <header class="c-header">
+    <div class="l-container c-header__inner">
+      <a href="index.html" class="c-brand" aria-label="DrumLab VR - Inicio">
+        <span class="c-brand__icon" aria-hidden="true">🥁</span>
+        <div class="c-brand__titles">
+          <span class="c-brand__name">DrumLab VR</span>
+          <span class="c-brand__tagline">WebXR Rhythm Lab // 4/4 Matrix</span>
+        </div>
+      </a>
+
+      <nav class="c-nav" aria-label="Navegación principal">
+        <ul class="c-nav__list">
+          <li class="c-nav__item">
+            <a href="index.html" class="c-nav__link c-nav__link--active" aria-current="page">Estudio &amp; Visor</a>
+          </li>
+          <li class="c-nav__item">
+            <a href="recursos/guia-ritmica.html" class="c-nav__link">Guía Rítmica</a>
+          </li>
+          <li class="c-nav__item">
+            <a href="recursos/licencias.html" class="c-nav__link">Licencias &amp; Atribución</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main id="main-content" class="l-container c-main">
+    <!-- Hero / Presentación Divulgativa -->
+    <section class="c-hero" aria-labelledby="hero-title">
+      <div class="c-hero__badge-container">
+        <span class="c-badge c-badge--uoc">UOC · Realidad Virtual · Práctica</span>
+        <span class="c-badge c-badge--accent">WebXR + A-Frame 1.6.0</span>
+        <span class="c-badge">Web Audio API &lt;15ms</span>
+      </div>
+
+      <h1 id="hero-title" class="c-hero__title">
+        Experimentación Rítmica y Secuenciación Espacial 4/4
+      </h1>
+
+      <p class="c-hero__lead">
+        Explora la relación entre la espacialidad inmersiva y la percepción musical con 
+        <strong>DrumLab VR</strong>. Diseñado según la arquitectura de dos niveles: 
+        un <em>nivel explorativo</em> en un estudio de producción sintético y un <em>nivel manipulativo y contributivo</em> 
+        basado en una matriz 4&times;4 de pads de percusión con síntesis procedural en tiempo real.
+      </p>
+    </section>
+
+    <!-- Visor WebXR / Escena Central -->
+    <section class="c-viewer" aria-labelledby="viewer-title">
+      <div class="c-viewer__frame-container">
+        <div class="c-viewer__bar">
+          <div class="c-viewer__status">
+            <span class="c-viewer__dot" aria-hidden="true"></span>
+            <span id="viewer-title">Visor WebXR: Escena 1 (Estudio de Producción)</span>
+          </div>
+
+          <div class="c-viewer__actions">
+            <button type="button" class="c-viewer__btn" id="btn-fullscreen" title="Pantalla completa">
+              ⛶ Expandir Visor
+            </button>
+            <button type="button" class="c-viewer__btn" id="btn-reload" title="Reiniciar escena">
+              ↻ Recargar
+            </button>
+          </div>
+        </div>
+
+        <!-- Incrustación central requerida de la escena A-Frame -->
+        <iframe 
+          id="drumlab-frame"
+          src="recursos/escena-estudio.html" 
+          title="Visor DrumLab VR" 
+          class="c-viewer__iframe"
+          allow="camera; microphone; xr-spatial-tracking; fullscreen"
+          loading="eager">
+        </iframe>
+      </div>
+    </section>
+
+    <!-- Leyenda Rápida de Controles -->
+    <section class="c-legend" aria-labelledby="controls-title">
+      <div class="c-legend__header">
+        <h2 id="controls-title" class="c-legend__title">
+          <span aria-hidden="true">⌨️</span> Interfaz de Control Doble (Ratón &amp; Teclado Isomórfico)
+        </h2>
+        <span class="c-badge c-badge--accent">Baja latencia perceptiva</span>
+      </div>
+
+      <div class="c-legend__grid">
+        <!-- Tarjeta Ratón -->
+        <article class="c-card">
+          <h3 class="c-card__title">
+            <span>🖱️ Ratón / Raycaster 3D</span>
+          </h3>
+          <p class="c-card__desc">
+            Haz clic directamente sobre los pads y botones en la escena 3D. 
+            En el estudio, pulsa en el controlador para viajar a la sala operativa. 
+            En el secuenciador, haz clic sobre los pads para conmutar su estado entre <strong>Inactivo</strong> y <strong>Activo (Espera)</strong>.
+          </p>
+        </article>
+
+        <!-- Tarjeta Teclado Fila Crash -->
+        <article class="c-card">
+          <h3 class="c-card__title">
+            <span>💥 Fila 0: Plato Crash (Tiempos 1-4)</span>
+          </h3>
+          <div class="c-card__keys" aria-label="Teclas Fila Crash">
+            <kbd class="c-kbd c-kbd--crash">1</kbd>
+            <kbd class="c-kbd c-kbd--crash">2</kbd>
+            <kbd class="c-kbd c-kbd--crash">3</kbd>
+            <kbd class="c-kbd c-kbd--crash">4</kbd>
+          </div>
+          <p class="c-card__desc">
+            Activa el brillo metálico y acentos dinámicos de caída larga en los 4 tiempos del compás.
+          </p>
+        </article>
+
+        <!-- Tarjeta Teclado Fila Hi-Hat -->
+        <article class="c-card">
+          <h3 class="c-card__title">
+            <span>⚡ Fila 1: Charles / Hi-Hat</span>
+          </h3>
+          <div class="c-card__keys" aria-label="Teclas Fila Hi-Hat">
+            <kbd class="c-kbd c-kbd--hihat">Q</kbd>
+            <kbd class="c-kbd c-kbd--hihat">W</kbd>
+            <kbd class="c-kbd c-kbd--hihat">E</kbd>
+            <kbd class="c-kbd c-kbd--hihat">R</kbd>
+          </div>
+          <p class="c-card__desc">
+            Percusión de alta frecuencia (>7 kHz) para mantener el groove continuo y la subdivisión temporal.
+          </p>
+        </article>
+
+        <!-- Tarjeta Teclado Fila Snare -->
+        <article class="c-card">
+          <h3 class="c-card__title">
+            <span>🎯 Fila 2: Caja / Snare</span>
+          </h3>
+          <div class="c-card__keys" aria-label="Teclas Fila Snare">
+            <kbd class="c-kbd c-kbd--snare">A</kbd>
+            <kbd class="c-kbd c-kbd--snare">S</kbd>
+            <kbd class="c-kbd c-kbd--snare">D</kbd>
+            <kbd class="c-kbd c-kbd--snare">F</kbd>
+          </div>
+          <p class="c-card__desc">
+            Respuesta contundente en frecuencias medias (~180 Hz + ruido blanco filtrado), ideal para los tiempos 2 y 4.
+          </p>
+        </article>
+
+        <!-- Tarjeta Teclado Fila Kick -->
+        <article class="c-card">
+          <h3 class="c-card__title">
+            <span>🥁 Fila 3: Bombo / Kick</span>
+          </h3>
+          <div class="c-card__keys" aria-label="Teclas Fila Kick">
+            <kbd class="c-kbd c-kbd--kick">Z</kbd>
+            <kbd class="c-kbd c-kbd--kick">X</kbd>
+            <kbd class="c-kbd c-kbd--kick">C</kbd>
+            <kbd class="c-kbd c-kbd--kick">V</kbd>
+          </div>
+          <p class="c-card__desc">
+            Fundamento rítmico en subgraves (~40-150 Hz con caída exponencial), base armónica del compás 4/4.
+          </p>
+        </article>
+
+        <!-- Tarjeta Transporte Global -->
+        <article class="c-card">
+          <h3 class="c-card__title">
+            <span>🎛️ Transporte y Configuración</span>
+          </h3>
+          <div class="c-card__keys" aria-label="Teclas de transporte">
+            <kbd class="c-kbd">Espacio</kbd>
+            <span class="c-badge">Play / Stop</span>
+            <kbd class="c-kbd">B</kbd>
+            <span class="c-badge">BPM (90/120/140)</span>
+            <kbd class="c-kbd">Borrar (C)</kbd>
+            <span class="c-badge">Clear Patrón</span>
+          </div>
+          <p class="c-card__desc">
+            Control del reloj secuenciador sincronizado con micro-compresión geométrica visual (100 ms) en cada paso disparado.
+          </p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <!-- Pie de Página -->
+  <footer class="c-footer">
+    <div class="l-container c-footer__content">
+      <p class="c-footer__copy">
+        <strong>DrumLab VR</strong> &copy; 2026 Alejandro Fuentes Pérez · Proyecto Académico Realidad Virtual (UOC).
+      </p>
+      <ul class="c-footer__links">
+        <li><a href="recursos/guia-ritmica.html">Guía Rítmica Didáctica</a></li>
+        <li><a href="recursos/licencias.html">Licencias y Atribución</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <!-- Script ligero para control de contenedor visor (Pantalla completa / Recarga) -->
+  <script>
+    (function initViewerControls() {
+      const iframe = document.getElementById('drumlab-frame');
+      const btnFullscreen = document.getElementById('btn-fullscreen');
+      const btnReload = document.getElementById('btn-reload');
+
+      if (btnFullscreen && iframe) {
+        btnFullscreen.addEventListener('click', () => {
+          if (iframe.requestFullscreen) {
+            iframe.requestFullscreen();
+          } else if (iframe.webkitRequestFullscreen) {
+            iframe.webkitRequestFullscreen();
+          }
+        });
+      }
+
+      if (btnReload && iframe) {
+        btnReload.addEventListener('click', () => {
+          iframe.src = iframe.src;
+        });
+      }
+
+      // Reenvío transparente de teclado isomórfico al iframe WebXR
+      window.addEventListener('keydown', (e) => {
+        if (!iframe || !iframe.contentWindow) return;
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        try {
+          iframe.contentWindow.dispatchEvent(new KeyboardEvent('keydown', {
+            key: e.key,
+            code: e.code,
+            shiftKey: e.shiftKey,
+            bubbles: true,
+            cancelable: true
+          }));
+        } catch (err) {}
+      });
+    })();
+  </script>
+</body>
+</html>

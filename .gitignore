@@ -1,0 +1,27 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Zip / Delivery files
+*.zip
+*.tar.gz
+
+# Local dev HTTPS certs and scripts
+server.crt
+server.key
+https_server.py
+
+# Logs
+*.log

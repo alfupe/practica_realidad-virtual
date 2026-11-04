@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DrumLab VR — Escena 1: Estudio de Producción (Nivel Explorativo)</title>
+  <!-- Framework WebXR A-Frame 1.6.0 Oficial -->
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #050811;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    /* Overlay informativo sutil para el visor */
+    .hud-overlay {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      z-index: 100;
+      color: #f0f6fc;
+      background: rgba(10, 13, 20, 0.75);
+      backdrop-filter: blur(8px);
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      font-size: 13px;
+      pointer-events: none;
+      line-height: 1.4;
+    }
+    .hud-overlay strong {
+      color: #00e5ff;
+    }
+  </style>
+</head>
+<body>
+  <!-- HUD 2D superpuesto -->
+  <div class="hud-overlay">
+    <strong>Nivel 1: Estudio Explorativo</strong><br>
+    Haz clic en el <em>Oversized Drum Pad</em> o en el cartel holográfico para acceder al secuenciador 4&times;4.
+  </div>
+
+  <a-scene 
+    embedded
+    loading-screen="dotsColor: #00e5ff; backgroundColor: #0a0d14"
+    renderer="antialias: true; colorManagement: true; physicallyCorrectLights: true"
+    vr-mode-ui="enabled: true">
+    
+    <!-- Gestor de Assets -->
+    <a-assets timeout="4000">
+      <!-- Fallback de modelo GLB si estuviera presente -->
+      <a-asset-item id="drumpad-model" src="assets/models/drumpad.glb"></a-asset-item>
+    </a-assets>
+
+    <!-- Iluminación de Estudio Sintético Low-Poly -->
+    <a-light type="ambient" color="#182033" intensity="0.9"></a-light>
+    <a-light type="directional" color="#dbeafe" intensity="1.2" position="2 4 3" target="#desk"></a-light>
+    <!-- Foco de acento cian sobre la mesa de mezclas -->
+    <a-light type="point" color="#00e5ff" intensity="2.2" distance="6" position="0 2.2 0"></a-light>
+    <!-- Foco de acento magenta en la pared trasera -->
+    <a-light type="point" color="#ff2a85" intensity="1.5" distance="7" position="0 2.5 -4"></a-light>
+
+    <!-- Cielo / Atmósfera del Estudio -->
+    <a-sky color="#070a12"></a-sky>
+
+    <!-- Suelo con rejilla sintética -->
+    <a-plane 
+      position="0 0 0" 
+      rotation="-90 0 0" 
+      width="20" 
+      height="20" 
+      color="#0f1420" 
+      roughness="0.8" 
+      metalness="0.3">
+    </a-plane>
+
+    <!-- Paredes del Estudio y Paneles Acústicos Low-Poly -->
+    <!-- Pared Trasera -->
+    <a-plane position="0 4 -5" width="16" height="8" color="#0a0d17" roughness="0.9"></a-plane>
+    <!-- Pared Izquierda -->
+    <a-plane position="-8 4 0" rotation="0 90 0" width="16" height="8" color="#0a0d17" roughness="0.9"></a-plane>
+    <!-- Pared Derecha -->
+    <a-plane position="8 4 0" rotation="0 -90 0" width="16" height="8" color="#0a0d17" roughness="0.9"></a-plane>
+
+    <!-- Paneles Acústicos Difusores Verticales (Pared Trasera) -->
+    <a-entity id="acoustic-panels" position="0 2.6 -4.85">
+      <a-box position="-3 0 0" width="0.8" height="3" depth="0.15" color="#1a2234"></a-box>
+      <a-box position="-1.5 0 0" width="0.8" height="3" depth="0.15" color="#141a29"></a-box>
+      <a-box position="0 0 0" width="1.2" height="3" depth="0.15" color="#1e293b"></a-box>
+      <a-box position="1.5 0 0" width="0.8" height="3" depth="0.15" color="#141a29"></a-box>
+      <a-box position="3 0 0" width="0.8" height="3" depth="0.15" color="#1a2234"></a-box>
+      
+      <!-- Tira LED decorativa en la pared -->
+      <a-box position="0 1.8 0.05" width="7.4" height="0.06" depth="0.05" 
+             material="color: #00e5ff; emissive: #00e5ff; emissiveIntensity: 0.8"></a-box>
+    </a-entity>
+
+    <!-- Mesa Central de Producción (Workstation) -->
+    <a-entity id="desk" position="0 0 0">
+      <!-- Tablero Principal -->
+      <a-box position="0 0.88 -0.2" width="2.4" height="0.08" depth="1.2" color="#182030" roughness="0.4" metalness="0.5"></a-box>
+      <!-- Patas Metálicas -->
+      <a-cylinder position="-1.05 0.44 0.25" radius="0.035" height="0.88" color="#0c0f18" metalness="0.8"></a-cylinder>
+      <a-cylinder position="1.05 0.44 0.25" radius="0.035" height="0.88" color="#0c0f18" metalness="0.8"></a-cylinder>
+      <a-cylinder position="-1.05 0.44 -0.65" radius="0.035" height="0.88" color="#0c0f18" metalness="0.8"></a-cylinder>
+      <a-cylinder position="1.05 0.44 -0.65" radius="0.035" height="0.88" color="#0c0f18" metalness="0.8"></a-cylinder>
+
+      <!-- Monitores de Estudio (Altavoces derecho e izquierdo) -->
+      <!-- Altavoz Izquierdo -->
+      <a-entity position="-0.95 1.15 -0.45" rotation="0 25 0">
+        <a-box width="0.25" height="0.42" depth="0.28" color="#111622" roughness="0.6"></a-box>
+        <!-- Woofer -->
+        <a-cylinder position="0 -0.06 0.14" rotation="90 0 0" radius="0.08" height="0.02" color="#ff2a85"></a-cylinder>
+        <!-- Tweeter -->
+        <a-cylinder position="0 0.11 0.14" rotation="90 0 0" radius="0.035" height="0.02" color="#00e5ff"></a-cylinder>
+      </a-entity>
+
+      <!-- Altavoz Derecho -->
+      <a-entity position="0.95 1.15 -0.45" rotation="0 -25 0">
+        <a-box width="0.25" height="0.42" depth="0.28" color="#111622" roughness="0.6"></a-box>
+        <a-cylinder position="0 -0.06 0.14" rotation="90 0 0" radius="0.08" height="0.02" color="#ff2a85"></a-cylinder>
+        <a-cylinder position="0 0.11 0.14" rotation="90 0 0" radius="0.035" height="0.02" color="#00e5ff"></a-cylinder>
+      </a-entity>
+
+      <!-- Pantalla / Monitor de Estudio Frontal -->
+      <a-entity position="0 1.25 -0.7">
+        <a-box width="1.1" height="0.6" depth="0.04" color="#080c14"></a-box>
+        <!-- Pantalla con forma de DAW / Espectrograma sintético -->
+        <a-plane position="0 0 0.025" width="1.04" height="0.54" 
+                 material="color: #0b111e; emissive: #003355; emissiveIntensity: 0.5"></a-plane>
+        <a-text value="DRUMLAB VR // AUDIO ENGINE STANDBY" align="center" position="0 0.12 0.03" scale="0.25 0.25 0.25" color="#00e5ff"></a-text>
+        <a-text value="WebXR Spatial Rhythm Workspace 4/4" align="center" position="0 -0.05 0.03" scale="0.18 0.18 0.18" color="#94a3b8"></a-text>
+        <!-- Soporte -->
+        <a-box position="0 -0.32 0" width="0.08" height="0.2" depth="0.06" color="#1e293b"></a-box>
+        <a-box position="0 -0.4 0.05" width="0.3" height="0.02" depth="0.2" color="#1e293b"></a-box>
+      </a-entity>
+
+      <!-- CONTROLADOR 3D: Oversized Drum Pad (Mesa Central) -->
+      <!-- Intenta cargar el modelo GLB; si no está aún en disco o falla la carga, muestra el controlador procedural elegante -->
+      <a-entity 
+        id="studio-drumpad"
+        class="interactable"
+        position="0 0.94 -0.05"
+        rotation="-12 0 0"
+        studio-navigator>
+        
+        <!-- Modelo 3D (GLTF) -->
+        <a-gltf-model 
+          src="#drumpad-model" 
+          position="0 0 0"
+          scale="1 1 1"
+          visible="false"
+          id="drumpad-gltf-node">
+        </a-gltf-model>
+
+        <!-- Chasis Procedural Robusto de Fallback (Oversized Drum Pad) -->
+        <a-entity id="drumpad-fallback">
+          <!-- Chasis base biselado -->
+          <a-box width="0.76" height="0.05" depth="0.58" color="#141824" metalness="0.6" roughness="0.4"></a-box>
+          <!-- Borde lateral emisivo -->
+          <a-box position="0 -0.01 0.28" width="0.74" height="0.015" depth="0.02" 
+                 material="color: #00e5ff; emissive: #00e5ff; emissiveIntensity: 0.6"></a-box>
+
+          <!-- Matriz 4x4 de pads decorativos brillantes en reposo -->
+          <!-- Fila 0 (Crash - Ámbar) -->
+          <a-box position="-0.21 0.03 -0.15" width="0.11" height="0.025" depth="0.08" material="color: #ffb703; emissive: #ffb703; emissiveIntensity: 0.4"></a-box>
+          <a-box position="-0.07 0.03 -0.15" width="0.11" height="0.025" depth="0.08" material="color: #ffb703; emissive: #ffb703; emissiveIntensity: 0.4"></a-box>
+          <a-box position="0.07 0.03 -0.15" width="0.11" height="0.025" depth="0.08" material="color: #ffb703; emissive: #ffb703; emissiveIntensity: 0.4"></a-box>
+          <a-box position="0.21 0.03 -0.15" width="0.11" height="0.025" depth="0.08" material="color: #ffb703; emissive: #ffb703; emissiveIntensity: 0.4"></a-box>
+
+          <!-- Fila 1 (Hi-Hat - Esmeralda) -->
+          <a-box position="-0.21 0.03 -0.05" width="0.11" height="0.025" depth="0.08" material="color: #00f59b; emissive: #00f59b; emissiveIntensity: 0.4"></a-box>
+          <a-box position="-0.07 0.03 -0.05" width="0.11" height="0.025" depth="0.08" material="color: #00f59b; emissive: #00f59b; emissiveIntensity: 0.4"></a-box>
+          <a-box position="0.07 0.03 -0.05" width="0.11" height="0.025" depth="0.08" material="color: #00f59b; emissive: #00f59b; emissiveIntensity: 0.4"></a-box>
+          <a-box position="0.21 0.03 -0.05" width="0.11" height="0.025" depth="0.08" material="color: #00f59b; emissive: #00f59b; emissiveIntensity: 0.4"></a-box>
+
+          <!-- Fila 2 (Snare - Cian) -->
+          <a-box position="-0.21 0.03 0.05" width="0.11" height="0.025" depth="0.08" material="color: #00e5ff; emissive: #00e5ff; emissiveIntensity: 0.4"></a-box>
+          <a-box position="-0.07 0.03 0.05" width="0.11" height="0.025" depth="0.08" material="color: #00e5ff; emissive: #00e5ff; emissiveIntensity: 0.4"></a-box>
+          <a-box position="0.07 0.03 0.05" width="0.11" height="0.025" depth="0.08" material="color: #00e5ff; emissive: #00e5ff; emissiveIntensity: 0.4"></a-box>
+          <a-box position="0.21 0.03 0.05" width="0.11" height="0.025" depth="0.08" material="color: #00e5ff; emissive: #00e5ff; emissiveIntensity: 0.4"></a-box>
+
+          <!-- Fila 3 (Kick - Magenta) -->
+          <a-box position="-0.21 0.03 0.15" width="0.11" height="0.025" depth="0.08" material="color: #ff2a85; emissive: #ff2a85; emissiveIntensity: 0.4"></a-box>
+          <a-box position="-0.07 0.03 0.15" width="0.11" height="0.025" depth="0.08" material="color: #ff2a85; emissive: #ff2a85; emissiveIntensity: 0.4"></a-box>
+          <a-box position="0.07 0.03 0.15" width="0.11" height="0.025" depth="0.08" material="color: #ff2a85; emissive: #ff2a85; emissiveIntensity: 0.4"></a-box>
+          <a-box position="0.21 0.03 0.15" width="0.11" height="0.025" depth="0.08" material="color: #ff2a85; emissive: #ff2a85; emissiveIntensity: 0.4"></a-box>
+
+          <!-- Zona superior de transporte / pantalla LCD del Pad -->
+          <a-box position="0 0.03 -0.23" width="0.6" height="0.02" depth="0.05" color="#0a0f1d"></a-box>
+          <a-text value="DRUMLAB OVERSIZED PAD [CLICK TO ENTER]" align="center" position="0 0.045 -0.23" rotation="-90 0 0" scale="0.18 0.18 0.18" color="#00e5ff"></a-text>
+        </a-entity>
+      </a-entity>
+
+      <!-- MARCADOR INTERACTIVO 3D FLOTANTE ("Entrar al Secuenciador") -->
+      <a-entity 
+        id="interactive-marker"
+        class="interactable"
+        position="0 1.5 -0.1"
+        studio-navigator
+        animation="property: position; to: 0 1.56 -0.1; dir: alternate; dur: 1400; loop: true; easing: easeInOutSine">
+        
+        <!-- Cartel Holográfico -->
+        <a-plane 
+          width="1.3" 
+          height="0.4" 
+          material="color: #0b101c; opacity: 0.88; transparent: true; emissive: #002b40; emissiveIntensity: 0.4">
+        </a-plane>
+        
+        <!-- Marco cian neón -->
+        <a-box position="0 0.2 0.01" width="1.32" height="0.015" depth="0.01" material="color: #00e5ff; emissive: #00e5ff; emissiveIntensity: 0.8"></a-box>
+        <a-box position="0 -0.2 0.01" width="1.32" height="0.015" depth="0.01" material="color: #00e5ff; emissive: #00e5ff; emissiveIntensity: 0.8"></a-box>
+        
+        <!-- Texto del Marcador -->
+        <a-text 
+          value="ENTRAR AL SECUENCIADOR" 
+          align="center" 
+          position="0 0.06 0.02" 
+          scale="0.32 0.32 0.32" 
+          color="#00e5ff" 
+          font="roboto">
+        </a-text>
+        
+        <a-text 
+          value="[ Clic para abrir el Nivel Operativo 4x4 ]" 
+          align="center" 
+          position="0 -0.08 0.02" 
+          scale="0.2 0.2 0.2" 
+          color="#94a3b8" 
+          font="roboto">
+        </a-text>
+
+        <!-- Flecha holográfica que señala al controlador -->
+        <a-triangle 
+          vertex-a="0 -0.32 0.02" 
+          vertex-b="-0.1 -0.22 0.02" 
+          vertex-c="0.1 -0.22 0.02" 
+          material="color: #ff2a85; emissive: #ff2a85; emissiveIntensity: 0.9">
+        </a-triangle>
+      </a-entity>
+    </a-entity>
+
+    <!-- Sujeto Virtual: Cámara en primera persona con look-controls y raycaster de ratón -->
+    <a-entity id="rig" position="0 1.5 1.3">
+      <a-camera 
+        id="camera" 
+        look-controls="pointerLockEnabled: false" 
+        wasd-controls="acceleration: 12">
+        <!-- Cursor de ratón configurado con el raycaster para objetos .interactable -->
+        <a-entity 
+          cursor="rayOrigin: mouse"
+          raycaster="objects: .interactable; interval: 50">
+        </a-entity>
+      </a-camera>
+    </a-entity>
+  </a-scene>
+
+  <!-- Script Componente de Navegación del Estudio -->
+  <script>
+    /**
+     * Componente studio-navigator:
+     * Escucha el clic sobre los elementos interactivos del estudio (marcador o controlador)
+     * y redirige la ventana/iframe a la escena del secuenciador.
+     */
+    AFRAME.registerComponent('studio-navigator', {
+      init: function () {
+        const el = this.el;
+
+        // Feedback de cursor hover
+        el.addEventListener('mouseenter', () => {
+          document.body.style.cursor = 'pointer';
+        });
+
+        el.addEventListener('mouseleave', () => {
+          document.body.style.cursor = 'default';
+        });
+
+        // Evento de clic para navegar a la Escena 2
+        el.addEventListener('click', () => {
+          // Breve sonido sintético de transición (Web Audio API)
+          try {
+            const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtxClass) {
+              const ctx = new AudioCtxClass();
+              const osc = ctx.createOscillator();
+              const gain = ctx.createGain();
+              osc.type = 'triangle';
+              osc.frequency.setValueAtTime(440, ctx.currentTime);
+              osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12);
+              gain.gain.setValueAtTime(0.2, ctx.currentTime);
+              gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+              osc.connect(gain);
+              gain.connect(ctx.destination);
+              osc.start();
+              osc.stop(ctx.currentTime + 0.15);
+            }
+          } catch (e) {
+            // Guard clause / degradación elegante si no hay audio
+          }
+
+          // Transición suave inmediata a la escena del secuenciador
+          window.location.href = 'escena-secuenciador.html';
+        });
+      }
+    });
+
+    // Verificación de modelo GLB: si existe y carga, ocultamos el fallback
+    document.addEventListener('DOMContentLoaded', () => {
+      const gltfNode = document.getElementById('drumpad-gltf-node');
+      const fallbackNode = document.getElementById('drumpad-fallback');
+
+      if (!gltfNode || !fallbackNode) return;
+
+      gltfNode.addEventListener('model-loaded', () => {
+        gltfNode.setAttribute('visible', 'true');
+        fallbackNode.setAttribute('visible', 'false');
+      });
+
+      gltfNode.addEventListener('model-error', () => {
+        // Mantiene visible el modelo procedural fallback
+        gltfNode.setAttribute('visible', 'false');
+        fallbackNode.setAttribute('visible', 'true');
+      });
+    });
+  </script>
+</body>
+</html>
