@@ -49,8 +49,8 @@
     
     <!-- Gestor de Assets -->
     <a-assets timeout="4000">
-      <!-- Fallback de modelo GLB si estuviera presente -->
-      <a-asset-item id="drumpad-model" src="assets/models/drumpad.glb"></a-asset-item>
+      <!-- Modelo 3D oficial del controlador Oversized Drum Pad -->
+      <a-asset-item id="drumpad-model" src="assets/models/oversized_drum_pad.glb"></a-asset-item>
     </a-assets>
 
     <!-- Iluminación de Estudio Sintético Low-Poly -->
@@ -148,8 +148,8 @@
         <!-- Modelo 3D (GLTF) -->
         <a-gltf-model 
           src="#drumpad-model" 
-          position="0 0 0"
-          scale="1 1 1"
+          position="0 0.02 0"
+          scale="0.38 0.38 0.38"
           visible="false"
           id="drumpad-gltf-node">
         </a-gltf-model>
