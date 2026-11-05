@@ -1,0 +1,22 @@
+Práctica: DrumLab VR — Secuenciador Rítmico Espacial 4/4 en WebXR (A-Frame)
+Estudiante: Alejandro Fuentes Pérez
+Asignatura: Realidad virtual (UOC)
+
+Enlace del proyecto (GitHub Pages):
+https://alfupe.github.io/practica_realidad-virtual/
+
+Repositorio en GitHub:
+https://github.com/alfupe/practica_realidad-virtual
+
+Descripción:
+Aplicación interactiva de experimentación rítmica y secuenciación espacial en compás de 4/4 
+construida con HTML5, CSS3 (metodología BEM), JavaScript modular, A-Frame (WebXR) y Web Audio API (<15 ms).
+Estructura de dos niveles:
+1. Nivel Explorativo: Estudio de producción sintético low-poly con controlador interactivo.
+2. Nivel Manipulativo y Contributivo: Secuenciador matricial 4x4 con micro-compresión geométrica Z (100 ms),
+   autómata finito de 3 estados (INACTIVO, ACTIVO_ESPERA, DISPARANDO) y doble interfaz física (ratón + teclado isomórfico).
+
+Recursos y licencias de terceros:
+1. Modelo 3D: "Oversized Drum Pad" (https://skfb.ly/6YTGQ) by lukus1 is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+2. Muestras de audio (kick, snare, hihat, crash): JavaScript Drum Kit by Arun Michael Dsouza (https://github.com/ArunMichaelDsouza/javascript-30-course), licencia MIT.
+3. Framework 3D: A-Frame v1.6.0 (https://github.com/aframevr/aframe), licencia MIT.
