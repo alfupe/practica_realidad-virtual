@@ -111,6 +111,7 @@
       <!-- MODELO 3D GLTF REAL (lukus1, CC BY 4.0) -->
       <a-gltf-model 
         id="gltf-controller"
+        class="interactable"
         src="#drumpad-model" 
         position="0 0 0" 
         rotation="0 -90 0" 
@@ -120,21 +121,21 @@
       <!-- ==================================================================
            BOTONES DE TRANSPORTE 3D (PLAY/STOP, BPM, CLEAR)
            ================================================================== -->
-      <a-entity id="transport-controls" position="0 0.055 -0.44">
+      <a-entity id="transport-controls" position="-0.08 0.16 -0.48">
         <!-- Botón Play/Stop -->
         <a-box 
           id="btn-play-stop" 
           class="interactable" 
-          position="-0.26 0 0" 
-          width="0.18" 
-          height="0.03" 
-          depth="0.075" 
+          position="-0.20 0 0" 
+          width="0.16" 
+          height="0.028" 
+          depth="0.065" 
           material="color: #059669; roughness: 0.3">
           <a-text 
             id="text-play-val" 
             value="PLAY" 
             align="center" 
-            position="0 0.018 0" 
+            position="0 0.016 0" 
             rotation="-90 0 0" 
             scale="0.22 0.22 0.22" 
             color="#ffffff">
@@ -145,16 +146,16 @@
         <a-box 
           id="btn-bpm" 
           class="interactable" 
-          position="0 0 0" 
-          width="0.22" 
-          height="0.03" 
-          depth="0.075" 
+          position="-0.02 0 0" 
+          width="0.16" 
+          height="0.028" 
+          depth="0.065" 
           material="color: #0284c7; roughness: 0.4">
           <a-text 
             id="text-bpm-val" 
             value="120 BPM" 
             align="center" 
-            position="0 0.018 0" 
+            position="0 0.016 0" 
             rotation="-90 0 0" 
             scale="0.2 0.2 0.2" 
             color="#ffffff">
@@ -165,15 +166,15 @@
         <a-box 
           id="btn-clear" 
           class="interactable" 
-          position="0.26 0 0" 
-          width="0.18" 
-          height="0.03" 
-          depth="0.075" 
+          position="0.16 0 0" 
+          width="0.16" 
+          height="0.028" 
+          depth="0.065" 
           material="color: #b91c1c; roughness: 0.4">
           <a-text 
             value="CLEAR" 
             align="center" 
-            position="0 0.018 0" 
+            position="0 0.016 0" 
             rotation="-90 0 0" 
             scale="0.2 0.2 0.2" 
             color="#ffffff">
@@ -183,80 +184,36 @@
 
       <!-- ==================================================================
            LEDS DE TEMPO (INDICADOR DE CABEZAL DE REPRODUCCIÓN EN TIEMPO REAL)
+           Alineados directamente sobre cada columna de pads del modelo 3D
            ================================================================== -->
-      <a-entity id="tempo-header" position="-0.02 0.055 -0.35">
-        <a-entity position="-0.32 0 0">
-          <a-cylinder class="tempo-led" data-col="0" radius="0.018" height="0.012" material="color: #334155; emissive: #000000; emissiveIntensity: 0"></a-cylinder>
+      <a-entity id="tempo-header" position="0 0.13 -0.42">
+        <a-entity position="-0.402 0 0">
+          <a-cylinder id="led-tempo-0" class="tempo-led" data-col="0" radius="0.018" height="0.012" material="color: #334155; emissive: #000000; emissiveIntensity: 0"></a-cylinder>
           <a-text value="T1" align="center" position="0 0.01 -0.025" rotation="-90 0 0" scale="0.15 0.15 0.15" color="#94a3b8"></a-text>
         </a-entity>
-        <a-entity position="-0.11 0 0">
-          <a-cylinder class="tempo-led" data-col="1" radius="0.018" height="0.012" material="color: #334155; emissive: #000000; emissiveIntensity: 0"></a-cylinder>
+        <a-entity position="-0.182 0 0">
+          <a-cylinder id="led-tempo-1" class="tempo-led" data-col="1" radius="0.018" height="0.012" material="color: #334155; emissive: #000000; emissiveIntensity: 0"></a-cylinder>
           <a-text value="T2" align="center" position="0 0.01 -0.025" rotation="-90 0 0" scale="0.15 0.15 0.15" color="#94a3b8"></a-text>
         </a-entity>
-        <a-entity position="0.10 0 0">
-          <a-cylinder class="tempo-led" data-col="2" radius="0.018" height="0.012" material="color: #334155; emissive: #000000; emissiveIntensity: 0"></a-cylinder>
+        <a-entity position="0.023 0 0">
+          <a-cylinder id="led-tempo-2" class="tempo-led" data-col="2" radius="0.018" height="0.012" material="color: #334155; emissive: #000000; emissiveIntensity: 0"></a-cylinder>
           <a-text value="T3" align="center" position="0 0.01 -0.025" rotation="-90 0 0" scale="0.15 0.15 0.15" color="#94a3b8"></a-text>
         </a-entity>
-        <a-entity position="0.31 0 0">
-          <a-cylinder class="tempo-led" data-col="3" radius="0.018" height="0.012" material="color: #334155; emissive: #000000; emissiveIntensity: 0"></a-cylinder>
+        <a-entity position="0.228 0 0">
+          <a-cylinder id="led-tempo-3" class="tempo-led" data-col="3" radius="0.018" height="0.012" material="color: #334155; emissive: #000000; emissiveIntensity: 0"></a-cylinder>
           <a-text value="T4" align="center" position="0 0.01 -0.025" rotation="-90 0 0" scale="0.15 0.15 0.15" color="#94a3b8"></a-text>
         </a-entity>
       </a-entity>
 
       <!-- ==================================================================
            ETIQUETAS DE FILAS / VOCES TÍMBRICAS (LATERAL IZQUIERDO)
+           Alineadas con la coordenada exacta de profundidad Z de cada voz
            ================================================================== -->
-      <a-entity id="row-labels" position="-0.54 0.055 0">
-        <a-text value="CRASH [1-4]" position="0 0 -0.23" rotation="-90 0 0" scale="0.16 0.16 0.16" color="#d97706"></a-text>
-        <a-text value="HI-HAT [Q-R]" position="0 0 -0.05" rotation="-90 0 0" scale="0.16 0.16 0.16" color="#059669"></a-text>
-        <a-text value="SNARE [A-F]" position="0 0 0.13" rotation="-90 0 0" scale="0.16 0.16 0.16" color="#0284c7"></a-text>
-        <a-text value="KICK [Z-V]" position="0 0 0.31" rotation="-90 0 0" scale="0.16 0.16 0.16" color="#db2777"></a-text>
-      </a-entity>
-
-      <!-- ==================================================================
-           MATRIZ DE 16 PADS INTERACTIVOS (ALINEADOS SOBRE EL MODELO 3D GLB)
-           ================================================================== -->
-      <a-entity id="matrix-pads" position="-0.02 0.055 0">
-
-        <!-- FILA 0: PLATO CRASH (Ámbar) — Z = -0.23 -->
-        <a-box id="pad-0" class="interactable pad" drum-pad="row: 0; col: 0; voice: crash; defaultColor: #1e293b; activeColor: #d97706; flashColor: #ffffff"
-               position="-0.32 0 -0.23" width="0.16" height="0.016" depth="0.14" material="color: #1e293b; roughness: 0.5"></a-box>
-        <a-box id="pad-1" class="interactable pad" drum-pad="row: 0; col: 1; voice: crash; defaultColor: #1e293b; activeColor: #d97706; flashColor: #ffffff"
-               position="-0.11 0 -0.23" width="0.16" height="0.016" depth="0.14" material="color: #1e293b; roughness: 0.5"></a-box>
-        <a-box id="pad-2" class="interactable pad" drum-pad="row: 0; col: 2; voice: crash; defaultColor: #1e293b; activeColor: #d97706; flashColor: #ffffff"
-               position="0.10 0 -0.23" width="0.16" height="0.016" depth="0.14" material="color: #1e293b; roughness: 0.5"></a-box>
-        <a-box id="pad-3" class="interactable pad" drum-pad="row: 0; col: 3; voice: crash; defaultColor: #1e293b; activeColor: #d97706; flashColor: #ffffff"
-               position="0.31 0 -0.23" width="0.16" height="0.016" depth="0.14" material="color: #1e293b; roughness: 0.5"></a-box>
-
-        <!-- FILA 1: CHARLES / HI-HAT (Esmeralda) — Z = -0.05 -->
-        <a-box id="pad-4" class="interactable pad" drum-pad="row: 1; col: 0; voice: hihat; defaultColor: #1e293b; activeColor: #059669; flashColor: #ffffff"
-               position="-0.32 0 -0.05" width="0.16" height="0.016" depth="0.14" material="color: #1e293b; roughness: 0.5"></a-box>
-        <a-box id="pad-5" class="interactable pad" drum-pad="row: 1; col: 1; voice: hihat; defaultColor: #1e293b; activeColor: #059669; flashColor: #ffffff"
-               position="-0.11 0 -0.05" width="0.16" height="0.016" depth="0.14" material="color: #1e293b; roughness: 0.5"></a-box>
-        <a-box id="pad-6" class="interactable pad" drum-pad="row: 1; col: 2; voice: hihat; defaultColor: #1e293b; activeColor: #059669; flashColor: #ffffff"
-               position="0.10 0 -0.05" width="0.16" height="0.016" depth="0.14" material="color: #1e293b; roughness: 0.5"></a-box>
-        <a-box id="pad-7" class="interactable pad" drum-pad="row: 1; col: 3; voice: hihat; defaultColor: #1e293b; activeColor: #059669; flashColor: #ffffff"
-               position="0.31 0 -0.05" width="0.16" height="0.016" depth="0.14" material="color: #1e293b; roughness: 0.5"></a-box>
-
-        <!-- FILA 2: CAJA / SNARE (Azul cobalto) — Z = 0.13 -->
-        <a-box id="pad-8" class="interactable pad" drum-pad="row: 2; col: 0; voice: snare; defaultColor: #1e293b; activeColor: #0284c7; flashColor: #ffffff"
-               position="-0.32 0 0.13" width="0.16" height="0.016" depth="0.14" material="color: #1e293b; roughness: 0.5"></a-box>
-        <a-box id="pad-9" class="interactable pad" drum-pad="row: 2; col: 1; voice: snare; defaultColor: #1e293b; activeColor: #0284c7; flashColor: #ffffff"
-               position="-0.11 0 0.13" width="0.16" height="0.016" depth="0.14" material="color: #1e293b; roughness: 0.5"></a-box>
-        <a-box id="pad-10" class="interactable pad" drum-pad="row: 2; col: 2; voice: snare; defaultColor: #1e293b; activeColor: #0284c7; flashColor: #ffffff"
-               position="0.10 0 0.13" width="0.16" height="0.016" depth="0.14" material="color: #1e293b; roughness: 0.5"></a-box>
-        <a-box id="pad-11" class="interactable pad" drum-pad="row: 2; col: 3; voice: snare; defaultColor: #1e293b; activeColor: #0284c7; flashColor: #ffffff"
-               position="0.31 0 0.13" width="0.16" height="0.016" depth="0.14" material="color: #1e293b; roughness: 0.5"></a-box>
-
-        <!-- FILA 3: BOMBO / KICK (Magenta / Rosa) — Z = 0.31 -->
-        <a-box id="pad-12" class="interactable pad" drum-pad="row: 3; col: 0; voice: kick; defaultColor: #1e293b; activeColor: #db2777; flashColor: #ffffff"
-               position="-0.32 0 0.31" width="0.16" height="0.016" depth="0.14" material="color: #1e293b; roughness: 0.5"></a-box>
-        <a-box id="pad-13" class="interactable pad" drum-pad="row: 3; col: 1; voice: kick; defaultColor: #1e293b; activeColor: #db2777; flashColor: #ffffff"
-               position="-0.11 0 0.31" width="0.16" height="0.016" depth="0.14" material="color: #1e293b; roughness: 0.5"></a-box>
-        <a-box id="pad-14" class="interactable pad" drum-pad="row: 3; col: 2; voice: kick; defaultColor: #1e293b; activeColor: #db2777; flashColor: #ffffff"
-               position="0.10 0 0.31" width="0.16" height="0.016" depth="0.14" material="color: #1e293b; roughness: 0.5"></a-box>
-        <a-box id="pad-15" class="interactable pad" drum-pad="row: 3; col: 3; voice: kick; defaultColor: #1e293b; activeColor: #db2777; flashColor: #ffffff"
-               position="0.31 0 0.31" width="0.16" height="0.016" depth="0.14" material="color: #1e293b; roughness: 0.5"></a-box>
+      <a-entity id="row-labels" position="-0.56 0.05 0">
+        <a-text value="CRASH [1-4]" position="0 0 -0.38" rotation="-90 0 0" scale="0.16 0.16 0.16" color="#d97706"></a-text>
+        <a-text value="HI-HAT [Q-R]" position="0 0 -0.194" rotation="-90 0 0" scale="0.16 0.16 0.16" color="#059669"></a-text>
+        <a-text value="SNARE [A-F]" position="0 0 -0.009" rotation="-90 0 0" scale="0.16 0.16 0.16" color="#0284c7"></a-text>
+        <a-text value="KICK [Z-V]" position="0 0 0.177" rotation="-90 0 0" scale="0.16 0.16 0.16" color="#db2777"></a-text>
       </a-entity>
     </a-entity>
 

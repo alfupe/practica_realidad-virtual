@@ -4,9 +4,10 @@
  * Estudiante: Alejandro Fuentes Pérez
  * 
  * Responsabilidades:
+ * - Integración directa con el modelo 3D GLTF real (oversized_drum_pad.glb).
+ * - Descomposición de la geometría de pads del modelo en 16 pulsadores interactivos (4 voces x 4 pasos).
  * - Reloj métrico cuaternario (4 tiempos por compás) con tempo seleccionable (90 / 120 / 140 BPM).
- * - Sincronización con el motor Web Audio y avance del cabezal de reproducción.
- * - Doble Interfaz Física: Entrada isomórfica de teclado (1-4, Q-R, A-F, Z-V) + Espacio + Clic 3D.
+ * - Doble Interfaz Física: Entrada isomórfica de teclado (1-4, Q-R, A-F, Z-V) + Espacio + Clic/Raycast en el modelo 3D.
  * - Coordinación de los LEDs de compás y activación de pads en estado ACTIVO_ESPERA.
  */
 
@@ -22,8 +23,9 @@ AFRAME.registerComponent('step-sequencer', {
     this.timerId = null;
     this.bpmOptions = [90, 120, 140];
     this.currentBpmIndex = 1;                  // 120 BPM por defecto
-    this.padMatrix = new Map();                // Clave: "row_col", Valor: componente drum-pad
+    this.padMatrix = new Map();                // Clave: "row_col", Valor: PadMeshController
     this.keyMap = new Map();                   // Clave: tecla, Valor: "row_col"
+    this.modelPadsInitialized = false;
 
     // Bindings de contexto
     this.onTick = this.onTick.bind(this);
@@ -33,32 +35,36 @@ AFRAME.registerComponent('step-sequencer', {
     this.stopPlayback = this.stopPlayback.bind(this);
     this.clearPattern = this.clearPattern.bind(this);
     this.cycleBpm = this.cycleBpm.bind(this);
-    this.registerPads = this.registerPads.bind(this);
     this.bindTransportButtons = this.bindTransportButtons.bind(this);
+    this.initModelPads = this.initModelPads.bind(this);
 
     // Mapeo isomórfico del teclado físico
     this.buildKeyMapping();
 
-    // Inicialización de pads y botones
-    const setup = () => {
-      this.registerPads();
-      this.bindTransportButtons();
-    };
+    // Inicialización de botones de transporte y pads del modelo GLTF
+    this.bindTransportButtons();
 
-    if (this.el.sceneEl && this.el.sceneEl.hasLoaded) {
-      setup();
-    } else if (this.el.sceneEl) {
-      this.el.sceneEl.addEventListener('loaded', setup);
+    const modelEl = document.getElementById('gltf-controller');
+    if (modelEl) {
+      if (modelEl.getObject3D('mesh')) {
+        this.initModelPads(modelEl);
+      } else {
+        modelEl.addEventListener('model-loaded', () => {
+          this.initModelPads(modelEl);
+        });
+      }
     }
-    // Doble comprobación defensiva
-    setTimeout(setup, 200);
 
     // Escucha de eventos de teclado físico
     window.addEventListener('keydown', this.onKeyDown);
   },
 
   /**
-   * Mapeo isomórfico directo del teclado QWERTY a la matriz de 4x4
+   * Mapeo isomórfico directo del teclado QWERTY a la matriz de 4x4:
+   * Fila 0 (Crash): 1 - 2 - 3 - 4
+   * Fila 1 (Hi-Hat): Q - W - E - R
+   * Fila 2 (Snare): A - S - D - F
+   * Fila 3 (Kick): Z - X - C - V
    */
   buildKeyMapping: function () {
     // Fila 0 (Crash): 1, 2, 3, 4
@@ -87,16 +93,150 @@ AFRAME.registerComponent('step-sequencer', {
   },
 
   /**
-   * Indexa todos los pads presentes en el DOM 3D de la escena
+   * Descompone los 4 objetos de malla del modelo 3D GLTF en 16 pads interactivos.
+   * Utiliza la geometría nativa del modelo lukus1 (CC BY 4.0), asociando a cada pad
+   * un controlador PadMeshController con feedback visual y háptico-visual en tiempo real.
    */
-  registerPads: function () {
-    const padElements = document.querySelectorAll('[drum-pad]');
-    padElements.forEach((padEl) => {
-      const padComp = padEl.components['drum-pad'];
-      if (!padComp) return;
-      const key = `${padComp.data.row}_${padComp.data.col}`;
-      this.padMatrix.set(key, padComp);
+  initModelPads: function (modelEl) {
+    if (this.modelPadsInitialized) return;
+    const rootMesh = modelEl.getObject3D('mesh');
+    if (!rootMesh) return;
+
+    // Columna 0: Object_8 (izquierda)
+    // Columna 1: Object_11
+    // Columna 2: Object_14
+    // Columna 3: Object_17 (derecha)
+    const colMeshNames = ['Object_8', 'Object_11', 'Object_14', 'Object_17'];
+    const padCenters = [0.0, 2.4, 4.8, 7.2, 9.6];
+
+    // Configuración tímbrica por fila (0..3 de atrás hacia adelante)
+    const voiceConfigs = [
+      { voice: 'crash', color: '#f59e0b' },  // Fila 0: Crash (Ámbar)
+      { voice: 'hihat', color: '#10b981' },  // Fila 1: Hi-Hat (Esmeralda)
+      { voice: 'snare', color: '#38bdf8' },  // Fila 2: Snare (Azul Cobalto)
+      { voice: 'kick',  color: '#ec4899' }   // Fila 3: Kick (Magenta/Rosa)
+    ];
+
+    colMeshNames.forEach((name, cIdx) => {
+      const colMesh = rootMesh.getObjectByName(name);
+      if (!colMesh) return;
+
+      // Ocultamos la malla original combinada
+      colMesh.visible = false;
+
+      const geom = colMesh.geometry;
+      const posAttr = geom.attributes.position;
+      const normAttr = geom.attributes.normal;
+      const uvAttr = geom.attributes.uv;
+      const indexAttr = geom.index;
+
+      // Agrupamos triángulos por el centro X local
+      const padTris = [[], [], [], [], []];
+      for (let i = 0; i < indexAttr.count; i += 3) {
+        const a = indexAttr.getX(i);
+        const b = indexAttr.getX(i + 1);
+        const c = indexAttr.getX(i + 2);
+
+        const avgX = (posAttr.getX(a) + posAttr.getX(b) + posAttr.getX(c)) / 3.0;
+        let bestP = 0;
+        let minD = 999;
+        for (let p = 0; p < 5; p++) {
+          const d = Math.abs(padCenters[p] - avgX);
+          if (d < minD) {
+            minD = d;
+            bestP = p;
+          }
+        }
+        padTris[bestP].push(a, b, c);
+      }
+
+      // Creamos submallas para cada uno de los pads
+      for (let pIdx = 0; pIdx < 5; pIdx++) {
+        const tris = padTris[pIdx];
+        const subGeom = new THREE.BufferGeometry();
+        const oldToNew = new Map();
+        const newPos = [];
+        const newNorm = [];
+        const newUv = [];
+        const newIdx = [];
+
+        tris.forEach((oldIdx) => {
+          if (!oldToNew.has(oldIdx)) {
+            const newI = newPos.length / 3;
+            oldToNew.set(oldIdx, newI);
+            newPos.push(posAttr.getX(oldIdx), posAttr.getY(oldIdx), posAttr.getZ(oldIdx));
+            if (normAttr) newNorm.push(normAttr.getX(oldIdx), normAttr.getY(oldIdx), normAttr.getZ(oldIdx));
+            if (uvAttr) newUv.push(uvAttr.getX(oldIdx), uvAttr.getY(oldIdx));
+          }
+          newIdx.push(oldToNew.get(oldIdx));
+        });
+
+        subGeom.setAttribute('position', new THREE.Float32BufferAttribute(newPos, 3));
+        if (normAttr) subGeom.setAttribute('normal', new THREE.Float32BufferAttribute(newNorm, 3));
+        if (uvAttr) subGeom.setAttribute('uv', new THREE.Float32BufferAttribute(newUv, 2));
+        subGeom.setIndex(newIdx);
+
+        const isExtraPad = (pIdx === 4);
+        const mat = new THREE.MeshStandardMaterial({
+          color: isExtraPad ? '#1e293b' : '#334155',
+          emissive: '#000000',
+          emissiveIntensity: 0,
+          roughness: 0.55,
+          metalness: 0.15
+        });
+
+        const padMesh = new THREE.Mesh(subGeom, mat);
+        padMesh.name = `real_pad_${pIdx}_${cIdx}`;
+        colMesh.parent.add(padMesh);
+
+        if (!isExtraPad) {
+          const rIdx = pIdx; // Fila 0..3 (Crash, Hi-Hat, Snare, Kick)
+          const voiceCfg = voiceConfigs[rIdx];
+
+          const padController = new window.PadMeshController({
+            row: rIdx,
+            col: cIdx,
+            voice: voiceCfg.voice,
+            activeColor: voiceCfg.color,
+            defaultColor: '#334155',
+            flashColor: '#ffffff',
+            mesh: padMesh
+          });
+
+          padMesh.userData = {
+            isPad: true,
+            row: rIdx,
+            col: cIdx,
+            pad: padController
+          };
+
+          this.padMatrix.set(`${rIdx}_${cIdx}`, padController);
+        }
+      }
     });
+
+    // Delegación de eventos de clic y raycast sobre el modelo GLTF
+    modelEl.classList.add('interactable');
+    const onModelClick = (evt) => {
+      const hitMesh = evt.detail?.intersection?.object;
+      if (hitMesh && hitMesh.userData?.pad) {
+        hitMesh.userData.pad.onClick(evt);
+      }
+    };
+
+    modelEl.addEventListener('click', onModelClick);
+    modelEl.addEventListener('touchend', onModelClick);
+
+    // Feedback de cursor en ratón
+    modelEl.addEventListener('mouseenter', () => {
+      document.body.style.cursor = 'pointer';
+    });
+    modelEl.addEventListener('mouseleave', () => {
+      document.body.style.cursor = 'default';
+    });
+
+    this.modelPadsInitialized = true;
+    console.log('[DrumLab] 16 pads interactivos del modelo 3D inicializados con éxito.');
   },
 
   /**
@@ -175,8 +315,7 @@ AFRAME.registerComponent('step-sequencer', {
       const pad = this.padMatrix.get(coords);
       if (!pad) return;
 
-      const nextState = (pad.state === 'INACTIVO') ? 'ACTIVO_ESPERA' : 'INACTIVO';
-      pad.triggerDisparo(nextState);
+      pad.onClick();
     }
   },
 
@@ -225,11 +364,6 @@ AFRAME.registerComponent('step-sequencer', {
    * Pulso del reloj secuenciador: avanza la columna activa y dispara los pads activos
    */
   onTick: function () {
-    // Asegurar que los pads estén indexados
-    if (this.padMatrix.size === 0) {
-      this.registerPads();
-    }
-
     // Avanza cíclicamente a través de los 4 tiempos (0, 1, 2, 3)
     this.currentStep = (this.currentStep + 1) % 4;
 

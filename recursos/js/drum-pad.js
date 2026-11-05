@@ -280,7 +280,112 @@ window.addEventListener('keydown', unlockAudioGlobal);
 
 
 /* ==========================================================================
-   2. COMPONENTE A-FRAME: drum-pad (Autómata Finito de 3 Estados)
+   2. CONTROLADOR DE PADS SOBRE EL MODELO 3D GLTF REAL
+   ========================================================================== */
+
+/**
+ * Controlador de Pad físico integrado en la geometría del modelo GLTF:
+ * Autómata finito de 3 estados (INACTIVO, ACTIVO_ESPERA, DISPARANDO) con
+ * micro-compresión física 3D en el pad del modelo y feedback emisivo tímbrico.
+ */
+class PadMeshController {
+  constructor(options) {
+    this.row = options.row;
+    this.col = options.col;
+    this.voice = options.voice;
+    this.mesh = options.mesh;
+    this.activeColor = options.activeColor;
+    this.defaultColor = options.defaultColor || '#334155';
+    this.flashColor = options.flashColor || '#ffffff';
+    this.state = 'INACTIVO';
+    this.originalLocalY = this.mesh ? this.mesh.position.y : 0;
+    this.flashTimeout = null;
+
+    this.onClick = this.onClick.bind(this);
+    this.triggerDisparo = this.triggerDisparo.bind(this);
+    this.resetFromDisparo = this.resetFromDisparo.bind(this);
+    this.applyStateVisuals = this.applyStateVisuals.bind(this);
+
+    this.applyStateVisuals();
+  }
+
+  onClick(evt) {
+    if (evt && evt.stopPropagation) evt.stopPropagation();
+    if (window.DrumLabAudio) {
+      window.DrumLabAudio.unlock();
+    }
+    const nextState = (this.state === 'INACTIVO') ? 'ACTIVO_ESPERA' : 'INACTIVO';
+    this.triggerDisparo(nextState);
+  }
+
+  triggerDisparo(returnState = null) {
+    const finalState = returnState || ((this.state === 'INACTIVO') ? 'INACTIVO' : 'ACTIVO_ESPERA');
+    this.state = 'DISPARANDO';
+
+    if (window.DrumLabAudio) {
+      window.DrumLabAudio.play(this.voice);
+    }
+
+    if (this.mesh && this.mesh.material) {
+      this.mesh.material.color.set(this.flashColor);
+      this.mesh.material.emissive.set(this.flashColor);
+      this.mesh.material.emissiveIntensity = 2.0;
+      this.mesh.position.y = this.originalLocalY - 0.008;
+    }
+
+    if (this.flashTimeout) clearTimeout(this.flashTimeout);
+    this.flashTimeout = setTimeout(() => {
+      this.state = finalState;
+      this.resetFromDisparo();
+    }, 100);
+  }
+
+  resetFromDisparo() {
+    if (this.mesh) {
+      this.mesh.position.y = this.originalLocalY;
+    }
+    this.applyStateVisuals();
+  }
+
+  applyStateVisuals() {
+    if (!this.mesh || !this.mesh.material) return;
+    if (this.state === 'INACTIVO') {
+      this.mesh.material.color.set(this.defaultColor);
+      this.mesh.material.emissive.set('#000000');
+      this.mesh.material.emissiveIntensity = 0;
+      this.mesh.material.roughness = 0.55;
+      this.mesh.material.metalness = 0.15;
+    } else if (this.state === 'ACTIVO_ESPERA') {
+      this.mesh.material.color.set(this.activeColor);
+      this.mesh.material.emissive.set(this.activeColor);
+      this.mesh.material.emissiveIntensity = 0.85;
+      this.mesh.material.roughness = 0.3;
+      this.mesh.material.metalness = 0.1;
+    }
+  }
+
+  setState(newState) {
+    if (this.flashTimeout) {
+      clearTimeout(this.flashTimeout);
+      this.flashTimeout = null;
+    }
+    this.state = newState;
+    if (this.mesh) {
+      this.mesh.position.y = this.originalLocalY;
+    }
+    this.applyStateVisuals();
+  }
+
+  isStepActive() {
+    return this.state === 'ACTIVO_ESPERA';
+  }
+}
+
+window.PadMeshController = PadMeshController;
+
+
+/* ==========================================================================
+   3. COMPONENTE A-FRAME: drum-pad (Autómata Finito para Entidades DOM)
    ========================================================================== */
 
 /**
