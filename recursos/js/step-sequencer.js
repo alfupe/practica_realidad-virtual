@@ -5,7 +5,7 @@
  * 
  * Responsabilidades:
  * - Reloj métrico cuaternario (4 tiempos por compás) con tempo seleccionable (90 / 120 / 140 BPM).
- * - Sincronización precisa con el motor Web Audio y avance del cabezal de reproducción.
+ * - Sincronización con el motor Web Audio y avance del cabezal de reproducción.
  * - Doble Interfaz Física: Entrada isomórfica de teclado (1-4, Q-R, A-F, Z-V) + Espacio + Clic 3D.
  * - Coordinación de los LEDs de compás y activación de pads en estado ACTIVO_ESPERA.
  */
@@ -13,11 +13,11 @@
 AFRAME.registerComponent('step-sequencer', {
   schema: {
     bpm: { type: 'int', default: 120 },
-    isPlaying: { type: 'boolean', default: false },
     tempoLedsSelector: { type: 'string', default: '.tempo-led' }
   },
 
   init: function () {
+    this.isPlaying = false;
     this.currentStep = -1;                     // Paso activo (0, 1, 2, 3)
     this.timerId = null;
     this.bpmOptions = [90, 120, 140];
@@ -29,18 +29,29 @@ AFRAME.registerComponent('step-sequencer', {
     this.onTick = this.onTick.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
     this.togglePlay = this.togglePlay.bind(this);
+    this.startPlayback = this.startPlayback.bind(this);
+    this.stopPlayback = this.stopPlayback.bind(this);
     this.clearPattern = this.clearPattern.bind(this);
     this.cycleBpm = this.cycleBpm.bind(this);
     this.registerPads = this.registerPads.bind(this);
+    this.bindTransportButtons = this.bindTransportButtons.bind(this);
 
     // Mapeo isomórfico del teclado físico
     this.buildKeyMapping();
 
-    // Registro de pads tras el renderizado de la escena
-    this.el.sceneEl.addEventListener('loaded', () => {
+    // Inicialización de pads y botones
+    const setup = () => {
       this.registerPads();
       this.bindTransportButtons();
-    });
+    };
+
+    if (this.el.sceneEl && this.el.sceneEl.hasLoaded) {
+      setup();
+    } else if (this.el.sceneEl) {
+      this.el.sceneEl.addEventListener('loaded', setup);
+    }
+    // Doble comprobación defensiva
+    setTimeout(setup, 200);
 
     // Escucha de eventos de teclado físico
     window.addEventListener('keydown', this.onKeyDown);
@@ -49,7 +60,7 @@ AFRAME.registerComponent('step-sequencer', {
   /**
    * Mapeo isomórfico directo del teclado QWERTY a la matriz de 4x4
    */
-  buildKeyMapping() {
+  buildKeyMapping: function () {
     // Fila 0 (Crash): 1, 2, 3, 4
     this.keyMap.set('1', '0_0');
     this.keyMap.set('2', '0_1');
@@ -79,7 +90,7 @@ AFRAME.registerComponent('step-sequencer', {
    * Indexa todos los pads presentes en el DOM 3D de la escena
    */
   registerPads: function () {
-    const padElements = this.el.querySelectorAll('[drum-pad]');
+    const padElements = document.querySelectorAll('[drum-pad]');
     padElements.forEach((padEl) => {
       const padComp = padEl.components['drum-pad'];
       if (!padComp) return;
@@ -96,25 +107,34 @@ AFRAME.registerComponent('step-sequencer', {
     const btnClear = document.getElementById('btn-clear');
     const btnBpm = document.getElementById('btn-bpm');
 
-    if (btnPlay) {
-      btnPlay.addEventListener('click', (e) => {
-        e.stopPropagation();
+    if (btnPlay && !btnPlay.dataset.bound) {
+      btnPlay.dataset.bound = 'true';
+      const onPlay = (e) => {
+        if (e) e.stopPropagation();
         this.togglePlay();
-      });
+      };
+      btnPlay.addEventListener('click', onPlay);
+      btnPlay.addEventListener('touchend', onPlay);
     }
 
-    if (btnClear) {
-      btnClear.addEventListener('click', (e) => {
-        e.stopPropagation();
+    if (btnClear && !btnClear.dataset.bound) {
+      btnClear.dataset.bound = 'true';
+      const onClear = (e) => {
+        if (e) e.stopPropagation();
         this.clearPattern();
-      });
+      };
+      btnClear.addEventListener('click', onClear);
+      btnClear.addEventListener('touchend', onClear);
     }
 
-    if (btnBpm) {
-      btnBpm.addEventListener('click', (e) => {
-        e.stopPropagation();
+    if (btnBpm && !btnBpm.dataset.bound) {
+      btnBpm.dataset.bound = 'true';
+      const onBpm = (e) => {
+        if (e) e.stopPropagation();
         this.cycleBpm();
-      });
+      };
+      btnBpm.addEventListener('click', onBpm);
+      btnBpm.addEventListener('touchend', onBpm);
     }
   },
 
@@ -122,7 +142,6 @@ AFRAME.registerComponent('step-sequencer', {
    * Manejador de eventos de teclado físico (doble interfaz)
    */
   onKeyDown: function (evt) {
-    // Si el usuario está escribiendo en algún input (si lo hubiera), salimos de inmediato
     if (evt.target && (evt.target.tagName === 'INPUT' || evt.target.tagName === 'TEXTAREA')) {
       return;
     }
@@ -143,8 +162,8 @@ AFRAME.registerComponent('step-sequencer', {
       return;
     }
 
-    // 3. Tecla 'Delete' o 'Backspace' o 'Shift + C': Limpiar patrón
-    if (key === 'delete' || key === 'backspace' || (key === 'c' && evt.shiftKey)) {
+    // 3. Tecla 'Delete' o 'Backspace' o 'c': Limpiar patrón
+    if (key === 'delete' || key === 'backspace' || key === 'c') {
       evt.preventDefault();
       this.clearPattern();
       return;
@@ -156,45 +175,42 @@ AFRAME.registerComponent('step-sequencer', {
       const pad = this.padMatrix.get(coords);
       if (!pad) return;
 
-      // Conmuta el paso del pad y dispara sonido y compresión visual
       const nextState = (pad.state === 'INACTIVO') ? 'ACTIVO_ESPERA' : 'INACTIVO';
       pad.triggerDisparo(nextState);
     }
   },
 
   /**
-   * Inicia o detiene la reproducción del secuenciador
+   * Conmuta la reproducción
    */
   togglePlay: function () {
-    if (this.data.isPlaying) {
-      this.stop();
+    if (this.isPlaying) {
+      this.stopPlayback();
     } else {
-      this.play();
+      this.startPlayback();
     }
   },
 
-  play: function () {
-    if (this.data.isPlaying) return;
-    window.DrumLabAudio.unlock();
+  startPlayback: function () {
+    if (this.isPlaying) return;
 
-    this.data.isPlaying = true;
+    if (window.DrumLabAudio) {
+      window.DrumLabAudio.unlock();
+    }
+
+    this.isPlaying = true;
     this.currentStep = -1;
-
-    // Actualiza la interfaz del botón 3D de transporte
     this.updatePlayButtonVisual(true);
 
-    // Intervalo de tiempo por negra en compás 4/4: ms = (60 / BPM) * 1000
     const stepIntervalMs = (60 / this.data.bpm) * 1000;
-    
-    // Dispara el primer tick y planifica el reloj
     this.onTick();
     this.timerId = setInterval(this.onTick, stepIntervalMs);
   },
 
-  stop: function () {
-    if (!this.data.isPlaying) return;
+  stopPlayback: function () {
+    if (!this.isPlaying) return;
 
-    this.data.isPlaying = false;
+    this.isPlaying = false;
     if (this.timerId) {
       clearInterval(this.timerId);
       this.timerId = null;
@@ -209,19 +225,23 @@ AFRAME.registerComponent('step-sequencer', {
    * Pulso del reloj secuenciador: avanza la columna activa y dispara los pads activos
    */
   onTick: function () {
+    // Asegurar que los pads estén indexados
+    if (this.padMatrix.size === 0) {
+      this.registerPads();
+    }
+
     // Avanza cíclicamente a través de los 4 tiempos (0, 1, 2, 3)
     this.currentStep = (this.currentStep + 1) % 4;
 
     // Actualiza los indicadores LED del compás
     this.updateTempoLeds(this.currentStep);
 
-    // Dispara todos los pads programados en esta columna (tiempos 0 a 3)
+    // Dispara todos los pads programados en esta columna (0 a 3)
     for (let row = 0; row < 4; row++) {
       const key = `${row}_${this.currentStep}`;
       const pad = this.padMatrix.get(key);
       if (!pad) continue;
 
-      // Cláusula de guarda: solo suena si está en ACTIVO_ESPERA
       if (pad.isStepActive()) {
         pad.triggerDisparo('ACTIVO_ESPERA');
       }
@@ -238,12 +258,12 @@ AFRAME.registerComponent('step-sequencer', {
       if (colAttr === activeCol) {
         ledEl.setAttribute('material', {
           color: '#ffffff',
-          emissive: '#00e5ff',
+          emissive: '#38bdf8',
           emissiveIntensity: 1.8
         });
       } else {
         ledEl.setAttribute('material', {
-          color: '#1a2234',
+          color: '#334155',
           emissive: '#000000',
           emissiveIntensity: 0
         });
@@ -258,14 +278,12 @@ AFRAME.registerComponent('step-sequencer', {
     this.currentBpmIndex = (this.currentBpmIndex + 1) % this.bpmOptions.length;
     this.data.bpm = this.bpmOptions[this.currentBpmIndex];
 
-    // Actualiza el texto en el panel 3D
     const bpmTextEl = document.getElementById('text-bpm-val');
     if (bpmTextEl) {
       bpmTextEl.setAttribute('value', `${this.data.bpm} BPM`);
     }
 
-    // Si estaba reproduciendo, reinicia el temporizador con el nuevo tempo
-    if (this.data.isPlaying) {
+    if (this.isPlaying) {
       clearInterval(this.timerId);
       const stepIntervalMs = (60 / this.data.bpm) * 1000;
       this.timerId = setInterval(this.onTick, stepIntervalMs);
@@ -280,20 +298,21 @@ AFRAME.registerComponent('step-sequencer', {
       pad.setState('INACTIVO');
     });
 
-    // Pequeño sonido de confirmación de borrado
     try {
-      const ctx = window.DrumLabAudio.getContext();
-      if (ctx) {
-        const osc = ctx.createOscillator();
-        const g = ctx.createGain();
-        osc.frequency.setValueAtTime(320, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(160, ctx.currentTime + 0.08);
-        g.gain.setValueAtTime(0.15, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
-        osc.connect(g);
-        g.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.09);
+      if (window.DrumLabAudio) {
+        const ctx = window.DrumLabAudio.getContext();
+        if (ctx) {
+          const osc = ctx.createOscillator();
+          const g = ctx.createGain();
+          osc.frequency.setValueAtTime(320, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(160, ctx.currentTime + 0.08);
+          g.gain.setValueAtTime(0.15, ctx.currentTime);
+          g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+          osc.connect(g);
+          g.connect(ctx.destination);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.09);
+        }
       }
     } catch (e) {}
   },
@@ -308,16 +327,16 @@ AFRAME.registerComponent('step-sequencer', {
 
     if (isPlaying) {
       btnPlay.setAttribute('material', {
-        color: '#ff2a85',
-        emissive: '#ff2a85',
-        emissiveIntensity: 0.9
+        color: '#b91c1c',
+        emissive: '#ef4444',
+        emissiveIntensity: 0.6
       });
       playText.setAttribute('value', 'STOP');
     } else {
       btnPlay.setAttribute('material', {
-        color: '#00f59b',
-        emissive: '#00f59b',
-        emissiveIntensity: 0.8
+        color: '#059669',
+        emissive: '#10b981',
+        emissiveIntensity: 0.4
       });
       playText.setAttribute('value', 'PLAY');
     }

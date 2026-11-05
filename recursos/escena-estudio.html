@@ -8,13 +8,8 @@
   <!-- Framework WebXR A-Frame 1.6.0 Oficial -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 
-  <!-- Componentes A-Frame registrados antes de <a-scene> -->
+  <!-- Componentes A-Frame registrados en <head> -->
   <script>
-    /**
-     * Componente studio-navigator:
-     * Gestiona la interacción multimodal (clic, toque, puntero láser WebXR)
-     * para navegar a la Escena 2 (Secuenciador 4x4).
-     */
     AFRAME.registerComponent('studio-navigator', {
       schema: {
         targetUrl: { type: 'string', default: 'escena-secuenciador.html' }
@@ -25,11 +20,9 @@
         const targetUrl = this.data.targetUrl;
 
         const navigate = (evt) => {
-          if (evt) {
-            evt.stopPropagation();
-          }
+          if (evt) evt.stopPropagation();
 
-          // Breve tono sutil con Web Audio API para feedback auditivo
+          // Feedback sonoro sutil con Web Audio API
           try {
             const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
             if (AudioCtxClass) {
@@ -51,11 +44,9 @@
           window.location.href = targetUrl;
         };
 
-        // Eventos para puntero, ratón, toque y controles VR
         el.addEventListener('click', navigate);
         el.addEventListener('touchend', navigate);
 
-        // Feedback de cursor en escritorio
         el.addEventListener('mouseenter', () => {
           document.body.style.cursor = 'pointer';
         });
@@ -78,7 +69,6 @@
       font-family: Helvetica, Arial, sans-serif;
     }
     
-    /* Overlay informativo sutil para el visor */
     .hud-overlay {
       position: absolute;
       top: 12px;
@@ -102,7 +92,7 @@
   <!-- HUD superpuesto -->
   <div class="hud-overlay">
     <strong>Escena 1: Estudio de Producción</strong><br>
-    Toca o apunta al panel o al controlador Drum Pad para acceder al secuenciador 4&times;4.
+    Toca o apunta al controlador Drum Pad o al panel de acceso para entrar al secuenciador.
   </div>
 
   <a-scene 
@@ -111,14 +101,14 @@
     vr-mode-ui="enabled: true">
     
     <!-- Gestor de Assets -->
-    <a-assets timeout="5000">
+    <a-assets timeout="6000">
       <a-asset-item id="drumpad-model" src="assets/models/oversized_drum_pad.glb"></a-asset-item>
     </a-assets>
 
     <!-- Iluminación del estudio -->
-    <a-light type="ambient" color="#94a3b8" intensity="1.2"></a-light>
-    <a-light type="directional" color="#ffffff" intensity="1.5" position="2 5 3" target="#desk"></a-light>
-    <a-light type="point" color="#38bdf8" intensity="1.4" distance="6" position="0 2.2 0"></a-light>
+    <a-light type="ambient" color="#cbd5e1" intensity="1.2"></a-light>
+    <a-light type="directional" color="#ffffff" intensity="1.6" position="2 5 3" target="#desk"></a-light>
+    <a-light type="point" color="#93c5fd" intensity="1.2" distance="6" position="0 2.2 -0.2"></a-light>
 
     <!-- Fondo / Entorno -->
     <a-sky color="#0f172a"></a-sky>
@@ -146,7 +136,6 @@
       <a-box position="0 0 0" width="1.2" height="3" depth="0.15" color="#334155"></a-box>
       <a-box position="1.5 0 0" width="0.8" height="3" depth="0.15" color="#243044"></a-box>
       <a-box position="3 0 0" width="0.8" height="3" depth="0.15" color="#334155"></a-box>
-      <!-- Moldura sutil -->
       <a-box position="0 1.8 0.05" width="7.4" height="0.04" depth="0.04" color="#475569"></a-box>
     </a-entity>
 
@@ -160,7 +149,7 @@
       <a-cylinder position="-1.05 0.44 -0.65" radius="0.035" height="0.88" color="#0f172a" metalness="0.7"></a-cylinder>
       <a-cylinder position="1.05 0.44 -0.65" radius="0.035" height="0.88" color="#0f172a" metalness="0.7"></a-cylinder>
 
-      <!-- Monitores de Audio (Altavoces derecho e izquierdo) -->
+      <!-- Monitores de Audio (Altavoces) -->
       <a-entity position="-0.95 1.15 -0.45" rotation="0 25 0">
         <a-box width="0.25" height="0.42" depth="0.28" color="#111827" roughness="0.6"></a-box>
         <a-cylinder position="0 -0.06 0.14" rotation="90 0 0" radius="0.08" height="0.02" color="#334155"></a-cylinder>
@@ -174,7 +163,7 @@
       </a-entity>
 
       <!-- Pantalla / Monitor Frontal del DAW -->
-      <a-entity position="0 1.25 -0.7">
+      <a-entity position="0 1.35 -0.65">
         <a-box width="1.1" height="0.6" depth="0.04" color="#0f172a"></a-box>
         <a-plane position="0 0 0.025" width="1.04" height="0.54" color="#1e293b"></a-plane>
         <a-text value="DRUMLAB VR // ESTUDIO DE PRODUCCION" align="center" position="0 0.12 0.03" scale="0.24 0.24 0.24" color="#38bdf8"></a-text>
@@ -184,124 +173,85 @@
         <a-box position="0 -0.4 0.05" width="0.3" height="0.02" depth="0.2" color="#334155"></a-box>
       </a-entity>
 
-      <!-- CONTROLADOR 3D: Oversized Drum Pad (Mesa Central) -->
+      <!-- ================================================================
+           MODELO 3D OFICIAL: Oversized Drum Pad (lukus1, CC BY 4.0)
+           Orientado hacia el usuario (rotation="0 -90 0") sobre la mesa
+           ================================================================ -->
       <a-entity 
         id="studio-drumpad"
-        position="0 0.94 -0.05"
-        rotation="-12 0 0">
+        position="0 0.93 -0.1"
+        rotation="-10 0 0">
         
-        <!-- Hitbox interactiva directa sobre el área del pad -->
+        <!-- Modelo 3D GLTF oficial cargado directamente sin fallbacks artificiales -->
+        <a-gltf-model 
+          id="drumpad-gltf-node"
+          src="#drumpad-model" 
+          position="0 0 0"
+          rotation="0 -90 0"
+          scale="0.42 0.42 0.42">
+        </a-gltf-model>
+
+        <!-- Hitbox interactiva que cubre el drum pad para clic y selección directa -->
         <a-box 
           id="drumpad-hitbox"
           class="interactable"
           studio-navigator
-          position="0 0.03 0" 
-          width="0.82" 
-          height="0.08" 
-          depth="0.62" 
+          position="0 0.04 0" 
+          width="0.95" 
+          height="0.12" 
+          depth="0.85" 
           material="opacity: 0; transparent: true">
         </a-box>
-
-        <!-- Modelo 3D GLTF oficial -->
-        <a-gltf-model 
-          src="#drumpad-model" 
-          position="0 0.02 0"
-          scale="0.38 0.38 0.38"
-          visible="false"
-          id="drumpad-gltf-node">
-        </a-gltf-model>
-
-        <!-- Chasis Procedural Fallback si el GLB tarda o no está disponible -->
-        <a-entity id="drumpad-fallback">
-          <a-box width="0.76" height="0.05" depth="0.58" color="#1e293b" metalness="0.5" roughness="0.5"></a-box>
-          <a-box position="0 -0.01 0.28" width="0.74" height="0.015" depth="0.02" color="#38bdf8"></a-box>
-
-          <!-- Fila 0 (Crash - Ámbar) -->
-          <a-box position="-0.21 0.03 -0.15" width="0.11" height="0.025" depth="0.08" color="#d97706"></a-box>
-          <a-box position="-0.07 0.03 -0.15" width="0.11" height="0.025" depth="0.08" color="#d97706"></a-box>
-          <a-box position="0.07 0.03 -0.15" width="0.11" height="0.025" depth="0.08" color="#d97706"></a-box>
-          <a-box position="0.21 0.03 -0.15" width="0.11" height="0.025" depth="0.08" color="#d97706"></a-box>
-
-          <!-- Fila 1 (Hi-Hat - Verde) -->
-          <a-box position="-0.21 0.03 -0.05" width="0.11" height="0.025" depth="0.08" color="#059669"></a-box>
-          <a-box position="-0.07 0.03 -0.05" width="0.11" height="0.025" depth="0.08" color="#059669"></a-box>
-          <a-box position="0.07 0.03 -0.05" width="0.11" height="0.025" depth="0.08" color="#059669"></a-box>
-          <a-box position="0.21 0.03 -0.05" width="0.11" height="0.025" depth="0.08" color="#059669"></a-box>
-
-          <!-- Fila 2 (Snare - Azul) -->
-          <a-box position="-0.21 0.03 0.05" width="0.11" height="0.025" depth="0.08" color="#0284c7"></a-box>
-          <a-box position="-0.07 0.03 0.05" width="0.11" height="0.025" depth="0.08" color="#0284c7"></a-box>
-          <a-box position="0.07 0.03 0.05" width="0.11" height="0.025" depth="0.08" color="#0284c7"></a-box>
-          <a-box position="0.21 0.03 0.05" width="0.11" height="0.025" depth="0.08" color="#0284c7"></a-box>
-
-          <!-- Fila 3 (Kick - Rojo vino) -->
-          <a-box position="-0.21 0.03 0.15" width="0.11" height="0.025" depth="0.08" color="#db2777"></a-box>
-          <a-box position="-0.07 0.03 0.15" width="0.11" height="0.025" depth="0.08" color="#db2777"></a-box>
-          <a-box position="0.07 0.03 0.15" width="0.11" height="0.025" depth="0.08" color="#db2777"></a-box>
-          <a-box position="0.21 0.03 0.15" width="0.11" height="0.025" depth="0.08" color="#db2777"></a-box>
-
-          <a-box position="0 0.03 -0.23" width="0.6" height="0.02" depth="0.05" color="#0f172a"></a-box>
-          <a-text value="OVERSIZED DRUM PAD [TOCAR PARA ENTRAR]" align="center" position="0 0.045 -0.23" rotation="-90 0 0" scale="0.18 0.18 0.18" color="#38bdf8"></a-text>
-        </a-entity>
       </a-entity>
 
-      <!-- PANEL DE NAVEGACIÓN 3D INTERACTIVO -->
+      <!-- Panel de navegación flotante situado sutilmente sobre el monitor (sin tapar el pad) -->
       <a-entity 
         id="interactive-marker"
-        position="0 1.42 -0.15"
-        animation="property: position; to: 0 1.46 -0.15; dir: alternate; dur: 1600; loop: true; easing: easeInOutSine">
+        position="0 1.8 -0.6"
+        animation="property: position; to: 0 1.84 -0.6; dir: alternate; dur: 1800; loop: true; easing: easeInOutSine">
         
-        <!-- Cartel plano que actúa como collider interactivo -->
         <a-plane 
           id="marker-clickable-plane"
           class="interactable"
           studio-navigator
           width="1.3" 
-          height="0.42" 
+          height="0.32" 
           color="#0f172a" 
           material="opacity: 0.95; transparent: true">
           
           <a-text 
-            value="ENTRAR AL SECUENCIADOR" 
+            value="ENTRAR AL SECUENCIADOR 4x4" 
             align="center" 
-            position="0 0.07 0.02" 
-            scale="0.32 0.32 0.32" 
+            position="0 0.05 0.02" 
+            scale="0.28 0.28 0.28" 
             color="#ffffff" 
             font="roboto">
           </a-text>
           
           <a-text 
-            value="[ Tocar o apuntar para acceder al Nivel 4x4 ]" 
+            value="[ Tocar o apuntar para abrir el Secuenciador ]" 
             align="center" 
-            position="0 -0.07 0.02" 
-            scale="0.2 0.2 0.2" 
+            position="0 -0.06 0.02" 
+            scale="0.18 0.18 0.18" 
             color="#94a3b8" 
             font="roboto">
           </a-text>
         </a-plane>
 
-        <!-- Bordes sutiles del panel -->
-        <a-box position="0 0.215 0.01" width="1.32" height="0.015" depth="0.01" color="#2b6cb0"></a-box>
-        <a-box position="0 -0.215 0.01" width="1.32" height="0.015" depth="0.01" color="#2b6cb0"></a-box>
-        
-        <!-- Triángulo indicador -->
-        <a-triangle 
-          vertex-a="0 -0.32 0.02" 
-          vertex-b="-0.08 -0.23 0.02" 
-          vertex-c="0.08 -0.23 0.02" 
-          material="color: #2b6cb0">
-        </a-triangle>
+        <a-box position="0 0.165 0.01" width="1.32" height="0.012" depth="0.01" color="#2b6cb0"></a-box>
+        <a-box position="0 -0.165 0.01" width="1.32" height="0.012" depth="0.01" color="#2b6cb0"></a-box>
       </a-entity>
     </a-entity>
 
-    <!-- Sujeto Virtual: Cámara en primera persona y controles WebXR -->
-    <a-entity id="rig" position="0 0 1.15">
+    <!-- Sujeto Virtual: Cámara ergonómica estable y controles WebXR -->
+    <!-- wasd-controls desactivado para no interferir con las teclas del teclado ni salir volando -->
+    <a-entity id="rig" position="0 0 1.05">
       <a-camera 
         id="camera" 
         position="0 1.25 0"
-        rotation="-12 0 0"
+        rotation="-10 0 0"
         look-controls="pointerLockEnabled: false" 
-        wasd-controls="acceleration: 12">
+        wasd-controls="enabled: false">
         <!-- Raycaster de ratón y pantalla táctil -->
         <a-entity 
           id="mouse-raycaster"
@@ -310,44 +260,10 @@
         </a-entity>
       </a-camera>
 
-      <!-- Controles WebXR para cascos de Realidad Virtual (Meta Quest, etc.) -->
+      <!-- Controles WebXR para cascos de Realidad Virtual -->
       <a-entity laser-controls="hand: right" raycaster="objects: .interactable; interval: 30; lineColor: #38bdf8; lineOpacity: 0.8"></a-entity>
       <a-entity laser-controls="hand: left" raycaster="objects: .interactable; interval: 30; lineColor: #38bdf8; lineOpacity: 0.8"></a-entity>
     </a-entity>
   </a-scene>
-
-  <!-- Lógica adicional de visibilidad de modelo 3D y listeners de respaldo -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const gltfNode = document.getElementById('drumpad-gltf-node');
-      const fallbackNode = document.getElementById('drumpad-fallback');
-
-      if (gltfNode && fallbackNode) {
-        gltfNode.addEventListener('model-loaded', () => {
-          gltfNode.setAttribute('visible', 'true');
-          fallbackNode.setAttribute('visible', 'false');
-        });
-
-        gltfNode.addEventListener('model-error', () => {
-          gltfNode.setAttribute('visible', 'false');
-          fallbackNode.setAttribute('visible', 'true');
-        });
-      }
-
-      // Respaldo de listener directo por si el framework raycaster dispara eventos DOM
-      const targetEls = [
-        document.getElementById('marker-clickable-plane'),
-        document.getElementById('drumpad-hitbox')
-      ];
-
-      targetEls.forEach(el => {
-        if (!el) return;
-        el.addEventListener('click', (e) => {
-          e.stopPropagation();
-          window.location.href = 'escena-secuenciador.html';
-        });
-      });
-    });
-  </script>
 </body>
 </html>
