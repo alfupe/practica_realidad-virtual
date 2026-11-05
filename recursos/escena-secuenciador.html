@@ -10,10 +10,13 @@
   <script src="js/drum-pad.js"></script>
   <script src="js/step-sequencer.js"></script>
   <style>
-    body {
+    html, body {
+      width: 100%;
+      height: 100%;
       margin: 0;
+      padding: 0;
       overflow: hidden;
-      background-color: #060913;
+      background-color: #0b1120;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
     /* HUD overlay superior con feedback contextual */
@@ -56,19 +59,18 @@
   </div>
 
   <a-scene 
-    embedded
     loading-screen="dotsColor: #00e5ff; backgroundColor: #0a0d14"
-    renderer="antialias: true; colorManagement: true; physicallyCorrectLights: true"
+    renderer="antialias: true; colorManagement: true"
     vr-mode-ui="enabled: true">
 
     <!-- Iluminación de Estudio y Enfoque Directo sobre el Pad -->
-    <a-light type="ambient" color="#141c2c" intensity="0.8"></a-light>
-    <a-light type="directional" color="#f8fafc" intensity="1.1" position="0 4 2" target="#drumpad-controller"></a-light>
-    <a-light type="point" color="#00e5ff" intensity="2.2" distance="4" position="0 2 0"></a-light>
-    <a-light type="point" color="#ff2a85" intensity="1.2" distance="5" position="0 1.5 -1.5"></a-light>
+    <a-light type="ambient" color="#475569" intensity="1.4"></a-light>
+    <a-light type="directional" color="#ffffff" intensity="1.6" position="0 5 2" target="#drumpad-controller"></a-light>
+    <a-light type="point" color="#00e5ff" intensity="2.8" distance="8" position="0 2.5 0"></a-light>
+    <a-light type="point" color="#ff2a85" intensity="2.0" distance="8" position="0 2 -1.5"></a-light>
 
     <!-- Atmósfera Sintética de Fondo -->
-    <a-sky color="#060913"></a-sky>
+    <a-sky color="#0f172a"></a-sky>
 
     <!-- Suelo con cuadrícula reflectante -->
     <a-plane 
@@ -76,9 +78,9 @@
       rotation="-90 0 0" 
       width="16" 
       height="16" 
-      color="#0b0f19" 
-      roughness="0.7" 
-      metalness="0.4">
+      color="#1e293b" 
+      roughness="0.5" 
+      metalness="0.3">
     </a-plane>
 
     <!-- Mesa Soporte del Controlador -->
@@ -424,10 +426,11 @@
     <!-- ====================================================================
          CÁMARA: PLANO PICADO ERGONÓMICO FRENTE AL CONTROLADOR
          ==================================================================== -->
-    <a-entity id="rig" position="0 1.85 0.72">
+    <a-entity id="rig" position="0 0 0.75">
       <a-camera 
         id="camera" 
-        rotation="-50 0 0" 
+        position="0 1.55 0"
+        rotation="-42 0 0" 
         look-controls="pointerLockEnabled: false" 
         wasd-controls="enabled: false">
         <!-- Raycaster de ratón interactivo -->

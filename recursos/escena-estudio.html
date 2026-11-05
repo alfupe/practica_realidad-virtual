@@ -7,10 +7,13 @@
   <!-- Framework WebXR A-Frame 1.6.0 Oficial -->
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
   <style>
-    body {
+    html, body {
+      width: 100%;
+      height: 100%;
       margin: 0;
+      padding: 0;
       overflow: hidden;
-      background-color: #050811;
+      background-color: #0b1120;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
     /* Overlay informativo sutil para el visor */
@@ -42,9 +45,8 @@
   </div>
 
   <a-scene 
-    embedded
     loading-screen="dotsColor: #00e5ff; backgroundColor: #0a0d14"
-    renderer="antialias: true; colorManagement: true; physicallyCorrectLights: true"
+    renderer="antialias: true; colorManagement: true"
     vr-mode-ui="enabled: true">
     
     <!-- Gestor de Assets -->
@@ -54,46 +56,46 @@
     </a-assets>
 
     <!-- Iluminación de Estudio Sintético Low-Poly -->
-    <a-light type="ambient" color="#182033" intensity="0.9"></a-light>
-    <a-light type="directional" color="#dbeafe" intensity="1.2" position="2 4 3" target="#desk"></a-light>
+    <a-light type="ambient" color="#475569" intensity="1.4"></a-light>
+    <a-light type="directional" color="#ffffff" intensity="1.6" position="2 5 3" target="#desk"></a-light>
     <!-- Foco de acento cian sobre la mesa de mezclas -->
-    <a-light type="point" color="#00e5ff" intensity="2.2" distance="6" position="0 2.2 0"></a-light>
+    <a-light type="point" color="#00e5ff" intensity="2.8" distance="8" position="0 2.2 0"></a-light>
     <!-- Foco de acento magenta en la pared trasera -->
-    <a-light type="point" color="#ff2a85" intensity="1.5" distance="7" position="0 2.5 -4"></a-light>
+    <a-light type="point" color="#ff2a85" intensity="2.0" distance="8" position="0 2.5 -4"></a-light>
 
     <!-- Cielo / Atmósfera del Estudio -->
-    <a-sky color="#070a12"></a-sky>
+    <a-sky color="#0f172a"></a-sky>
 
-    <!-- Suelo con rejilla sintética -->
+    <!-- Suelo con cuadrícula sintética -->
     <a-plane 
       position="0 0 0" 
       rotation="-90 0 0" 
       width="20" 
       height="20" 
-      color="#0f1420" 
-      roughness="0.8" 
-      metalness="0.3">
+      color="#1e293b" 
+      roughness="0.5" 
+      metalness="0.2">
     </a-plane>
 
     <!-- Paredes del Estudio y Paneles Acústicos Low-Poly -->
     <!-- Pared Trasera -->
-    <a-plane position="0 4 -5" width="16" height="8" color="#0a0d17" roughness="0.9"></a-plane>
+    <a-plane position="0 4 -5" width="16" height="8" color="#1e293b" roughness="0.7"></a-plane>
     <!-- Pared Izquierda -->
-    <a-plane position="-8 4 0" rotation="0 90 0" width="16" height="8" color="#0a0d17" roughness="0.9"></a-plane>
+    <a-plane position="-8 4 0" rotation="0 90 0" width="16" height="8" color="#1e293b" roughness="0.7"></a-plane>
     <!-- Pared Derecha -->
-    <a-plane position="8 4 0" rotation="0 -90 0" width="16" height="8" color="#0a0d17" roughness="0.9"></a-plane>
+    <a-plane position="8 4 0" rotation="0 -90 0" width="16" height="8" color="#1e293b" roughness="0.7"></a-plane>
 
     <!-- Paneles Acústicos Difusores Verticales (Pared Trasera) -->
     <a-entity id="acoustic-panels" position="0 2.6 -4.85">
-      <a-box position="-3 0 0" width="0.8" height="3" depth="0.15" color="#1a2234"></a-box>
-      <a-box position="-1.5 0 0" width="0.8" height="3" depth="0.15" color="#141a29"></a-box>
-      <a-box position="0 0 0" width="1.2" height="3" depth="0.15" color="#1e293b"></a-box>
-      <a-box position="1.5 0 0" width="0.8" height="3" depth="0.15" color="#141a29"></a-box>
-      <a-box position="3 0 0" width="0.8" height="3" depth="0.15" color="#1a2234"></a-box>
+      <a-box position="-3 0 0" width="0.8" height="3" depth="0.15" color="#334155"></a-box>
+      <a-box position="-1.5 0 0" width="0.8" height="3" depth="0.15" color="#243044"></a-box>
+      <a-box position="0 0 0" width="1.2" height="3" depth="0.15" color="#334155"></a-box>
+      <a-box position="1.5 0 0" width="0.8" height="3" depth="0.15" color="#243044"></a-box>
+      <a-box position="3 0 0" width="0.8" height="3" depth="0.15" color="#334155"></a-box>
       
       <!-- Tira LED decorativa en la pared -->
       <a-box position="0 1.8 0.05" width="7.4" height="0.06" depth="0.05" 
-             material="color: #00e5ff; emissive: #00e5ff; emissiveIntensity: 0.8"></a-box>
+             material="color: #00e5ff; emissive: #00e5ff; emissiveIntensity: 0.9"></a-box>
     </a-entity>
 
     <!-- Mesa Central de Producción (Workstation) -->
@@ -197,9 +199,9 @@
       <a-entity 
         id="interactive-marker"
         class="interactable"
-        position="0 1.5 -0.1"
+        position="0 1.42 -0.15"
         studio-navigator
-        animation="property: position; to: 0 1.56 -0.1; dir: alternate; dur: 1400; loop: true; easing: easeInOutSine">
+        animation="property: position; to: 0 1.48 -0.15; dir: alternate; dur: 1400; loop: true; easing: easeInOutSine">
         
         <!-- Cartel Holográfico -->
         <a-plane 
@@ -241,10 +243,12 @@
       </a-entity>
     </a-entity>
 
-    <!-- Sujeto Virtual: Cámara en primera persona con look-controls y raycaster de ratón -->
-    <a-entity id="rig" position="0 1.5 1.3">
+    <!-- Sujeto Virtual: Cámara en primera persona ergonómica frente a la mesa de producción -->
+    <a-entity id="rig" position="0 0 1.15">
       <a-camera 
         id="camera" 
+        position="0 1.25 0"
+        rotation="-12 0 0"
         look-controls="pointerLockEnabled: false" 
         wasd-controls="acceleration: 12">
         <!-- Cursor de ratón configurado con el raycaster para objetos .interactable -->
