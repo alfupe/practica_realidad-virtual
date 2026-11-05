@@ -196,6 +196,72 @@
         </article>
       </div>
     </section>
+
+    <!-- Mapa Arquitectónico de la Matriz 4x4 (16 Pads) -->
+    <section class="c-legend" style="margin-top: var(--space-xl);" aria-labelledby="matrix-map-title">
+      <div class="c-legend__header">
+        <h2 id="matrix-map-title" class="c-legend__title">
+          <span aria-hidden="true">🗺️</span> Arquitectura de la Matriz: 4 Voces &times; 4 Tiempos (16 Pads)
+        </h2>
+        <span class="c-badge c-badge--accent">Secuenciador por Pasos (Step Sequencer)</span>
+      </div>
+
+      <p class="c-hero__lead" style="margin-bottom: var(--space-md); font-size: 0.95rem;">
+        Los 16 pads no son 16 sonidos aislados, sino la <strong>intersección temporal entre las 4 voces del kit (filas) y los 4 tiempos del compás de 4/4 (columnas)</strong>. Al pulsar Play, el cabezal recorre las 4 columnas de izquierda a derecha:
+      </p>
+
+      <div class="c-matrix-demo">
+        <table class="c-matrix-demo__table" aria-label="Mapa de distribución de los 16 pads">
+          <thead>
+            <tr>
+              <th scope="col" class="c-matrix-demo__th">Voz / Fila</th>
+              <th scope="col" class="c-matrix-demo__th">Tiempo 1 · <span style="color: #00e5ff;">LED 1</span></th>
+              <th scope="col" class="c-matrix-demo__th">Tiempo 2 · <span style="color: #00e5ff;">LED 2</span></th>
+              <th scope="col" class="c-matrix-demo__th">Tiempo 3 · <span style="color: #00e5ff;">LED 3</span></th>
+              <th scope="col" class="c-matrix-demo__th">Tiempo 4 · <span style="color: #00e5ff;">LED 4</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row" class="c-matrix-demo__td-voice" style="color: var(--color-voice-crash);">
+                Fila 0: Crash <kbd class="c-kbd c-kbd--crash" style="padding: 2px 6px; font-size: 11px;">1-2-3-4</kbd>
+              </th>
+              <td class="c-matrix-demo__cell">Pad 0 <small style="color: var(--color-text-muted);">(Crash T1)</small></td>
+              <td class="c-matrix-demo__cell">Pad 1 <small style="color: var(--color-text-muted);">(Crash T2)</small></td>
+              <td class="c-matrix-demo__cell">Pad 2 <small style="color: var(--color-text-muted);">(Crash T3)</small></td>
+              <td class="c-matrix-demo__cell">Pad 3 <small style="color: var(--color-text-muted);">(Crash T4)</small></td>
+            </tr>
+            <tr>
+              <th scope="row" class="c-matrix-demo__td-voice" style="color: var(--color-voice-hihat);">
+                Fila 1: Hi-Hat <kbd class="c-kbd c-kbd--hihat" style="padding: 2px 6px; font-size: 11px;">Q-W-E-R</kbd>
+              </th>
+              <td class="c-matrix-demo__cell">Pad 4 <small style="color: var(--color-text-muted);">(Hi-Hat T1)</small></td>
+              <td class="c-matrix-demo__cell">Pad 5 <small style="color: var(--color-text-muted);">(Hi-Hat T2)</small></td>
+              <td class="c-matrix-demo__cell">Pad 6 <small style="color: var(--color-text-muted);">(Hi-Hat T3)</small></td>
+              <td class="c-matrix-demo__cell">Pad 7 <small style="color: var(--color-text-muted);">(Hi-Hat T4)</small></td>
+            </tr>
+            <tr>
+              <th scope="row" class="c-matrix-demo__td-voice" style="color: var(--color-voice-snare);">
+                Fila 2: Snare <kbd class="c-kbd c-kbd--snare" style="padding: 2px 6px; font-size: 11px;">A-S-D-F</kbd>
+              </th>
+              <td class="c-matrix-demo__cell">Pad 8 <small style="color: var(--color-text-muted);">(Snare T1)</small></td>
+              <td class="c-matrix-demo__cell">Pad 9 <small style="color: var(--color-text-muted);">(Snare T2)</small></td>
+              <td class="c-matrix-demo__cell">Pad 10 <small style="color: var(--color-text-muted);">(Snare T3)</small></td>
+              <td class="c-matrix-demo__cell">Pad 11 <small style="color: var(--color-text-muted);">(Snare T4)</small></td>
+            </tr>
+            <tr>
+              <th scope="row" class="c-matrix-demo__td-voice" style="color: var(--color-voice-kick);">
+                Fila 3: Kick <kbd class="c-kbd c-kbd--kick" style="padding: 2px 6px; font-size: 11px;">Z-X-C-V</kbd>
+              </th>
+              <td class="c-matrix-demo__cell">Pad 12 <small style="color: var(--color-text-muted);">(Kick T1)</small></td>
+              <td class="c-matrix-demo__cell">Pad 13 <small style="color: var(--color-text-muted);">(Kick T2)</small></td>
+              <td class="c-matrix-demo__cell">Pad 14 <small style="color: var(--color-text-muted);">(Kick T3)</small></td>
+              <td class="c-matrix-demo__cell">Pad 15 <small style="color: var(--color-text-muted);">(Kick T4)</small></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
   </main>
 
   <!-- Pie de Página -->

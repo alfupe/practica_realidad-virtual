@@ -39,6 +39,25 @@ El diseño del proyecto aborda los pilares teóricos fundamentales de la asignat
 ## Funcionalidades y arquitectura técnica
 
 ### 1. Secuenciador Matricial 4×4 y Reloj Temporal
+La cuadrícula de 16 pads no responde a un disparador de muestras sueltas (*finger drumming*), sino a un **Secuenciador por Pasos (Step Sequencer)** que cruza el eje tímbrico (4 voces) con el eje temporal (los 4 pulsos del compás de 4/4):
+
+```text
+               Columna 1      Columna 2      Columna 3      Columna 4
+              (Tiempo 1)     (Tiempo 2)     (Tiempo 3)     (Tiempo 4)
+             ┌──────────────┬──────────────┬──────────────┬──────────────┐
+Fila 0: CRASH│    Pad 0     │    Pad 1     │    Pad 2     │    Pad 3     │ Teclas: 1 - 2 - 3 - 4
+             ├──────────────┼──────────────┼──────────────┼──────────────┤
+Fila 1: HIHAT│    Pad 4     │    Pad 5     │    Pad 6     │    Pad 7     │ Teclas: Q - W - E - R
+             ├──────────────┼──────────────┼──────────────┼──────────────┤
+Fila 2: SNARE│    Pad 8     │    Pad 9     │    Pad 10    │    Pad 11    │ Teclas: A - S - D - F
+             ├──────────────┼──────────────┼──────────────┼──────────────┤
+Fila 3: KICK │    Pad 12    │    Pad 13    │    Pad 14    │    Pad 15    │ Teclas: Z - X - C - V
+             └──────────────┴──────────────┴──────────────┴──────────────┘
+               [ LED 1 ]      [ LED 2 ]      [ LED 3 ]      [ LED 4 ]
+                                 ▲
+                          Cabezal (Playhead)
+```
+
 * **4 voces percusivas:** Plato Crash (Fila 0), Charles/Hi-Hat cerrado (Fila 1), Caja/Snare (Fila 2) y Bombo/Kick (Fila 3).
 * **4 subdivisiones de pulso:** Tiempos 1, 2, 3 y 4 del compás de 4/4.
 * **Cabezal visual de tiempo (Playhead):** 4 LEDs emisivos sincronizados en la parte superior del controlador que indican el pulso activo del compás en tiempo real.

@@ -174,10 +174,126 @@
       </div>
     </section>
 
-    <!-- Sección 3: Patrones Didácticos Canónicos en la Matriz 4x4 -->
+    <!-- Sección 3: Arquitectura de la Matriz 4x4 (Secuenciador vs Finger Drumming) -->
+    <section class="c-guide__section" aria-labelledby="matrix-arch-title">
+      <h2 id="matrix-arch-title" class="c-guide__heading">
+        3. Arquitectura de la Matriz 4&times;4: Secuenciador por Pasos vs. Finger Drumming
+      </h2>
+      <p class="c-guide__text">
+        Una duda habitual al ver una cuadrícula de 16 pads es si cada botón dispara un sonido diferente (como en un sampler de <em>finger drumming</em>). 
+        En <strong>DrumLab VR</strong> la concepción es la de un <strong>Secuenciador por Pasos (Step Sequencer)</strong>: la matriz es la intersección bidimensional entre el <strong>eje vertical tímbrico (4 voces percusivas)</strong> y el <strong>eje horizontal métrico (los 4 pulsos del compás cuaternario)</strong>.
+      </p>
+
+      <div class="c-matrix-demo">
+        <table class="c-matrix-demo__table" aria-label="Esquema de distribución de los 16 pads en la matriz">
+          <thead>
+            <tr>
+              <th scope="col" class="c-matrix-demo__th">Voz / Fila</th>
+              <th scope="col" class="c-matrix-demo__th">
+                Columna 1 (Tiempo 1)<br>
+                <small style="color: #00e5ff;">[ LED 1 · Downbeat ]</small>
+              </th>
+              <th scope="col" class="c-matrix-demo__th">
+                Columna 2 (Tiempo 2)<br>
+                <small style="color: #00e5ff;">[ LED 2 · Backbeat 1 ]</small>
+              </th>
+              <th scope="col" class="c-matrix-demo__th">
+                Columna 3 (Tiempo 3)<br>
+                <small style="color: #00e5ff;">[ LED 3 · Semifuerte ]</small>
+              </th>
+              <th scope="col" class="c-matrix-demo__th">
+                Columna 4 (Tiempo 4)<br>
+                <small style="color: #00e5ff;">[ LED 4 · Backbeat 2 ]</small>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row" class="c-matrix-demo__td-voice" style="color: var(--color-voice-crash);">
+                Fila 0: Crash<br><small style="color: var(--color-text-muted);">Teclas: 1 - 2 - 3 - 4</small>
+              </th>
+              <td class="c-matrix-demo__cell">
+                <strong>Pad 0</strong><br><small style="color: var(--color-text-muted);">Crash · T1</small>
+              </td>
+              <td class="c-matrix-demo__cell">
+                <strong>Pad 1</strong><br><small style="color: var(--color-text-muted);">Crash · T2</small>
+              </td>
+              <td class="c-matrix-demo__cell">
+                <strong>Pad 2</strong><br><small style="color: var(--color-text-muted);">Crash · T3</small>
+              </td>
+              <td class="c-matrix-demo__cell">
+                <strong>Pad 3</strong><br><small style="color: var(--color-text-muted);">Crash · T4</small>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row" class="c-matrix-demo__td-voice" style="color: var(--color-voice-hihat);">
+                Fila 1: Hi-Hat<br><small style="color: var(--color-text-muted);">Teclas: Q - W - E - R</small>
+              </th>
+              <td class="c-matrix-demo__cell">
+                <strong>Pad 4</strong><br><small style="color: var(--color-text-muted);">Hi-Hat · T1</small>
+              </td>
+              <td class="c-matrix-demo__cell">
+                <strong>Pad 5</strong><br><small style="color: var(--color-text-muted);">Hi-Hat · T2</small>
+              </td>
+              <td class="c-matrix-demo__cell">
+                <strong>Pad 6</strong><br><small style="color: var(--color-text-muted);">Hi-Hat · T3</small>
+              </td>
+              <td class="c-matrix-demo__cell">
+                <strong>Pad 7</strong><br><small style="color: var(--color-text-muted);">Hi-Hat · T4</small>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row" class="c-matrix-demo__td-voice" style="color: var(--color-voice-snare);">
+                Fila 2: Snare<br><small style="color: var(--color-text-muted);">Teclas: A - S - D - F</small>
+              </th>
+              <td class="c-matrix-demo__cell">
+                <strong>Pad 8</strong><br><small style="color: var(--color-text-muted);">Snare · T1</small>
+              </td>
+              <td class="c-matrix-demo__cell">
+                <strong>Pad 9</strong><br><small style="color: var(--color-text-muted);">Snare · T2</small>
+              </td>
+              <td class="c-matrix-demo__cell">
+                <strong>Pad 10</strong><br><small style="color: var(--color-text-muted);">Snare · T3</small>
+              </td>
+              <td class="c-matrix-demo__cell">
+                <strong>Pad 11</strong><br><small style="color: var(--color-text-muted);">Snare · T4</small>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row" class="c-matrix-demo__td-voice" style="color: var(--color-voice-kick);">
+                Fila 3: Kick<br><small style="color: var(--color-text-muted);">Teclas: Z - X - C - V</small>
+              </th>
+              <td class="c-matrix-demo__cell">
+                <strong>Pad 12</strong><br><small style="color: var(--color-text-muted);">Kick · T1</small>
+              </td>
+              <td class="c-matrix-demo__cell">
+                <strong>Pad 13</strong><br><small style="color: var(--color-text-muted);">Kick · T2</small>
+              </td>
+              <td class="c-matrix-demo__cell">
+                <strong>Pad 14</strong><br><small style="color: var(--color-text-muted);">Kick · T3</small>
+              </td>
+              <td class="c-matrix-demo__cell">
+                <strong>Pad 15</strong><br><small style="color: var(--color-text-muted);">Kick · T4</small>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top: var(--space-md); padding: var(--space-md); background: rgba(0, 229, 255, 0.05); border-left: 3px solid #00e5ff; border-radius: var(--radius-sm);">
+        <h3 style="margin: 0 0 var(--space-xs) 0; color: #00e5ff; font-size: 0.95rem;">
+          ⚙️ Dinámica del Cabezal Temporal (Playhead)
+        </h3>
+        <p class="c-guide__text" style="margin: 0; font-size: 0.88rem; line-height: 1.55;">
+          Al pulsar <strong>Play</strong> (o la barra espaciadora), el cabezal del reloj recorre las columnas en bucle (<code>Col 1 ➔ Col 2 ➔ Col 3 ➔ Col 4 ➔ Col 1...</code>) sincronizado con los LEDs luminosos superiores. Si activas el <strong>Pad 12</strong>, programas el Bombo para que suene automáticamente en el primer pulso. Si activas los <strong>Pads 9 y 11</strong>, la Caja marcará los pulsos 2 y 4 (el clásico <em>backbeat</em>). De este modo, los 16 pads permiten programar secuencias rítmicas infinitas combinando tan solo 4 fuentes sonoras.
+        </p>
+      </div>
+    </section>
+
+    <!-- Sección 4: Patrones Didácticos Canónicos en la Matriz 4x4 -->
     <section class="c-guide__section" aria-labelledby="patterns-title">
       <h2 id="patterns-title" class="c-guide__heading">
-        3. Plantillas Didácticas de Programación en la Matriz 4&times;4
+        4. Plantillas Didácticas de Programación en la Matriz 4&times;4
       </h2>
       <p class="c-guide__text">
         Prueba a configurar estos tres patrones fundamentales en el secuenciador para experimentar 
