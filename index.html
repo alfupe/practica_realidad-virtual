@@ -1,292 +1,352 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DrumLab VR — Secuenciador Rítmico Espacial 4/4 (WebXR)</title>
-  <meta name="description" content="DrumLab VR: Aplicación interactiva de experimentación rítmica y secuenciación espacial en compás 4/4 construida con HTML5, BEM, WebXR (A-Frame) y Web Audio API.">
+  <title>Práctica: DrumLab VR — Alejandro Fuentes Pérez</title>
+  <meta name="description" content="Práctica final de Realidad Virtual: DrumLab VR, secuenciador rítmico espacial 4/4 con WebXR y Web Audio API. Grado en Multimedia, UOC.">
   <link rel="stylesheet" href="recursos/css/styles.css">
 </head>
 <body>
-  <!-- Accesibilidad: Enlace de salto al contenido principal -->
-  <a href="#main-content" class="c-skip-link">Saltar al contenido principal</a>
+  <!-- Enlace de accesibilidad para saltar al contenido principal -->
+  <a href="#contenido-principal" class="skip-link">Saltar al contenido principal</a>
 
-  <!-- Cabecera de Navegación Común -->
-  <header class="c-header">
-    <div class="l-container c-header__inner">
-      <a href="index.html" class="c-brand" aria-label="DrumLab VR - Inicio">
-        <span class="c-brand__icon" aria-hidden="true">🥁</span>
-        <div class="c-brand__titles">
-          <span class="c-brand__name">DrumLab VR</span>
-          <span class="c-brand__tagline">WebXR Rhythm Lab // 4/4 Matrix</span>
-        </div>
-      </a>
+  <main class="page" id="contenido-principal">
+    <!-- Cabecera institucional de la entrega -->
+    <header class="page__header">
+      <h1 class="page__title">Práctica: DrumLab VR — Secuenciador Rítmico Espacial 4/4</h1>
+      <h2 class="page__subtitle">UOC - Realidad virtual (semestre 2627/1)</h2>
+      <p class="page__author">Alejandro Fuentes Pérez</p>
+    </header>
 
-      <nav class="c-nav" aria-label="Navegación principal">
-        <ul class="c-nav__list">
-          <li class="c-nav__item">
-            <a href="index.html" class="c-nav__link c-nav__link--active" aria-current="page">Estudio &amp; Visor</a>
-          </li>
-          <li class="c-nav__item">
-            <a href="recursos/guia-ritmica.html" class="c-nav__link">Guía Rítmica</a>
-          </li>
-          <li class="c-nav__item">
-            <a href="recursos/licencias.html" class="c-nav__link">Licencias &amp; Atribución</a>
-          </li>
-        </ul>
-      </nav>
+    <!-- Navegación de páginas secundarias -->
+    <nav class="page__nav" aria-label="Navegación del proyecto">
+      <a href="index.html" class="page__nav-link page__nav-link--active" aria-current="page">Estudio &amp; Visor</a>
+      <a href="recursos/guia-ritmica.html" class="page__nav-link">Guía Rítmica Didáctica</a>
+      <a href="recursos/licencias.html" class="page__nav-link">Licencias y Atribución</a>
+    </nav>
+
+    <!-- Selector de escenas -->
+    <div class="scene-selector" role="tablist" aria-label="Selector de escena WebXR">
+      <button type="button" class="scene-btn active" id="btn-scene1" role="tab" aria-selected="true" aria-controls="contenedor-1" onclick="cambiarEscena(1)">
+        Escena 1 (Estudio de Producción)
+      </button>
+      <button type="button" class="scene-btn" id="btn-scene2" role="tab" aria-selected="false" aria-controls="contenedor-2" onclick="cambiarEscena(2)">
+        Escena 2 (Secuenciador 4&times;4)
+      </button>
     </div>
-  </header>
 
-  <!-- Contenido Principal -->
-  <main id="main-content" class="l-container c-main">
-    <!-- Hero / Presentación Divulgativa -->
-    <section class="c-hero" aria-labelledby="hero-title">
-      <div class="c-hero__badge-container">
-        <span class="c-badge c-badge--uoc">UOC · Realidad Virtual · Práctica</span>
-        <span class="c-badge c-badge--accent">WebXR + A-Frame 1.6.0</span>
-        <span class="c-badge">Web Audio API &lt;15ms</span>
-      </div>
-
-      <h1 id="hero-title" class="c-hero__title">
-        Experimentación Rítmica y Secuenciación Espacial 4/4
-      </h1>
-
-      <p class="c-hero__lead">
-        Explora la relación entre la espacialidad inmersiva y la percepción musical con 
-        <strong>DrumLab VR</strong>. Diseñado según la arquitectura de dos niveles: 
-        un <em>nivel explorativo</em> en un estudio de producción sintético y un <em>nivel manipulativo y contributivo</em> 
-        basado en una matriz 4&times;4 de pads de percusión con síntesis procedural en tiempo real.
-      </p>
-    </section>
-
-    <!-- Visor WebXR / Escena Central -->
-    <section class="c-viewer" aria-labelledby="viewer-title">
-      <div class="c-viewer__frame-container">
-        <div class="c-viewer__bar">
-          <div class="c-viewer__status">
-            <span class="c-viewer__dot" aria-hidden="true"></span>
-            <span id="viewer-title">Visor WebXR: Escena 1 (Estudio de Producción)</span>
-          </div>
-
-          <div class="c-viewer__actions">
-            <button type="button" class="c-viewer__btn" id="btn-fullscreen" title="Pantalla completa">
-              ⛶ Expandir Visor
-            </button>
-            <button type="button" class="c-viewer__btn" id="btn-reload" title="Reiniciar escena">
-              ↻ Recargar
-            </button>
-          </div>
-        </div>
-
-        <!-- Incrustación central requerida de la escena A-Frame -->
+    <!-- Visor WebXR -->
+    <section class="page__viewer" aria-label="Visor 3D interactivo">
+      <div id="contenedor-1" class="scene-container active" role="tabpanel" aria-labelledby="btn-scene1">
         <iframe 
-          id="drumlab-frame"
+          id="frame-scene1" 
+          class="page__frame" 
           src="recursos/escena-estudio.html" 
-          title="Visor DrumLab VR" 
-          class="c-viewer__iframe"
-          allow="camera; microphone; xr-spatial-tracking; fullscreen"
-          loading="eager">
+          title="Escena 1: Estudio de Producción" 
+          allow="accelerometer; gyroscope; xr-spatial-tracking; fullscreen" 
+          allowfullscreen="true">
+        </iframe>
+      </div>
+      <div id="contenedor-2" class="scene-container" role="tabpanel" aria-labelledby="btn-scene2">
+        <iframe 
+          id="frame-scene2" 
+          class="page__frame" 
+          src="recursos/escena-secuenciador.html" 
+          title="Escena 2: Secuenciador 4x4" 
+          allow="autoplay; accelerometer; gyroscope; xr-spatial-tracking; fullscreen" 
+          allowfullscreen="true">
         </iframe>
       </div>
     </section>
 
-    <!-- Leyenda Rápida de Controles -->
-    <section class="c-legend" aria-labelledby="controls-title">
-      <div class="c-legend__header">
-        <h2 id="controls-title" class="c-legend__title">
-          <span aria-hidden="true">⌨️</span> Interfaz de Control Doble (Ratón &amp; Teclado Isomórfico)
-        </h2>
-        <span class="c-badge c-badge--accent">Baja latencia perceptiva</span>
+    <!-- Barra de acciones del visor -->
+    <div class="viewer-actions">
+      <span>WebXR compatible con ratón, pantalla táctil y cascos de realidad virtual</span>
+      <div>
+        <button type="button" class="viewer-actions__btn" id="btn-fullscreen">Pantalla completa</button>
+        <button type="button" class="viewer-actions__btn" id="btn-reload">Recargar escena</button>
       </div>
+    </div>
 
-      <div class="c-legend__grid">
-        <!-- Tarjeta Ratón -->
-        <article class="c-card">
-          <h3 class="c-card__title">
-            <span>🖱️ Ratón / Raycaster 3D</span>
-          </h3>
-          <p class="c-card__desc">
-            Haz clic directamente sobre los pads y botones en la escena 3D. 
-            En el estudio, pulsa en el controlador para viajar a la sala operativa. 
-            En el secuenciador, haz clic sobre los pads para conmutar su estado entre <strong>Inactivo</strong> y <strong>Activo (Espera)</strong>.
-          </p>
-        </article>
+    <!-- Instrucciones de interacción y advertencias de navegación -->
+    <footer class="page__footer">
+      <p>Apunta o toca directamente sobre el Drum Pad y los elementos interactivos en el visor 3D.</p>
+      <p class="page__warning">
+        <strong>Navegación:</strong> Se puede cambiar de escena usando las pestañas superiores o directamente dentro del entorno virtual (seleccionando el cartel holográfico o el pad en el estudio, o pulsando el botón <em>Volver al estudio</em> en el secuenciador). El teclado isomórfico permite activar pasos y controlar el secuenciador desde cualquier punto de la ventana.
+      </p>
+    </footer>
 
-        <!-- Tarjeta Teclado Fila Crash -->
-        <article class="c-card">
-          <h3 class="c-card__title">
-            <span>💥 Fila 0: Plato Crash (Tiempos 1-4)</span>
-          </h3>
-          <div class="c-card__keys" aria-label="Teclas Fila Crash">
-            <kbd class="c-kbd c-kbd--crash">1</kbd>
-            <kbd class="c-kbd c-kbd--crash">2</kbd>
-            <kbd class="c-kbd c-kbd--crash">3</kbd>
-            <kbd class="c-kbd c-kbd--crash">4</kbd>
-          </div>
-          <p class="c-card__desc">
-            Activa el brillo metálico y acentos dinámicos de caída larga en los 4 tiempos del compás.
-          </p>
-        </article>
-
-        <!-- Tarjeta Teclado Fila Hi-Hat -->
-        <article class="c-card">
-          <h3 class="c-card__title">
-            <span>⚡ Fila 1: Charles / Hi-Hat</span>
-          </h3>
-          <div class="c-card__keys" aria-label="Teclas Fila Hi-Hat">
-            <kbd class="c-kbd c-kbd--hihat">Q</kbd>
-            <kbd class="c-kbd c-kbd--hihat">W</kbd>
-            <kbd class="c-kbd c-kbd--hihat">E</kbd>
-            <kbd class="c-kbd c-kbd--hihat">R</kbd>
-          </div>
-          <p class="c-card__desc">
-            Percusión de alta frecuencia (>7 kHz) para mantener el groove continuo y la subdivisión temporal.
-          </p>
-        </article>
-
-        <!-- Tarjeta Teclado Fila Snare -->
-        <article class="c-card">
-          <h3 class="c-card__title">
-            <span>🎯 Fila 2: Caja / Snare</span>
-          </h3>
-          <div class="c-card__keys" aria-label="Teclas Fila Snare">
-            <kbd class="c-kbd c-kbd--snare">A</kbd>
-            <kbd class="c-kbd c-kbd--snare">S</kbd>
-            <kbd class="c-kbd c-kbd--snare">D</kbd>
-            <kbd class="c-kbd c-kbd--snare">F</kbd>
-          </div>
-          <p class="c-card__desc">
-            Respuesta contundente en frecuencias medias (~180 Hz + ruido blanco filtrado), ideal para los tiempos 2 y 4.
-          </p>
-        </article>
-
-        <!-- Tarjeta Teclado Fila Kick -->
-        <article class="c-card">
-          <h3 class="c-card__title">
-            <span>🥁 Fila 3: Bombo / Kick</span>
-          </h3>
-          <div class="c-card__keys" aria-label="Teclas Fila Kick">
-            <kbd class="c-kbd c-kbd--kick">Z</kbd>
-            <kbd class="c-kbd c-kbd--kick">X</kbd>
-            <kbd class="c-kbd c-kbd--kick">C</kbd>
-            <kbd class="c-kbd c-kbd--kick">V</kbd>
-          </div>
-          <p class="c-card__desc">
-            Fundamento rítmico en subgraves (~40-150 Hz con caída exponencial), base armónica del compás 4/4.
-          </p>
-        </article>
-
-        <!-- Tarjeta Transporte Global -->
-        <article class="c-card">
-          <h3 class="c-card__title">
-            <span>🎛️ Transporte y Configuración</span>
-          </h3>
-          <div class="c-card__keys" aria-label="Teclas de transporte">
-            <kbd class="c-kbd">Espacio</kbd>
-            <span class="c-badge">Play / Stop</span>
-            <kbd class="c-kbd">B</kbd>
-            <span class="c-badge">BPM (90/120/140)</span>
-            <kbd class="c-kbd">Borrar (C)</kbd>
-            <span class="c-badge">Clear Patrón</span>
-          </div>
-          <p class="c-card__desc">
-            Control del reloj secuenciador sincronizado con micro-compresión geométrica visual (100 ms) en cada paso disparado.
-          </p>
-        </article>
-      </div>
+    <!-- Checklist de la práctica -->
+    <section class="instructions" aria-labelledby="checklist-title">
+      <h2 id="checklist-title" class="instructions__title">Checklist de la práctica</h2>
+      <ul class="instructions__list">
+        <li class="instructions__item">
+          ✅ <strong>Arquitectura en dos niveles espaciales</strong>:
+          <span class="instructions__note">
+            Nivel 1 (Estudio de producción explorativo con workstation y monitores) y Nivel 2 (Secuenciador 4&times;4 manipulativo y contributivo en primer plano).
+          </span>
+        </li>
+        <li class="instructions__item">
+          ✅ <strong>Modelo 3D externo incorporado</strong>:
+          <span class="instructions__note">
+            Integración del modelo <code>oversized_drum_pad.glb</code> de lukus1 (bajo licencia CC BY 4.0), con chasis procedural de respaldo para garantizar robustez de carga.
+          </span>
+        </li>
+        <li class="instructions__item">
+          ✅ <strong>Motor de audio Web Audio API (&lt;15 ms)</strong>:
+          <span class="instructions__note">
+            Implementación híbrida de baja latencia con muestras WAV reales (licencia MIT) y síntesis procedural por osciladores analógicos (seno, onda triangular y generador de transitorios).
+          </span>
+        </li>
+        <li class="instructions__item">
+          ✅ <strong>Interacción multimodal (Desktop, Mobile, VR)</strong>:
+          <span class="instructions__note">
+            Soporte simultáneo para raycaster de ratón, eventos táctiles en pantallas móviles, puntero láser para mandos WebXR (Meta Quest) y teclado isomórfico mapeado físicamente a la rejilla de pads.
+          </span>
+        </li>
+        <li class="instructions__item">
+          ✅ <strong>Secuenciador rítmico por pasos 4/4 completo</strong>:
+          <span class="instructions__note">
+            16 pads interactivos (4 voces &times; 4 tiempos), reloj BPM ajustable (90, 120, 140 BPM), fila de LEDs de tempo sincronizados y microanimación de compresión visual (100 ms) al disparar cada sonido.
+          </span>
+        </li>
+        <li class="instructions__item">
+          ✅ <strong>Estructura de entrega y despliegue</strong>:
+          <span class="instructions__note">
+            Archivo <code>index.html</code> en la raíz, recursos organizados en <code>recursos/</code>, repositorio en GitHub y despliegue público en GitHub Pages con código QR para prueba en dispositivos móviles.
+          </span>
+        </li>
+      </ul>
     </section>
 
     <!-- Mapa Arquitectónico de la Matriz 4x4 (16 Pads) -->
-    <section class="c-legend" style="margin-top: var(--space-xl);" aria-labelledby="matrix-map-title">
-      <div class="c-legend__header">
-        <h2 id="matrix-map-title" class="c-legend__title">
-          <span aria-hidden="true">🗺️</span> Arquitectura de la Matriz: 4 Voces &times; 4 Tiempos (16 Pads)
-        </h2>
-        <span class="c-badge c-badge--accent">Secuenciador por Pasos (Step Sequencer)</span>
-      </div>
-
-      <p class="c-hero__lead" style="margin-bottom: var(--space-md); font-size: 0.95rem;">
-        Los 16 pads no son 16 sonidos aislados, sino la <strong>intersección temporal entre las 4 voces del kit (filas) y los 4 tiempos del compás de 4/4 (columnas)</strong>. Al pulsar Play, el cabezal recorre las 4 columnas de izquierda a derecha:
+    <section class="matrix-section" aria-labelledby="matrix-title">
+      <h2 id="matrix-title" class="matrix-section__title">Arquitectura de la Matriz: 4 Voces &times; 4 Tiempos (16 Pads)</h2>
+      <p style="margin: 0 0 0.75rem; font-size: 0.95rem; line-height: 1.5;">
+        Los 16 pads del controlador representan la <strong>intersección temporal entre las 4 voces del kit (filas) y los 4 tiempos del compás de 4/4 (columnas)</strong>. Durante la reproducción, el cabezal de lectura avanza de izquierda a derecha a lo largo de las 4 columnas al tempo seleccionado:
       </p>
 
-      <div class="c-matrix-demo">
-        <table class="c-matrix-demo__table" aria-label="Mapa de distribución de los 16 pads">
+      <div class="table-wrapper" tabindex="0" role="region" aria-labelledby="matrix-caption">
+        <table class="matrix-table">
+          <caption id="matrix-caption">Distribución de los 16 pads del secuenciador por pasos</caption>
           <thead>
             <tr>
-              <th scope="col" class="c-matrix-demo__th">Voz / Fila</th>
-              <th scope="col" class="c-matrix-demo__th">Tiempo 1 · <span style="color: #00e5ff;">LED 1</span></th>
-              <th scope="col" class="c-matrix-demo__th">Tiempo 2 · <span style="color: #00e5ff;">LED 2</span></th>
-              <th scope="col" class="c-matrix-demo__th">Tiempo 3 · <span style="color: #00e5ff;">LED 3</span></th>
-              <th scope="col" class="c-matrix-demo__th">Tiempo 4 · <span style="color: #00e5ff;">LED 4</span></th>
+              <th scope="col">Voz / Fila</th>
+              <th scope="col">Tiempo 1 (LED 1)</th>
+              <th scope="col">Tiempo 2 (LED 2)</th>
+              <th scope="col">Tiempo 3 (LED 3)</th>
+              <th scope="col">Tiempo 4 (LED 4)</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <th scope="row" class="c-matrix-demo__td-voice" style="color: var(--color-voice-crash);">
-                Fila 0: Crash <kbd class="c-kbd c-kbd--crash" style="padding: 2px 6px; font-size: 11px;">1-2-3-4</kbd>
+              <th scope="row">
+                <span class="voice-dot voice-dot--crash"></span>Crash <kbd>1-2-3-4</kbd>
               </th>
-              <td class="c-matrix-demo__cell">Pad 0 <small style="color: var(--color-text-muted);">(Crash T1)</small></td>
-              <td class="c-matrix-demo__cell">Pad 1 <small style="color: var(--color-text-muted);">(Crash T2)</small></td>
-              <td class="c-matrix-demo__cell">Pad 2 <small style="color: var(--color-text-muted);">(Crash T3)</small></td>
-              <td class="c-matrix-demo__cell">Pad 3 <small style="color: var(--color-text-muted);">(Crash T4)</small></td>
+              <td>Pad 0 <small>(Crash T1)</small></td>
+              <td>Pad 1 <small>(Crash T2)</small></td>
+              <td>Pad 2 <small>(Crash T3)</small></td>
+              <td>Pad 3 <small>(Crash T4)</small></td>
             </tr>
             <tr>
-              <th scope="row" class="c-matrix-demo__td-voice" style="color: var(--color-voice-hihat);">
-                Fila 1: Hi-Hat <kbd class="c-kbd c-kbd--hihat" style="padding: 2px 6px; font-size: 11px;">Q-W-E-R</kbd>
+              <th scope="row">
+                <span class="voice-dot voice-dot--hihat"></span>Hi-Hat <kbd>Q-W-E-R</kbd>
               </th>
-              <td class="c-matrix-demo__cell">Pad 4 <small style="color: var(--color-text-muted);">(Hi-Hat T1)</small></td>
-              <td class="c-matrix-demo__cell">Pad 5 <small style="color: var(--color-text-muted);">(Hi-Hat T2)</small></td>
-              <td class="c-matrix-demo__cell">Pad 6 <small style="color: var(--color-text-muted);">(Hi-Hat T3)</small></td>
-              <td class="c-matrix-demo__cell">Pad 7 <small style="color: var(--color-text-muted);">(Hi-Hat T4)</small></td>
+              <td>Pad 4 <small>(Hi-Hat T1)</small></td>
+              <td>Pad 5 <small>(Hi-Hat T2)</small></td>
+              <td>Pad 6 <small>(Hi-Hat T3)</small></td>
+              <td>Pad 7 <small>(Hi-Hat T4)</small></td>
             </tr>
             <tr>
-              <th scope="row" class="c-matrix-demo__td-voice" style="color: var(--color-voice-snare);">
-                Fila 2: Snare <kbd class="c-kbd c-kbd--snare" style="padding: 2px 6px; font-size: 11px;">A-S-D-F</kbd>
+              <th scope="row">
+                <span class="voice-dot voice-dot--snare"></span>Snare <kbd>A-S-D-F</kbd>
               </th>
-              <td class="c-matrix-demo__cell">Pad 8 <small style="color: var(--color-text-muted);">(Snare T1)</small></td>
-              <td class="c-matrix-demo__cell">Pad 9 <small style="color: var(--color-text-muted);">(Snare T2)</small></td>
-              <td class="c-matrix-demo__cell">Pad 10 <small style="color: var(--color-text-muted);">(Snare T3)</small></td>
-              <td class="c-matrix-demo__cell">Pad 11 <small style="color: var(--color-text-muted);">(Snare T4)</small></td>
+              <td>Pad 8 <small>(Snare T1)</small></td>
+              <td>Pad 9 <small>(Snare T2)</small></td>
+              <td>Pad 10 <small>(Snare T3)</small></td>
+              <td>Pad 11 <small>(Snare T4)</small></td>
             </tr>
             <tr>
-              <th scope="row" class="c-matrix-demo__td-voice" style="color: var(--color-voice-kick);">
-                Fila 3: Kick <kbd class="c-kbd c-kbd--kick" style="padding: 2px 6px; font-size: 11px;">Z-X-C-V</kbd>
+              <th scope="row">
+                <span class="voice-dot voice-dot--kick"></span>Kick <kbd>Z-X-C-V</kbd>
               </th>
-              <td class="c-matrix-demo__cell">Pad 12 <small style="color: var(--color-text-muted);">(Kick T1)</small></td>
-              <td class="c-matrix-demo__cell">Pad 13 <small style="color: var(--color-text-muted);">(Kick T2)</small></td>
-              <td class="c-matrix-demo__cell">Pad 14 <small style="color: var(--color-text-muted);">(Kick T3)</small></td>
-              <td class="c-matrix-demo__cell">Pad 15 <small style="color: var(--color-text-muted);">(Kick T4)</small></td>
+              <td>Pad 12 <small>(Kick T1)</small></td>
+              <td>Pad 13 <small>(Kick T2)</small></td>
+              <td>Pad 14 <small>(Kick T3)</small></td>
+              <td>Pad 15 <small>(Kick T4)</small></td>
             </tr>
           </tbody>
         </table>
       </div>
+
+      <!-- Guía de controles multimodal -->
+      <div class="controls-grid">
+        <div class="control-card">
+          <h3 class="control-card__title">Interacción Puntero / WebXR</h3>
+          <p class="control-card__text">
+            Toca o haz clic sobre los pads para alternar entre <em>Inactivo</em> y <em>Programado</em>. En cascos VR, apunta con el mando y pulsa el gatillo.
+          </p>
+        </div>
+
+        <div class="control-card">
+          <h3 class="control-card__title">Teclado Isomórfico</h3>
+          <p class="control-card__text">
+            Las 4 filas del teclado físico corresponden a las 4 voces: <kbd>1-4</kbd> Crash, <kbd>Q-R</kbd> Hi-Hat, <kbd>A-F</kbd> Snare y <kbd>Z-V</kbd> Kick.
+          </p>
+        </div>
+
+        <div class="control-card">
+          <h3 class="control-card__title">Transporte Global</h3>
+          <p class="control-card__text">
+            Pulsa <kbd>Espacio</kbd> para Play/Stop, <kbd>B</kbd> para cambiar el tempo (90, 120 o 140 BPM) y <kbd>C</kbd> para limpiar todos los pasos activos.
+          </p>
+        </div>
+      </div>
     </section>
+
+    <!-- Repositorio y acceso móvil con QR -->
+    <section class="instructions" aria-labelledby="repo-title">
+      <h2 id="repo-title" class="instructions__title">Repositorio y acceso móvil</h2>
+      <div class="access-box">
+        <div class="access-box__info">
+          <p><strong>Repositorio en GitHub:</strong> <a class="credits__link" href="https://github.com/alfupe/practica_realidad-virtual" target="_blank" rel="noopener noreferrer">github.com/alfupe/practica_realidad-virtual</a></p>
+          <p><strong>Despliegue online (GitHub Pages):</strong> <a class="credits__link" href="https://alfupe.github.io/practica_realidad-virtual/" target="_blank" rel="noopener noreferrer">alfupe.github.io/practica_realidad-virtual</a></p>
+          <p class="access-box__hint">Escanea este código QR con un smartphone o dispositivo móvil para abrir la experiencia WebXR directamente y verificar la compatibilidad táctil y de giroscopios.</p>
+        </div>
+        <div class="access-box__qr">
+          <img src="recursos/assets/qr-github-pages.png" alt="Código QR de acceso a GitHub Pages" width="110" height="110">
+        </div>
+      </div>
+    </section>
+
+    <!-- Créditos y Atribución -->
+    <section class="credits" aria-labelledby="credits-title">
+      <h2 id="credits-title" class="credits__title">Créditos y licencias</h2>
+      <ul class="credits__list">
+        <li class="credits__item">
+          <strong>Modelo 3D del controlador:</strong> 
+          <a class="credits__link" href="https://skfb.ly/6YTGQ" target="_blank" rel="noopener noreferrer">"Oversized Drum Pad"</a> 
+          por lukus1, licenciado bajo 
+          <a class="credits__link" href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">Creative Commons Attribution 4.0 International (CC BY 4.0)</a>.
+        </li>
+        <li class="credits__item">
+          <strong>Muestras de percusión (WAV):</strong> 
+          Colección acústica Kick, Snare, Hi-Hat y Crash de 
+          <a class="credits__link" href="https://github.com/ArunMichaelDsouza/javascript-30-course" target="_blank" rel="noopener noreferrer">JavaScript 30 Drum Kit</a> 
+          por Arun Michael Dsouza, bajo licencia 
+          <a class="credits__link" href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener noreferrer">MIT License</a>.
+        </li>
+        <li class="credits__item">
+          <strong>Framework WebXR:</strong> 
+          <a class="credits__link" href="https://aframe.io/" target="_blank" rel="noopener noreferrer">A-Frame 1.6.0</a> 
+          desarrollado por Supermedium y Mozilla VR bajo licencia MIT.
+        </li>
+        <li class="credits__item">
+          <strong>Documento de auditoría legal:</strong> 
+          Consulta la tabla detallada de titularidad y licencias en la sección <a class="credits__link" href="recursos/licencias.html">Licencias y Atribución</a>.
+        </li>
+      </ul>
+    </section>
+
+    <!-- Declaración institucional de uso de IA -->
+    <section class="ai-declaration" aria-labelledby="ai-title">
+      <h2 id="ai-title" class="ai-declaration__title">Declaración de uso de Inteligencia Artificial (IA)</h2>
+      <p>Siguiendo las directrices institucionales de la UOC sobre el uso ético, crítico y responsable de las herramientas de Inteligencia Artificial en las actividades de evaluación del Grado en Multimedia, se detalla a continuación el alcance de su empleo en la realización de esta práctica:</p>
+
+      <ul class="instructions__list">
+        <li class="instructions__item">
+          <strong>Herramienta utilizada:</strong> Asistente de Inteligencia Artificial (Antigravity / Gemini).
+        </li>
+        <li class="instructions__item">
+          <strong>Objetivos perseguidos:</strong>
+          <ul style="margin-top: 0.35rem; padding-left: 1.25rem;">
+            <li>Localización de muestras de audio de percusión libres de derechos con licencia permisiva (MIT) para complementar la síntesis por Web Audio API.</li>
+            <li>Revisión de estándares de accesibilidad WCAG 2.1 (tablas con encabezados semánticos, contraste de color e interacción por teclado).</li>
+            <li>Asistencia en la formulación de ecuaciones de síntesis aditiva y sustractiva procedural en Web Audio API (filtros pasa-altos para hi-hats y modulación de frecuencia para bombos).</li>
+            <li>Generación automática del código QR vectorial/PNG que vincula directamente al despliegue público en GitHub Pages.</li>
+          </ul>
+        </li>
+        <li class="instructions__item">
+          <strong>Instrucciones o prompts representativos:</strong>
+          <div style="margin-top: 0.4rem; display: flex; flex-direction: column; gap: 0.35rem;">
+            <blockquote>«Ayúdame a localizar muestras libres de percusión con licencia compatible (MIT o CC) para integrar en DrumLab VR y documentar su procedencia.»</blockquote>
+            <blockquote>«¿Cómo configurar el raycaster de A-Frame para que funcione de manera idéntica con ratón, pantallas táctiles y mandos de Meta Quest?»</blockquote>
+            <blockquote>«Estructura una tabla accesible para representar la matriz 4x4 de un secuenciador por pasos con teclado isomórfico.»</blockquote>
+          </div>
+        </li>
+        <li class="instructions__item">
+          <strong>Respuestas obtenidas:</strong>
+          <span class="instructions__note">
+            La herramienta proporcionó referencias de repositorios abiertos para las muestras sonoras, fragmentos para el registro de componentes en A-Frame y recomendaciones de sintaxis para tablas semánticas.
+          </span>
+        </li>
+        <li class="instructions__item">
+          <strong>Proceso de revisión, reelaboración y edición:</strong>
+          <span class="instructions__note">
+            El uso de la IA ha sido estrictamente auxiliar y de consulta técnica. La concepción didáctica musical de DrumLab VR, la arquitectura de dos niveles espaciales, la selección y depuración de los modelos 3D y muestras de audio, la adaptación al diseño visual institucional de las PEC de la asignatura y la validación en dispositivos reales han sido dirigidos, revisados y validados íntegramente por mí.
+          </span>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Pie de página -->
+    <footer class="site-footer">
+      <p>
+        <strong>DrumLab VR</strong> &copy; 2026 Alejandro Fuentes Pérez · Práctica de Realidad Virtual · Grado en Multimedia (UOC)
+      </p>
+    </footer>
   </main>
 
-  <!-- Pie de Página -->
-  <footer class="c-footer">
-    <div class="l-container c-footer__content">
-      <p class="c-footer__copy">
-        <strong>DrumLab VR</strong> &copy; 2026 Alejandro Fuentes Pérez · Proyecto Académico Realidad Virtual (UOC).
-      </p>
-      <ul class="c-footer__links">
-        <li><a href="recursos/guia-ritmica.html">Guía Rítmica Didáctica</a></li>
-        <li><a href="recursos/licencias.html">Licencias y Atribución</a></li>
-        <li><a href="https://github.com/alfupe/practica_realidad-virtual" target="_blank" rel="noopener noreferrer">Repositorio GitHub</a></li>
-      </ul>
-    </div>
-  </footer>
-
-  <!-- Script ligero para control de contenedor visor (Pantalla completa / Recarga) -->
+  <!-- Lógica de control de escenas (Pestañas e iframe sincronizado) -->
   <script>
-    (function initViewerControls() {
-      const iframe = document.getElementById('drumlab-frame');
+    function cambiarEscena(num, actualizarUrl = true) {
+      const c1 = document.getElementById('contenedor-1');
+      const c2 = document.getElementById('contenedor-2');
+      const b1 = document.getElementById('btn-scene1');
+      const b2 = document.getElementById('btn-scene2');
+
+      if (!c1 || !c2 || !b1 || !b2) return;
+
+      if (num === 1) {
+        c1.className = 'scene-container active';
+        c2.className = 'scene-container';
+        b1.className = 'scene-btn active';
+        b2.className = 'scene-btn';
+        b1.setAttribute('aria-selected', 'true');
+        b2.setAttribute('aria-selected', 'false');
+      } else {
+        c1.className = 'scene-container';
+        c2.className = 'scene-container active';
+        b1.className = 'scene-btn';
+        b2.className = 'scene-btn active';
+        b1.setAttribute('aria-selected', 'false');
+        b2.setAttribute('aria-selected', 'true');
+      }
+
+      if (actualizarUrl && window.history && window.history.pushState) {
+        const url = new URL(window.location);
+        url.searchParams.set('escena', num);
+        window.history.pushState({ escena: num }, '', url);
+      }
+    }
+
+    // Botones de pantalla completa y recarga
+    (function initViewerActions() {
       const btnFullscreen = document.getElementById('btn-fullscreen');
       const btnReload = document.getElementById('btn-reload');
+      const f1 = document.getElementById('frame-scene1');
+      const f2 = document.getElementById('frame-scene2');
 
-      if (btnFullscreen && iframe) {
+      function getActiveIframe() {
+        const c1 = document.getElementById('contenedor-1');
+        return (c1 && c1.classList.contains('active')) ? f1 : f2;
+      }
+
+      if (btnFullscreen) {
         btnFullscreen.addEventListener('click', () => {
+          const iframe = getActiveIframe();
+          if (!iframe) return;
           if (iframe.requestFullscreen) {
             iframe.requestFullscreen();
           } else if (iframe.webkitRequestFullscreen) {
@@ -295,18 +355,21 @@
         });
       }
 
-      if (btnReload && iframe) {
+      if (btnReload) {
         btnReload.addEventListener('click', () => {
-          iframe.src = iframe.src;
+          const iframe = getActiveIframe();
+          if (iframe) {
+            iframe.src = iframe.src;
+          }
         });
       }
 
-      // Reenvío transparente de teclado isomórfico al iframe WebXR
+      // Reenvío de pulsaciones de teclado isomórfico al iframe del secuenciador
       window.addEventListener('keydown', (e) => {
-        if (!iframe || !iframe.contentWindow) return;
+        if (!f2 || !f2.contentWindow) return;
         if (e.ctrlKey || e.metaKey || e.altKey) return;
         try {
-          iframe.contentWindow.dispatchEvent(new KeyboardEvent('keydown', {
+          f2.contentWindow.dispatchEvent(new KeyboardEvent('keydown', {
             key: e.key,
             code: e.code,
             shiftKey: e.shiftKey,
@@ -314,6 +377,18 @@
             cancelable: true
           }));
         } catch (err) {}
+      });
+
+      // Leer parámetro URL ?escena=1 o ?escena=2
+      const params = new URLSearchParams(window.location.search);
+      const escenaParam = params.get('escena');
+      if (escenaParam === '2') {
+        cambiarEscena(2, false);
+      }
+
+      window.addEventListener('popstate', () => {
+        const p = new URLSearchParams(window.location.search);
+        cambiarEscena(p.get('escena') === '2' ? 2 : 1, false);
       });
     })();
   </script>

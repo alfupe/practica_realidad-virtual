@@ -1,415 +1,158 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Guía Rítmica Didáctica — DrumLab VR (Compás 4/4 y Voces Percusivas)</title>
-  <meta name="description" content="Aprende los fundamentos del compás de 4/4, la subdivisión del tiempo y las funciones tímbricas de Bombo, Caja, Hi-Hat y Crash en DrumLab VR.">
+  <title>Guía Rítmica Didáctica — DrumLab VR</title>
+  <meta name="description" content="Fundamentos del compás 4/4, subdivisión métrica y funciones acústicas de Bombo, Caja, Hi-Hat y Crash en DrumLab VR.">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <!-- Accesibilidad: Enlace de salto al contenido principal -->
-  <a href="#main-content" class="c-skip-link">Saltar al contenido principal</a>
+  <a href="#contenido-principal" class="skip-link">Saltar al contenido principal</a>
 
-  <!-- Cabecera de Navegación Común -->
-  <header class="c-header">
-    <div class="l-container c-header__inner">
-      <a href="../index.html" class="c-brand" aria-label="DrumLab VR - Volver al Inicio">
-        <span class="c-brand__icon" aria-hidden="true">🥁</span>
-        <div class="c-brand__titles">
-          <span class="c-brand__name">DrumLab VR</span>
-          <span class="c-brand__tagline">WebXR Rhythm Lab // 4/4 Matrix</span>
+  <main class="page" id="contenido-principal">
+    <!-- Cabecera -->
+    <header class="page__header">
+      <h1 class="page__title">Guía Rítmica: Compás 4/4 y el Kit de 4 Voces</h1>
+      <h2 class="page__subtitle">DrumLab VR — Fundamentos Didácticos y Psicoacústicos</h2>
+      <p class="page__author">Alejandro Fuentes Pérez · UOC Realidad Virtual</p>
+    </header>
+
+    <!-- Navegación -->
+    <nav class="page__nav" aria-label="Navegación del proyecto">
+      <a href="../index.html" class="page__nav-link">Estudio &amp; Visor</a>
+      <a href="guia-ritmica.html" class="page__nav-link page__nav-link--active" aria-current="page">Guía Rítmica Didáctica</a>
+      <a href="licencias.html" class="page__nav-link">Licencias y Atribución</a>
+    </nav>
+
+    <!-- Sección 1: El compás 4/4 -->
+    <section class="instructions" aria-labelledby="compas-title">
+      <h2 id="compas-title" class="instructions__title">1. El compás cuaternario de 4/4 y las columnas métricas</h2>
+      <p style="margin: 0 0 0.75rem; font-size: 0.95rem; line-height: 1.5;">
+        El compás de <strong>4/4</strong> (cuatro negras por compás) es la piedra angular de la música moderna y contemporánea. En DrumLab VR, cada compás se divide en 4 columnas de lectura sucesiva (Tiempos 1 a 4) que poseen una jerarquía perceptiva claramente diferenciada:
+      </p>
+
+      <div class="controls-grid">
+        <div class="control-card">
+          <h3 class="control-card__title">Tiempo 1 (Columna 0) · Pulso Fuerte</h3>
+          <p class="control-card__text">
+            Es el ancla métrica del compás. Establece la resolución rítmica. Habitualmente acentuado con el <strong>Bombo (Kick)</strong> y, en arranques o transiciones, con el <strong>Crash</strong>.
+          </p>
         </div>
-      </a>
 
-      <nav class="c-nav" aria-label="Navegación principal">
-        <ul class="c-nav__list">
-          <li class="c-nav__item">
-            <a href="../index.html" class="c-nav__link">Estudio &amp; Visor</a>
-          </li>
-          <li class="c-nav__item">
-            <a href="guia-ritmica.html" class="c-nav__link c-nav__link--active" aria-current="page">Guía Rítmica</a>
-          </li>
-          <li class="c-nav__item">
-            <a href="licencias.html" class="c-nav__link">Licencias &amp; Atribución</a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </header>
-
-  <!-- Contenido Principal -->
-  <main id="main-content" class="l-container c-main">
-    <section class="c-hero" aria-labelledby="guide-title">
-      <div class="c-hero__badge-container">
-        <span class="c-badge c-badge--uoc">Didáctica Rítmica y Percepción Sonora</span>
-        <span class="c-badge c-badge--accent">Estructura Cuaternaria 4/4</span>
-      </div>
-
-      <h1 id="guide-title" class="c-hero__title">
-        Guía Rítmica: Compás 4/4 y el Kit de 4 Voces
-      </h1>
-
-      <p class="c-hero__lead">
-        Comprender el compás de 4/4 es la base de la música moderna. Esta guía detalla la anatomía temporal 
-        de las 4 columnas del secuenciador y el papel psicoacústico de cada una de las 4 filas tímbricas en DrumLab VR.
-      </p>
-    </section>
-
-    <!-- Sección 1: El Compás 4/4 y las Columnas -->
-    <section class="c-guide__section" aria-labelledby="meter-title">
-      <h2 id="meter-title" class="c-guide__heading">
-        1. El Compás de 4/4 y la Subdivisión Temporal (Columnas 1 a 4)
-      </h2>
-      <p class="c-guide__text">
-        El compás cuaternario de <strong>4/4</strong> (o compasillo) se compone de <strong>cuatro pulsos de negra</strong> por cada compás. 
-        En la música occidental, estos cuatro tiempos poseen una jerarquía de peso perceptivo o <em>energía métrica</em>:
-      </p>
-
-      <div class="c-voice-grid">
-        <article class="c-card">
-          <h3 class="c-card__title">
-            <span class="c-badge c-badge--accent">Columna 0 · Tiempo 1</span> Pulso Fuerte (Downbeat)
-          </h3>
-          <p class="c-card__desc">
-            Es el ancla métrica del compás. Establece la resolución armónica y la entrada enérgica. 
-            Tradicionalmente se acentúa con el <strong>Bombo (Kick)</strong> y, en los inicios de frase o cambios de sección, con el <strong>Crash</strong>.
+        <div class="control-card">
+          <h3 class="control-card__title">Tiempo 2 (Columna 1) · Pulso Débil (Backbeat 1)</h3>
+          <p class="control-card__text">
+            Primer tiempo débil que en la música moderna se convierte en el <em>backbeat</em> principal impulsado por el golpe cortante de la <strong>Caja (Snare)</strong>.
           </p>
-        </article>
+        </div>
 
-        <article class="c-card">
-          <h3 class="c-card__title">
-            <span class="c-badge">Columna 1 · Tiempo 2</span> Pulso Débil (Backbeat 1)
-          </h3>
-          <p class="c-card__desc">
-            Primer tiempo débil del compás, que en la música moderna se convierte en el <em>backbeat</em> principal impulsado 
-            por el golpe cortante de la <strong>Caja (Snare)</strong>, equilibrando la gravedad del Tiempo 1.
+        <div class="control-card">
+          <h3 class="control-card__title">Tiempo 3 (Columna 2) · Pulso Semifuerte</h3>
+          <p class="control-card__text">
+            Punto de inflexión intermedio que aporta estabilidad rítmica. Suele llevar un segundo impulso de <strong>Bombo</strong> o variaciones sincopadas.
           </p>
-        </article>
+        </div>
 
-        <article class="c-card">
-          <h3 class="c-card__title">
-            <span class="c-badge">Columna 2 · Tiempo 3</span> Pulso Semifuerte
-          </h3>
-          <p class="c-card__desc">
-            Punto de inflexión intermedio del compás. Aporta estabilidad rítmica antes de la tensión final. 
-            Suele llevar un segundo impacto de <strong>Bombo</strong> o variaciones sincopadas.
+        <div class="control-card">
+          <h3 class="control-card__title">Tiempo 4 (Columna 3) · Pulso Débil (Backbeat 2)</h3>
+          <p class="control-card__text">
+            Segundo <em>backbeat</em> a cargo de la <strong>Caja</strong>, generando la máxima tensión resolutiva que prepara la caída nuevamente en el Tiempo 1.
           </p>
-        </article>
-
-        <article class="c-card">
-          <h3 class="c-card__title">
-            <span class="c-badge">Columna 3 · Tiempo 4</span> Pulso Débil (Backbeat 2 &amp; Resolución)
-          </h3>
-          <p class="c-card__desc">
-            Segundo <em>backbeat</em> del compás. Conduce la expectación hacia el siguiente ciclo. 
-            El golpe de <strong>Caja</strong> en este pulso genera la inercia necesaria para reiniciar el bucle en el Tiempo 1.
-          </p>
-        </article>
+        </div>
       </div>
     </section>
 
-    <!-- Sección 2: Voces Tímbricas del Kit (Filas 0 a 3) -->
-    <section class="c-guide__section" aria-labelledby="voices-title">
-      <h2 id="voices-title" class="c-guide__heading">
-        2. Función Tímbrica y Psicoacústica del Kit Percusivo
-      </h2>
-      <p class="c-guide__text">
-        El kit interactivo de DrumLab VR está ordenado verticalmente en 4 estratos tímbricos que abarcan 
-        desde las altas frecuencias brillantes hasta el subgrave de mayor energía cinética:
+    <!-- Sección 2: Las 4 Voces del Kit -->
+    <section class="matrix-section" aria-labelledby="voces-title">
+      <h2 id="voces-title" class="matrix-section__title">2. Las 4 voces de percusión y su función espectral</h2>
+      <p style="margin: 0 0 0.75rem; font-size: 0.95rem; line-height: 1.5;">
+        Cada una de las cuatro filas horizontales del secuenciador genera un timbre sonoro optimizado para un rango de frecuencias específico, evitando el enmascaramiento psicoacústico:
       </p>
 
-      <div class="c-voice-grid">
-        <!-- Fila 0: Crash -->
-        <article class="c-voice-card c-voice-card--crash">
-          <div class="c-voice-card__header">
-            <h3 class="c-voice-card__title">Plato Crash</h3>
-            <span class="c-voice-card__row-id">Fila 0 · Teclas 1-2-3-4</span>
-          </div>
-          <p class="c-voice-card__freq">Espectro: 3 kHz – 16 kHz · Decaimiento: ~1.2 s</p>
-          <p class="c-voice-card__desc">
-            <strong>Función musical:</strong> Acento dinámico, transiciones y picos de máxima intensidad emocional. 
-            Proporciona un brillo metálico envolvente que suele colocarse en el Tiempo 1 de frases de 4 u 8 compases.
-          </p>
-        </article>
-
-        <!-- Fila 1: Hi-Hat -->
-        <article class="c-voice-card c-voice-card--hihat">
-          <div class="c-voice-card__header">
-            <h3 class="c-voice-card__title">Charles / Hi-Hat</h3>
-            <span class="c-voice-card__row-id">Fila 1 · Teclas Q-W-E-R</span>
-          </div>
-          <p class="c-voice-card__freq">Espectro: 7 kHz – 18 kHz · Decaimiento: ~0.06 s</p>
-          <p class="c-voice-card__desc">
-            <strong>Función musical:</strong> Subdivisión temporal y groove continuo. Al ser un sonido seco, 
-            articulado y de rápida respuesta, actúa como el metrónomo auditivo de la composición musical.
-          </p>
-        </article>
-
-        <!-- Fila 2: Snare -->
-        <article class="c-voice-card c-voice-card--snare">
-          <div class="c-voice-card__header">
-            <h3 class="c-voice-card__title">Caja / Snare</h3>
-            <span class="c-voice-card__row-id">Fila 2 · Teclas A-S-D-F</span>
-          </div>
-          <p class="c-voice-card__freq">Espectro: 180 Hz cuerpo + 1.2 kHz bordón · Decaimiento: ~0.18 s</p>
-          <p class="c-voice-card__desc">
-            <strong>Función musical:</strong> Contrapunto dinámico y respuesta (*call &amp; response*). 
-            Su impacto percusivo en frecuencias medias fija la cadencia del tema sobre los tiempos 2 y 4.
-          </p>
-        </article>
-
-        <!-- Fila 3: Kick -->
-        <article class="c-voice-card c-voice-card--kick">
-          <div class="c-voice-card__header">
-            <h3 class="c-voice-card__title">Bombo / Kick</h3>
-            <span class="c-voice-card__row-id">Fila 3 · Teclas Z-X-C-V</span>
-          </div>
-          <p class="c-voice-card__freq">Espectro: 40 Hz – 150 Hz subgrave · Decaimiento: ~0.35 s</p>
-          <p class="c-voice-card__desc">
-            <strong>Función musical:</strong> Cimiento y energía visceral del compás. 
-            Define la marcha del ritmo, sincroniza con las líneas de bajo y ancla la sensación de gravedad espacial en VR.
-          </p>
-        </article>
-      </div>
-    </section>
-
-    <!-- Sección 3: Arquitectura de la Matriz 4x4 (Secuenciador vs Finger Drumming) -->
-    <section class="c-guide__section" aria-labelledby="matrix-arch-title">
-      <h2 id="matrix-arch-title" class="c-guide__heading">
-        3. Arquitectura de la Matriz 4&times;4: Secuenciador por Pasos vs. Finger Drumming
-      </h2>
-      <p class="c-guide__text">
-        Una duda habitual al ver una cuadrícula de 16 pads es si cada botón dispara un sonido diferente (como en un sampler de <em>finger drumming</em>). 
-        En <strong>DrumLab VR</strong> la concepción es la de un <strong>Secuenciador por Pasos (Step Sequencer)</strong>: la matriz es la intersección bidimensional entre el <strong>eje vertical tímbrico (4 voces percusivas)</strong> y el <strong>eje horizontal métrico (los 4 pulsos del compás cuaternario)</strong>.
-      </p>
-
-      <div class="c-matrix-demo">
-        <table class="c-matrix-demo__table" aria-label="Esquema de distribución de los 16 pads en la matriz">
-          <thead>
-            <tr>
-              <th scope="col" class="c-matrix-demo__th">Voz / Fila</th>
-              <th scope="col" class="c-matrix-demo__th">
-                Columna 1 (Tiempo 1)<br>
-                <small style="color: #00e5ff;">[ LED 1 · Downbeat ]</small>
-              </th>
-              <th scope="col" class="c-matrix-demo__th">
-                Columna 2 (Tiempo 2)<br>
-                <small style="color: #00e5ff;">[ LED 2 · Backbeat 1 ]</small>
-              </th>
-              <th scope="col" class="c-matrix-demo__th">
-                Columna 3 (Tiempo 3)<br>
-                <small style="color: #00e5ff;">[ LED 3 · Semifuerte ]</small>
-              </th>
-              <th scope="col" class="c-matrix-demo__th">
-                Columna 4 (Tiempo 4)<br>
-                <small style="color: #00e5ff;">[ LED 4 · Backbeat 2 ]</small>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row" class="c-matrix-demo__td-voice" style="color: var(--color-voice-crash);">
-                Fila 0: Crash<br><small style="color: var(--color-text-muted);">Teclas: 1 - 2 - 3 - 4</small>
-              </th>
-              <td class="c-matrix-demo__cell">
-                <strong>Pad 0</strong><br><small style="color: var(--color-text-muted);">Crash · T1</small>
-              </td>
-              <td class="c-matrix-demo__cell">
-                <strong>Pad 1</strong><br><small style="color: var(--color-text-muted);">Crash · T2</small>
-              </td>
-              <td class="c-matrix-demo__cell">
-                <strong>Pad 2</strong><br><small style="color: var(--color-text-muted);">Crash · T3</small>
-              </td>
-              <td class="c-matrix-demo__cell">
-                <strong>Pad 3</strong><br><small style="color: var(--color-text-muted);">Crash · T4</small>
-              </td>
-            </tr>
-            <tr>
-              <th scope="row" class="c-matrix-demo__td-voice" style="color: var(--color-voice-hihat);">
-                Fila 1: Hi-Hat<br><small style="color: var(--color-text-muted);">Teclas: Q - W - E - R</small>
-              </th>
-              <td class="c-matrix-demo__cell">
-                <strong>Pad 4</strong><br><small style="color: var(--color-text-muted);">Hi-Hat · T1</small>
-              </td>
-              <td class="c-matrix-demo__cell">
-                <strong>Pad 5</strong><br><small style="color: var(--color-text-muted);">Hi-Hat · T2</small>
-              </td>
-              <td class="c-matrix-demo__cell">
-                <strong>Pad 6</strong><br><small style="color: var(--color-text-muted);">Hi-Hat · T3</small>
-              </td>
-              <td class="c-matrix-demo__cell">
-                <strong>Pad 7</strong><br><small style="color: var(--color-text-muted);">Hi-Hat · T4</small>
-              </td>
-            </tr>
-            <tr>
-              <th scope="row" class="c-matrix-demo__td-voice" style="color: var(--color-voice-snare);">
-                Fila 2: Snare<br><small style="color: var(--color-text-muted);">Teclas: A - S - D - F</small>
-              </th>
-              <td class="c-matrix-demo__cell">
-                <strong>Pad 8</strong><br><small style="color: var(--color-text-muted);">Snare · T1</small>
-              </td>
-              <td class="c-matrix-demo__cell">
-                <strong>Pad 9</strong><br><small style="color: var(--color-text-muted);">Snare · T2</small>
-              </td>
-              <td class="c-matrix-demo__cell">
-                <strong>Pad 10</strong><br><small style="color: var(--color-text-muted);">Snare · T3</small>
-              </td>
-              <td class="c-matrix-demo__cell">
-                <strong>Pad 11</strong><br><small style="color: var(--color-text-muted);">Snare · T4</small>
-              </td>
-            </tr>
-            <tr>
-              <th scope="row" class="c-matrix-demo__td-voice" style="color: var(--color-voice-kick);">
-                Fila 3: Kick<br><small style="color: var(--color-text-muted);">Teclas: Z - X - C - V</small>
-              </th>
-              <td class="c-matrix-demo__cell">
-                <strong>Pad 12</strong><br><small style="color: var(--color-text-muted);">Kick · T1</small>
-              </td>
-              <td class="c-matrix-demo__cell">
-                <strong>Pad 13</strong><br><small style="color: var(--color-text-muted);">Kick · T2</small>
-              </td>
-              <td class="c-matrix-demo__cell">
-                <strong>Pad 14</strong><br><small style="color: var(--color-text-muted);">Kick · T3</small>
-              </td>
-              <td class="c-matrix-demo__cell">
-                <strong>Pad 15</strong><br><small style="color: var(--color-text-muted);">Kick · T4</small>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div style="margin-top: var(--space-md); padding: var(--space-md); background: rgba(0, 229, 255, 0.05); border-left: 3px solid #00e5ff; border-radius: var(--radius-sm);">
-        <h3 style="margin: 0 0 var(--space-xs) 0; color: #00e5ff; font-size: 0.95rem;">
-          ⚙️ Dinámica del Cabezal Temporal (Playhead)
-        </h3>
-        <p class="c-guide__text" style="margin: 0; font-size: 0.88rem; line-height: 1.55;">
-          Al pulsar <strong>Play</strong> (o la barra espaciadora), el cabezal del reloj recorre las columnas en bucle (<code>Col 1 ➔ Col 2 ➔ Col 3 ➔ Col 4 ➔ Col 1...</code>) sincronizado con los LEDs luminosos superiores. Si activas el <strong>Pad 12</strong>, programas el Bombo para que suene automáticamente en el primer pulso. Si activas los <strong>Pads 9 y 11</strong>, la Caja marcará los pulsos 2 y 4 (el clásico <em>backbeat</em>). De este modo, los 16 pads permiten programar secuencias rítmicas infinitas combinando tan solo 4 fuentes sonoras.
-        </p>
-      </div>
-    </section>
-
-    <!-- Sección 4: Patrones Didácticos Canónicos en la Matriz 4x4 -->
-    <section class="c-guide__section" aria-labelledby="patterns-title">
-      <h2 id="patterns-title" class="c-guide__heading">
-        4. Plantillas Didácticas de Programación en la Matriz 4&times;4
-      </h2>
-      <p class="c-guide__text">
-        Prueba a configurar estos tres patrones fundamentales en el secuenciador para experimentar 
-        cómo cambian el estilo y la sensación temporal con las mismas 4 voces:
-      </p>
-
-      <!-- Patrón A: Rock Estándar -->
-      <h3 class="c-guide__subheading">A. Patrón Estándar Rock / Pop (BPM recomendado: 120)</h3>
-      <p class="c-guide__text">Bombo en tiempos 1 y 3; Caja en tiempos 2 y 4; Hi-Hat marcando todos los pulsos; Crash de apertura en tiempo 1.</p>
-      
-      <div class="c-matrix-demo">
-        <table class="c-matrix-demo__table" aria-label="Matriz de patrón Rock estándar">
-          <thead>
-            <tr>
-              <th scope="col" class="c-matrix-demo__th">Voz / Fila</th>
-              <th scope="col" class="c-matrix-demo__th">Tiempo 1 (Col 0)</th>
-              <th scope="col" class="c-matrix-demo__th">Tiempo 2 (Col 1)</th>
-              <th scope="col" class="c-matrix-demo__th">Tiempo 3 (Col 2)</th>
-              <th scope="col" class="c-matrix-demo__th">Tiempo 4 (Col 3)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row" class="c-matrix-demo__td-voice">F0: Crash</th>
-              <td class="c-matrix-demo__cell c-matrix-demo__cell--on-crash">ON (💥)</td>
-              <td class="c-matrix-demo__cell">—</td>
-              <td class="c-matrix-demo__cell">—</td>
-              <td class="c-matrix-demo__cell">—</td>
-            </tr>
-            <tr>
-              <th scope="row" class="c-matrix-demo__td-voice">F1: Hi-Hat</th>
-              <td class="c-matrix-demo__cell c-matrix-demo__cell--on-hihat">ON (⚡)</td>
-              <td class="c-matrix-demo__cell c-matrix-demo__cell--on-hihat">ON (⚡)</td>
-              <td class="c-matrix-demo__cell c-matrix-demo__cell--on-hihat">ON (⚡)</td>
-              <td class="c-matrix-demo__cell c-matrix-demo__cell--on-hihat">ON (⚡)</td>
-            </tr>
-            <tr>
-              <th scope="row" class="c-matrix-demo__td-voice">F2: Snare</th>
-              <td class="c-matrix-demo__cell">—</td>
-              <td class="c-matrix-demo__cell c-matrix-demo__cell--on-snare">ON (🎯)</td>
-              <td class="c-matrix-demo__cell">—</td>
-              <td class="c-matrix-demo__cell c-matrix-demo__cell--on-snare">ON (🎯)</td>
-            </tr>
-            <tr>
-              <th scope="row" class="c-matrix-demo__td-voice">F3: Kick</th>
-              <td class="c-matrix-demo__cell c-matrix-demo__cell--on-kick">ON (🥁)</td>
-              <td class="c-matrix-demo__cell">—</td>
-              <td class="c-matrix-demo__cell c-matrix-demo__cell--on-kick">ON (🥁)</td>
-              <td class="c-matrix-demo__cell">—</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Patrón B: House Four-on-the-Floor -->
-      <h3 class="c-guide__subheading">B. Patrón Electrónico "Four-on-the-Floor" (BPM recomendado: 120 o 140)</h3>
-      <p class="c-guide__text">Bombo palpitando ininterrumpidamente en los 4 tiempos; Caja reforzando los tiempos 2 y 4; Hi-Hat en todos los pasos.</p>
-      
-      <div class="c-matrix-demo">
-        <table class="c-matrix-demo__table" aria-label="Matriz de patrón Four-on-the-Floor">
-          <thead>
-            <tr>
-              <th scope="col" class="c-matrix-demo__th">Voz / Fila</th>
-              <th scope="col" class="c-matrix-demo__th">Tiempo 1 (Col 0)</th>
-              <th scope="col" class="c-matrix-demo__th">Tiempo 2 (Col 1)</th>
-              <th scope="col" class="c-matrix-demo__th">Tiempo 3 (Col 2)</th>
-              <th scope="col" class="c-matrix-demo__th">Tiempo 4 (Col 3)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row" class="c-matrix-demo__td-voice">F0: Crash</th>
-              <td class="c-matrix-demo__cell c-matrix-demo__cell--on-crash">ON (💥)</td>
-              <td class="c-matrix-demo__cell">—</td>
-              <td class="c-matrix-demo__cell">—</td>
-              <td class="c-matrix-demo__cell">—</td>
-            </tr>
-            <tr>
-              <th scope="row" class="c-matrix-demo__td-voice">F1: Hi-Hat</th>
-              <td class="c-matrix-demo__cell c-matrix-demo__cell--on-hihat">ON (⚡)</td>
-              <td class="c-matrix-demo__cell c-matrix-demo__cell--on-hihat">ON (⚡)</td>
-              <td class="c-matrix-demo__cell c-matrix-demo__cell--on-hihat">ON (⚡)</td>
-              <td class="c-matrix-demo__cell c-matrix-demo__cell--on-hihat">ON (⚡)</td>
-            </tr>
-            <tr>
-              <th scope="row" class="c-matrix-demo__td-voice">F2: Snare</th>
-              <td class="c-matrix-demo__cell">—</td>
-              <td class="c-matrix-demo__cell c-matrix-demo__cell--on-snare">ON (🎯)</td>
-              <td class="c-matrix-demo__cell">—</td>
-              <td class="c-matrix-demo__cell c-matrix-demo__cell--on-snare">ON (🎯)</td>
-            </tr>
-            <tr>
-              <th scope="row" class="c-matrix-demo__td-voice">F3: Kick</th>
-              <td class="c-matrix-demo__cell c-matrix-demo__cell--on-kick">ON (🥁)</td>
-              <td class="c-matrix-demo__cell c-matrix-demo__cell--on-kick">ON (🥁)</td>
-              <td class="c-matrix-demo__cell c-matrix-demo__cell--on-kick">ON (🥁)</td>
-              <td class="c-matrix-demo__cell c-matrix-demo__cell--on-kick">ON (🥁)</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-  </main>
-
-  <!-- Pie de Página -->
-  <footer class="c-footer">
-    <div class="l-container c-footer__content">
-      <p class="c-footer__copy">
-        <strong>DrumLab VR</strong> &copy; 2026 Alejandro Fuentes Pérez · Proyecto Académico Realidad Virtual (UOC).
-      </p>
-      <ul class="c-footer__links">
-        <li><a href="../index.html">Estudio &amp; Visor</a></li>
-        <li><a href="licencias.html">Licencias y Atribución</a></li>
-        <li><a href="https://github.com/alfupe/practica_realidad-virtual" target="_blank" rel="noopener noreferrer">Repositorio GitHub</a></li>
+      <ul class="instructions__list">
+        <li class="instructions__item">
+          <strong><span class="voice-dot voice-dot--crash"></span>Fila 0: Plato Crash (Teclas 1, 2, 3, 4)</strong>:
+          <span class="instructions__note">
+            <strong>Frecuencias:</strong> Altas y armónicos metálicos (&gt;5 kHz).
+            <strong>Envolvente:</strong> Ataque súbito (&lt;5 ms) y decaimiento exponencial largo (~800 ms).
+            <strong>Función:</strong> Acento dinámico, apertura de frase musical o énfasis en transiciones de compás.
+          </span>
+        </li>
+        <li class="instructions__item">
+          <strong><span class="voice-dot voice-dot--hihat"></span>Fila 1: Charles / Hi-Hat (Teclas Q, W, E, R)</strong>:
+          <span class="instructions__note">
+            <strong>Frecuencias:</strong> Altas muy brillantes (~7-12 kHz), síntesis con ruido blanco filtrado pasa-altos.
+            <strong>Envolvente:</strong> Ataque instantáneo y caída ultracorta (~60-90 ms).
+            <strong>Función:</strong> Pulso conductor continuo (groove) que delimita el tempo exacto de la pieza.
+          </span>
+        </li>
+        <li class="instructions__item">
+          <strong><span class="voice-dot voice-dot--snare"></span>Fila 2: Caja / Snare (Teclas A, S, D, F)</strong>:
+          <span class="instructions__note">
+            <strong>Frecuencias:</strong> Medias-agudas con resonancia tonal (~180 Hz) combinada con el bordonero metálico de ruido (~2 kHz).
+            <strong>Envolvente:</strong> Ataque seco (&lt;10 ms) y cuerpo de ~180 ms.
+            <strong>Función:</strong> Contrapunto al bombo en los tiempos 2 y 4 (el latido de la música pop, rock y electrónica).
+          </span>
+        </li>
+        <li class="instructions__item">
+          <strong><span class="voice-dot voice-dot--kick"></span>Fila 3: Bombo / Kick (Teclas Z, X, C, V)</strong>:
+          <span class="instructions__note">
+            <strong>Frecuencias:</strong> Subgraves y graves (~45-130 Hz), con modulación de frecuencia rápida (pitch drop).
+            <strong>Envolvente:</strong> Punch contundente y cuerpo de ~160 ms con ganancia alta.
+            <strong>Función:</strong> Cimiento rítmico y armónico que ancla el compás en el espacio físico.
+          </span>
+        </li>
       </ul>
-    </div>
-  </footer>
+    </section>
+
+    <!-- Sección 3: Patrones Rítmicos Clásicos en 4/4 -->
+    <section class="instructions" aria-labelledby="patrones-title">
+      <h2 id="patrones-title" class="instructions__title">3. Ejemplos prácticos para programar en DrumLab VR</h2>
+      <p style="margin: 0 0 0.75rem; font-size: 0.95rem; line-height: 1.5;">
+        Para experimentar con la matriz 4&times;4, puedes programar estos tres patrones rítmicos canónicos utilizando el puntero o el teclado isomórfico:
+      </p>
+
+      <div class="controls-grid">
+        <div class="control-card">
+          <h3 class="control-card__title">A. Rock / Pop Estándar (120 BPM)</h3>
+          <p class="control-card__text">
+            <strong>Kick:</strong> Tiempos 1 y 3 (<kbd>Z</kbd>, <kbd>C</kbd>)<br>
+            <strong>Snare:</strong> Tiempos 2 y 4 (<kbd>S</kbd>, <kbd>F</kbd>)<br>
+            <strong>Hi-Hat:</strong> Los 4 tiempos (<kbd>Q</kbd>, <kbd>W</kbd>, <kbd>E</kbd>, <kbd>R</kbd>)<br>
+            El patrón elemental más extendido del compás 4/4.
+          </p>
+        </div>
+
+        <div class="control-card">
+          <h3 class="control-card__title">B. Four-on-the-Floor / House (120-140 BPM)</h3>
+          <p class="control-card__text">
+            <strong>Kick:</strong> Los 4 tiempos (<kbd>Z</kbd>, <kbd>X</kbd>, <kbd>C</kbd>, <kbd>V</kbd>)<br>
+            <strong>Snare:</strong> Tiempos 2 y 4 (<kbd>S</kbd>, <kbd>F</kbd>)<br>
+            <strong>Hi-Hat:</strong> Tiempos 2 y 4 (o los 4 para más empuje)<br>
+            <strong>Crash:</strong> Tiempo 1 (<kbd>1</kbd>)
+          </p>
+        </div>
+
+        <div class="control-card">
+          <h3 class="control-card__title">C. Hip-Hop Boom Bap (90 BPM)</h3>
+          <p class="control-card__text">
+            <strong>Kick:</strong> Tiempo 1 (<kbd>Z</kbd>) y Tiempo 3 (<kbd>C</kbd>)<br>
+            <strong>Snare:</strong> Tiempo 2 (<kbd>S</kbd>) y Tiempo 4 (<kbd>F</kbd>)<br>
+            <strong>Hi-Hat:</strong> Tiempos 1, 2, 3, 4 (<kbd>Q</kbd>, <kbd>W</kbd>, <kbd>E</kbd>, <kbd>R</kbd>)<br>
+            Pulsa <kbd>B</kbd> hasta fijar el tempo en 90 BPM para un tempo cadencioso.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pie de página -->
+    <footer class="site-footer">
+      <p>
+        <a href="../index.html">&larr; Volver al Estudio &amp; Visor</a> · 
+        <strong>DrumLab VR</strong> &copy; 2026 Alejandro Fuentes Pérez · UOC
+      </p>
+    </footer>
+  </main>
 </body>
 </html>

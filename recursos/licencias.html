@@ -1,195 +1,131 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Licencias y Propiedad Intelectual — DrumLab VR</title>
-  <meta name="description" content="Tabla de propiedad intelectual, autoría, procedencia de activos 3D, muestras de audio y licencias de código abierto de DrumLab VR.">
+  <title>Licencias y Atribución — DrumLab VR</title>
+  <meta name="description" content="Inventario de propiedad intelectual, derechos de autor y licencias de software y contenido multimedia en DrumLab VR.">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <!-- Accesibilidad: Enlace de salto al contenido principal -->
-  <a href="#main-content" class="c-skip-link">Saltar al contenido principal</a>
+  <a href="#contenido-principal" class="skip-link">Saltar al contenido principal</a>
 
-  <!-- Cabecera de Navegación Común -->
-  <header class="c-header">
-    <div class="l-container c-header__inner">
-      <a href="../index.html" class="c-brand" aria-label="DrumLab VR - Volver al Inicio">
-        <span class="c-brand__icon" aria-hidden="true">🥁</span>
-        <div class="c-brand__titles">
-          <span class="c-brand__name">DrumLab VR</span>
-          <span class="c-brand__tagline">WebXR Rhythm Lab // 4/4 Matrix</span>
-        </div>
-      </a>
+  <main class="page" id="contenido-principal">
+    <!-- Cabecera -->
+    <header class="page__header">
+      <h1 class="page__title">Licencias, Atribución y Propiedad Intelectual</h1>
+      <h2 class="page__subtitle">DrumLab VR — Transparencia y Honestidad Académica</h2>
+      <p class="page__author">Alejandro Fuentes Pérez · UOC Realidad Virtual</p>
+    </header>
 
-      <nav class="c-nav" aria-label="Navegación principal">
-        <ul class="c-nav__list">
-          <li class="c-nav__item">
-            <a href="../index.html" class="c-nav__link">Estudio &amp; Visor</a>
-          </li>
-          <li class="c-nav__item">
-            <a href="guia-ritmica.html" class="c-nav__link">Guía Rítmica</a>
-          </li>
-          <li class="c-nav__item">
-            <a href="licencias.html" class="c-nav__link c-nav__link--active" aria-current="page">Licencias &amp; Atribución</a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </header>
+    <!-- Navegación -->
+    <nav class="page__nav" aria-label="Navegación del proyecto">
+      <a href="../index.html" class="page__nav-link">Estudio &amp; Visor</a>
+      <a href="guia-ritmica.html" class="page__nav-link">Guía Rítmica Didáctica</a>
+      <a href="licencias.html" class="page__nav-link page__nav-link--active" aria-current="page">Licencias y Atribución</a>
+    </nav>
 
-  <!-- Contenido Principal -->
-  <main id="main-content" class="l-container c-main">
-    <section class="c-hero" aria-labelledby="lic-title">
-      <div class="c-hero__badge-container">
-        <span class="c-badge c-badge--uoc">Transparencia y Buenas Prácticas Académicas</span>
-        <span class="c-badge c-badge--accent">Creative Commons &amp; Open Source</span>
+    <!-- Declaración General -->
+    <section class="instructions" aria-labelledby="declaracion-title">
+      <h2 id="declaracion-title" class="instructions__title">Marco de Derechos y Atribución</h2>
+      <p style="margin: 0; font-size: 0.95rem; line-height: 1.5;">
+        En cumplimiento de la normativa académica de la Universitat Oberta de Catalunya (UOC) y de las buenas prácticas de la comunidad de código abierto, en este documento se detalla el origen, titularidad de autoría y términos de licenciamiento de todos los activos multimedia (modelos 3D, muestras sonoras) y librerías de software incorporadas en <strong>DrumLab VR</strong>.
+      </p>
+    </section>
+
+    <!-- Tabla de Inventario de Activos -->
+    <section class="matrix-section" aria-labelledby="tabla-activos-title">
+      <h2 id="tabla-activos-title" class="matrix-section__title">Inventario de Activos y Licencias</h2>
+
+      <div class="table-wrapper" tabindex="0" role="region" aria-labelledby="tabla-caption">
+        <table class="matrix-table">
+          <caption id="tabla-caption">Relación de componentes externos, titulares y licencias aplicadas</caption>
+          <thead>
+            <tr>
+              <th scope="col">Recurso / Componente</th>
+              <th scope="col">Tipo de Activo</th>
+              <th scope="col">Autor / Titular</th>
+              <th scope="col">Procedencia</th>
+              <th scope="col">Licencia</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">
+                <a class="credits__link" href="https://skfb.ly/6YTGQ" target="_blank" rel="noopener noreferrer">"Oversized Drum Pad"</a>
+              </th>
+              <td>Modelo 3D (.glb) del controlador</td>
+              <td>lukus1</td>
+              <td><a class="credits__link" href="https://skfb.ly/6YTGQ" target="_blank" rel="noopener noreferrer">Sketchfab</a></td>
+              <td><a class="credits__link" href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a></td>
+            </tr>
+            <tr>
+              <th scope="row">
+                <a class="credits__link" href="https://github.com/ArunMichaelDsouza/javascript-30-course" target="_blank" rel="noopener noreferrer">JavaScript Drum Kit Sounds</a>
+              </th>
+              <td>Muestras de percusión (.wav)</td>
+              <td>Arun Michael Dsouza</td>
+              <td><a class="credits__link" href="https://github.com/ArunMichaelDsouza/javascript-30-course" target="_blank" rel="noopener noreferrer">GitHub</a></td>
+              <td><a class="credits__link" href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener noreferrer">MIT</a></td>
+            </tr>
+            <tr>
+              <th scope="row">
+                <a class="credits__link" href="https://aframe.io/" target="_blank" rel="noopener noreferrer">A-Frame 1.6.0</a>
+              </th>
+              <td>Framework WebXR</td>
+              <td>Supermedium &amp; Mozilla VR</td>
+              <td><a class="credits__link" href="https://github.com/aframevr/aframe" target="_blank" rel="noopener noreferrer">GitHub / npm</a></td>
+              <td><a class="credits__link" href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener noreferrer">MIT</a></td>
+            </tr>
+            <tr>
+              <th scope="row">
+                <a class="credits__link" href="https://threejs.org/" target="_blank" rel="noopener noreferrer">Three.js (r164)</a>
+              </th>
+              <td>Motor 3D WebGL (núcleo A-Frame)</td>
+              <td>Ricardo Cabello (Mr.doob)</td>
+              <td><a class="credits__link" href="https://github.com/mrdoob/three.js" target="_blank" rel="noopener noreferrer">GitHub / npm</a></td>
+              <td><a class="credits__link" href="https://opensource.org/licenses/MIT" target="_blank" rel="noopener noreferrer">MIT</a></td>
+            </tr>
+            <tr>
+              <th scope="row">
+                Código fuente de la aplicación
+              </th>
+              <td>Lógica, secuenciador y síntesis</td>
+              <td>Alejandro Fuentes Pérez</td>
+              <td><a class="credits__link" href="https://github.com/alfupe/practica_realidad-virtual" target="_blank" rel="noopener noreferrer">GitHub</a></td>
+              <td>Educativa / Académica UOC</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-
-      <h1 id="lic-title" class="c-hero__title">
-        Licencias, Autoría y Propiedad Intelectual
-      </h1>
-
-      <p class="c-hero__lead">
-        En cumplimiento de los principios de honestidad académica y las directrices de la UOC, 
-        este documento registra la autoría, origen y condiciones de uso de todos los recursos 3D, 
-        sonoros, librerías de software y modelos de asistencia empleados en <strong>DrumLab VR</strong>.
-      </p>
     </section>
 
-    <!-- Tabla de Propiedad Intelectual -->
-    <section class="c-table-container" aria-labelledby="table-caption">
-      <table class="c-table">
-        <caption id="table-caption" class="c-table__caption">
-          Inventario de Activos, Librerías y Derechos de Propiedad Intelectual
-        </caption>
-        <thead>
-          <tr>
-            <th scope="col" class="c-table__th">Recurso / Componente</th>
-            <th scope="col" class="c-table__th">Tipo de Activo</th>
-            <th scope="col" class="c-table__th">Autor / Titular</th>
-            <th scope="col" class="c-table__th">Procedencia / Repositorio</th>
-            <th scope="col" class="c-table__th">Tipo de Licencia</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Modelo 3D -->
-          <tr class="c-table__tr">
-            <th scope="row" class="c-table__td">
-              <strong><a href="https://skfb.ly/6YTGQ" target="_blank" rel="noopener noreferrer">"Oversized Drum Pad"</a></strong>
-            </th>
-            <td class="c-table__td">Modelo 3D (.glb) / Malla del controlador</td>
-            <td class="c-table__td">lukus1</td>
-            <td class="c-table__td">
-              <a href="https://skfb.ly/6YTGQ" target="_blank" rel="noopener noreferrer">Sketchfab (skfb.ly/6YTGQ)</a>
-            </td>
-            <td class="c-table__td">
-              <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" class="c-table__badge c-table__badge--cc-by">CC BY 4.0</a>
-            </td>
-          </tr>
-
-          <!-- Muestras de Percusión WAV -->
-          <tr class="c-table__tr">
-            <th scope="row" class="c-table__td">
-              <strong><a href="https://github.com/ArunMichaelDsouza/javascript-30-course" target="_blank" rel="noopener noreferrer">JavaScript Drum Kit Samples</a></strong>
-            </th>
-            <td class="c-table__td">Muestras de percusión (.wav: kick, snare, hihat, crash)</td>
-            <td class="c-table__td">Arun Michael Dsouza</td>
-            <td class="c-table__td">
-              <a href="https://github.com/ArunMichaelDsouza/javascript-30-course/tree/master/src/01-javascript-drum-kit/sounds" target="_blank" rel="noopener noreferrer">GitHub (ArunMichaelDsouza)</a>
-            </td>
-            <td class="c-table__td">
-              <a href="https://github.com/ArunMichaelDsouza/javascript-30-course/blob/master/LICENSE" target="_blank" rel="noopener noreferrer" class="c-table__badge c-table__badge--mit">MIT License</a>
-            </td>
-          </tr>
-
-          <!-- Síntesis Procedural Web Audio -->
-          <tr class="c-table__tr">
-            <th scope="row" class="c-table__td">
-              <strong>Síntesis Procedural de Respaldo</strong>
-            </th>
-            <td class="c-table__td">Generación procedural Web Audio API (osciladores + filtros)</td>
-            <td class="c-table__td">DrumLab Sound Engine (Desarrollo propio)</td>
-            <td class="c-table__td">recursos/js/drum-pad.js</td>
-            <td class="c-table__td">
-              <span class="c-table__badge c-table__badge--mit">MIT License</span>
-            </td>
-          </tr>
-
-          <!-- A-Frame -->
-          <tr class="c-table__tr">
-            <th scope="row" class="c-table__td">
-              <strong>A-Frame WebXR Framework</strong>
-            </th>
-            <td class="c-table__td">Framework 3D / WebXR v1.6.0</td>
-            <td class="c-table__td">Supermedium, Diego Marcos, Don McCurdy, Kevin Ngo</td>
-            <td class="c-table__td">
-              <a href="https://github.com/aframevr/aframe" target="_blank" rel="noopener noreferrer">github.com/aframevr/aframe</a>
-            </td>
-            <td class="c-table__td">
-              <span class="c-table__badge c-table__badge--mit">MIT License</span>
-            </td>
-          </tr>
-
-          <!-- Web Audio & WebXR APIs -->
-          <tr class="c-table__tr">
-            <th scope="row" class="c-table__td">
-              <strong>Web Audio API &amp; WebXR Device API</strong>
-            </th>
-            <td class="c-table__td">Especificaciones estándar del navegador</td>
-            <td class="c-table__td">W3C (World Wide Web Consortium)</td>
-            <td class="c-table__td">
-              <a href="https://www.w3.org/TR/webaudio/" target="_blank" rel="noopener noreferrer">w3.org/TR/webaudio/</a>
-            </td>
-            <td class="c-table__td">
-              <span class="c-table__badge c-table__badge--cc0">W3C Open Standard</span>
-            </td>
-          </tr>
-
-          <!-- Código y Arquitectura del Proyecto -->
-          <tr class="c-table__tr">
-            <th scope="row" class="c-table__td">
-              <strong>DrumLab VR (Código y Arquitectura)</strong>
-            </th>
-            <td class="c-table__td">HTML5, CSS BEM, JS Modular, Componentes A-Frame</td>
-            <td class="c-table__td">Alejandro Fuentes Pérez</td>
-            <td class="c-table__td">Proyecto Académico UOC (Práctica)</td>
-            <td class="c-table__td">
-              <span class="c-table__badge c-table__badge--mit">MIT / Académico UOC</span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-
-    <!-- Declaración Ética de Uso de IA -->
-    <section class="c-guide__section" style="margin-top: var(--space-xl);" aria-labelledby="ai-title">
-      <h2 id="ai-title" class="c-guide__heading">
-        Declaración de Uso de Inteligencia Artificial
-      </h2>
-      <p class="c-guide__text">
-        De conformidad con la política de integridad académica de la Universitat Oberta de Catalunya (UOC), 
-        se declara expresamente que se han utilizado herramientas de Inteligencia Artificial Generativa 
-        (Google Gemini / Antigravity Agentic Assistant) como apoyo técnico para la estructuración de la arquitectura BEM, 
-        la formulación matemática de los osciladores y filtros del motor de audio sintético Web Audio API, 
-        y la verificación de accesibilidad WCAG. El diseño pedagógico, la conceptualización de la experiencia 
-        en dos niveles espaciales y la integración funcional han sido supervisados, validados e implementados por el estudiante.
-      </p>
-    </section>
-  </main>
-
-  <!-- Pie de Página -->
-  <footer class="c-footer">
-    <div class="l-container c-footer__content">
-      <p class="c-footer__copy">
-        <strong>DrumLab VR</strong> &copy; 2026 Alejandro Fuentes Pérez · Proyecto Académico Realidad Virtual (UOC).
-      </p>
-      <ul class="c-footer__links">
-        <li><a href="../index.html">Estudio &amp; Visor</a></li>
-        <li><a href="guia-ritmica.html">Guía Rítmica</a></li>
-        <li><a href="https://github.com/alfupe/practica_realidad-virtual" target="_blank" rel="noopener noreferrer">Repositorio GitHub</a></li>
+    <!-- Resumen de Condiciones de Licencias -->
+    <section class="instructions" aria-labelledby="terminos-title">
+      <h2 id="terminos-title" class="instructions__title">Resumen de Términos de Licenciamiento</h2>
+      <ul class="instructions__list">
+        <li class="instructions__item">
+          <strong>Creative Commons Attribution 4.0 International (CC BY 4.0)</strong>:
+          <span class="instructions__note">
+            Permite compartir y adaptar el material para cualquier propósito, incluso comercialmente, siempre que se otorgue el crédito adecuado, se provea un enlace a la licencia y se indique si se han realizado cambios. En DrumLab VR, el modelo de lukus1 ha sido integrado sin modificaciones sobre la malla geométrica original.
+          </span>
+        </li>
+        <li class="instructions__item">
+          <strong>Licencia MIT (Expat)</strong>:
+          <span class="instructions__note">
+            Licencia de software libre sumamente permisiva que otorga permiso sin cargo para usar, copiar, modificar, fusionar, publicar, distribuir, sublicenciar y/o vender copias del software y archivos de sonido, sujeta únicamente a la inclusión del aviso de copyright original.
+          </span>
+        </li>
       </ul>
-    </div>
-  </footer>
+    </section>
+
+    <!-- Pie de página -->
+    <footer class="site-footer">
+      <p>
+        <a href="../index.html">&larr; Volver al Estudio &amp; Visor</a> · 
+        <strong>DrumLab VR</strong> &copy; 2026 Alejandro Fuentes Pérez · UOC
+      </p>
+    </footer>
+  </main>
 </body>
 </html>

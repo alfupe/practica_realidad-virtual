@@ -16,45 +16,44 @@
       margin: 0;
       padding: 0;
       overflow: hidden;
-      background-color: #0b1120;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #1a1e24;
+      font-family: Helvetica, Arial, sans-serif;
     }
     /* HUD overlay superior con feedback contextual */
     .hud-sequencer {
       position: absolute;
-      top: 14px;
-      left: 14px;
+      top: 12px;
+      left: 12px;
       z-index: 100;
-      color: #f0f6fc;
-      background: rgba(10, 13, 20, 0.82);
-      backdrop-filter: blur(8px);
-      padding: 10px 16px;
-      border-radius: 8px;
-      border: 1px solid rgba(0, 229, 255, 0.35);
+      color: #f1f5f9;
+      background: rgba(15, 23, 42, 0.85);
+      padding: 8px 14px;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
       font-size: 13px;
       line-height: 1.45;
       pointer-events: none;
     }
     .hud-sequencer strong {
-      color: #00e5ff;
+      color: #38bdf8;
     }
     .hud-badge {
       display: inline-block;
-      background: #1e293b;
-      padding: 2px 6px;
-      border-radius: 4px;
+      background: #334155;
+      padding: 1px 5px;
+      border-radius: 3px;
       font-family: monospace;
       font-size: 11px;
-      color: #38bdf8;
-      margin-top: 3px;
+      color: #f8fafc;
+      margin-top: 2px;
     }
   </style>
 </head>
 <body>
-  <!-- HUD 2D informativo -->
+  <!-- HUD 2D informativo multimodal -->
   <div class="hud-sequencer">
-    <strong>Nivel 2: Secuenciador 4&times;4 Operativo</strong><br>
-    Haz clic en los pads para programar pasos. Pulsa <span class="hud-badge">Espacio</span> para Play/Stop.<br>
+    <strong>Escena 2: Secuenciador 4&times;4 Operativo</strong><br>
+    Toca o apunta a los pads para programar pasos. Pulsa <span class="hud-badge">Espacio</span> para Play/Stop.<br>
     Teclado isomórfico activo: <span class="hud-badge">1-4</span> Crash · <span class="hud-badge">Q-R</span> Hi-Hat · <span class="hud-badge">A-F</span> Snare · <span class="hud-badge">Z-V</span> Kick
   </div>
 
@@ -433,12 +432,16 @@
         rotation="-42 0 0" 
         look-controls="pointerLockEnabled: false" 
         wasd-controls="enabled: false">
-        <!-- Raycaster de ratón interactivo -->
+        <!-- Raycaster de ratón y pantalla táctil interactivo -->
         <a-entity 
           cursor="rayOrigin: mouse"
-          raycaster="objects: .interactable; interval: 40">
+          raycaster="objects: .interactable; interval: 30">
         </a-entity>
       </a-camera>
+
+      <!-- Mandos WebXR para Realidad Virtual -->
+      <a-entity laser-controls="hand: right" raycaster="objects: .interactable; interval: 30; lineColor: #38bdf8; lineOpacity: 0.8"></a-entity>
+      <a-entity laser-controls="hand: left" raycaster="objects: .interactable; interval: 30; lineColor: #38bdf8; lineOpacity: 0.8"></a-entity>
     </a-entity>
   </a-scene>
 
@@ -448,17 +451,20 @@
       const btnBack = document.getElementById('btn-back-studio');
       if (!btnBack) return;
 
+      const goBack = (e) => {
+        if (e) e.stopPropagation();
+        window.location.href = 'escena-estudio.html';
+      };
+
+      btnBack.addEventListener('click', goBack);
+      btnBack.addEventListener('touchend', goBack);
+
       btnBack.addEventListener('mouseenter', () => {
         document.body.style.cursor = 'pointer';
       });
 
       btnBack.addEventListener('mouseleave', () => {
         document.body.style.cursor = 'default';
-      });
-
-      btnBack.addEventListener('click', (e) => {
-        e.stopPropagation();
-        window.location.href = 'escena-estudio.html';
       });
     });
   </script>
