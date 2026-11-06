@@ -6,8 +6,8 @@
  * Responsabilidades:
  * - Integración directa con el modelo 3D GLTF real (oversized_drum_pad.glb).
  * - Descomposición de la geometría de pads del modelo en 16 pulsadores interactivos (4 voces x 4 pasos).
+ * - Doble Interfaz Física: Entrada isomórfica de teclado (1-4, Q-R, A-F, Z-V) + Espacio + Clic nativo Three.js / WebXR.
  * - Reloj métrico cuaternario (4 tiempos por compás) con tempo seleccionable (90 / 120 / 140 BPM).
- * - Doble Interfaz Física: Entrada isomórfica de teclado (1-4, Q-R, A-F, Z-V) + Espacio + Clic/Raycast en el modelo 3D.
  * - Coordinación de los LEDs de compás y activación de pads en estado ACTIVO_ESPERA.
  */
 
@@ -24,6 +24,7 @@ AFRAME.registerComponent('step-sequencer', {
     this.bpmOptions = [90, 120, 140];
     this.currentBpmIndex = 1;                  // 120 BPM por defecto
     this.padMatrix = new Map();                // Clave: "row_col", Valor: PadMeshController
+    this.padMeshes = [];                       // Array de Three.js Mesh de los pads para raycasting directo
     this.keyMap = new Map();                   // Clave: tecla, Valor: "row_col"
     this.modelPadsInitialized = false;
 
@@ -37,6 +38,7 @@ AFRAME.registerComponent('step-sequencer', {
     this.cycleBpm = this.cycleBpm.bind(this);
     this.bindTransportButtons = this.bindTransportButtons.bind(this);
     this.initModelPads = this.initModelPads.bind(this);
+    this.setupDirectRaycasting = this.setupDirectRaycasting.bind(this);
 
     // Mapeo isomórfico del teclado físico
     this.buildKeyMapping();
@@ -117,6 +119,8 @@ AFRAME.registerComponent('step-sequencer', {
       { voice: 'kick',  color: '#ec4899' }   // Fila 3: Kick (Magenta/Rosa)
     ];
 
+    this.padMeshes = [];
+
     colMeshNames.forEach((name, cIdx) => {
       const colMesh = rootMesh.getObjectByName(name);
       if (!colMesh) return;
@@ -187,6 +191,7 @@ AFRAME.registerComponent('step-sequencer', {
 
         const padMesh = new THREE.Mesh(subGeom, mat);
         padMesh.name = `real_pad_${pIdx}_${cIdx}`;
+        padMesh.el = modelEl; // Asocia la entidad A-Frame para interoperabilidad
         colMesh.parent.add(padMesh);
 
         if (!isExtraPad) {
@@ -211,32 +216,90 @@ AFRAME.registerComponent('step-sequencer', {
           };
 
           this.padMatrix.set(`${rIdx}_${cIdx}`, padController);
+          this.padMeshes.push(padMesh);
         }
       }
     });
 
-    // Delegación de eventos de clic y raycast sobre el modelo GLTF
+    // Configuración del sistema de raycasting directo nativo
+    this.setupDirectRaycasting(modelEl);
+
+    this.modelPadsInitialized = true;
+    console.log('[DrumLab] 16 pads interactivos del modelo 3D inicializados con éxito.');
+  },
+
+  /**
+   * Sistema de Raycasting directo de Three.js:
+   * Garantiza que el clic y toque sobre los pads del modelo 3D funcione con 100% de fiabilidad
+   * sin depender de la caché interna del cursor de A-Frame ni de envoltorios de entidades DOM.
+   */
+  setupDirectRaycasting: function (modelEl) {
+    const sceneEl = this.el.sceneEl;
+    const raycaster = new THREE.Raycaster();
+
+    const getHitPad = (clientX, clientY) => {
+      const canvas = sceneEl.canvas || document.querySelector('canvas');
+      const camera = sceneEl.camera;
+      if (!canvas || !camera) return null;
+
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return null;
+
+      const mouse = new THREE.Vector2(
+        ((clientX - rect.left) / rect.width) * 2 - 1,
+        -((clientY - rect.top) / rect.height) * 2 + 1
+      );
+
+      raycaster.setFromCamera(mouse, camera);
+      const hits = raycaster.intersectObjects(this.padMeshes, false);
+      if (hits.length > 0) {
+        return hits[0].object.userData?.pad || null;
+      }
+      return null;
+    };
+
+    // Manejador unificado de clics / toques con puntero (ratón y pantalla táctil)
+    const onPointerDown = (evt) => {
+      // Ignorar clics sobre elementos HTML superpuestos (como enlaces de ayuda o HUD)
+      if (evt.target && evt.target.tagName !== 'CANVAS' && evt.target !== document.body && evt.target !== document.documentElement) {
+        return;
+      }
+
+      const pad = getHitPad(evt.clientX, evt.clientY);
+      if (pad) {
+        if (evt.stopPropagation) evt.stopPropagation();
+        pad.onClick();
+      }
+    };
+
+    window.addEventListener('pointerdown', onPointerDown, { passive: false });
+
+    // Manejador de movimiento de puntero para feedback visual del cursor
+    const onPointerMove = (evt) => {
+      if (evt.target && evt.target.tagName !== 'CANVAS' && evt.target !== document.body && evt.target !== document.documentElement) {
+        return;
+      }
+
+      const pad = getHitPad(evt.clientX, evt.clientY);
+      if (pad) {
+        document.body.style.cursor = 'pointer';
+      } else {
+        document.body.style.cursor = 'default';
+      }
+    };
+
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
+
+    // Delegación secundaria para controles WebXR (láser VR)
     modelEl.classList.add('interactable');
-    const onModelClick = (evt) => {
+    const onAFrameClick = (evt) => {
       const hitMesh = evt.detail?.intersection?.object;
       if (hitMesh && hitMesh.userData?.pad) {
         hitMesh.userData.pad.onClick(evt);
       }
     };
-
-    modelEl.addEventListener('click', onModelClick);
-    modelEl.addEventListener('touchend', onModelClick);
-
-    // Feedback de cursor en ratón
-    modelEl.addEventListener('mouseenter', () => {
-      document.body.style.cursor = 'pointer';
-    });
-    modelEl.addEventListener('mouseleave', () => {
-      document.body.style.cursor = 'default';
-    });
-
-    this.modelPadsInitialized = true;
-    console.log('[DrumLab] 16 pads interactivos del modelo 3D inicializados con éxito.');
+    modelEl.addEventListener('click', onAFrameClick);
+    modelEl.addEventListener('touchend', onAFrameClick);
   },
 
   /**
