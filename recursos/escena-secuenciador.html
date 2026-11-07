@@ -22,42 +22,336 @@
       background-color: #1a1e24;
       font-family: Helvetica, Arial, sans-serif;
     }
-    /* HUD overlay superior con feedback contextual */
-    .hud-sequencer {
+    /* Barra superior HUD minimalista (despeja el área del controlador) */
+    .hud-topbar {
       position: absolute;
       top: 12px;
       left: 12px;
+      right: 12px;
       z-index: 100;
-      color: #f1f5f9;
-      background: rgba(15, 23, 42, 0.85);
-      padding: 8px 14px;
-      border-radius: 4px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      font-size: 13px;
-      line-height: 1.45;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       pointer-events: none;
     }
-    .hud-sequencer strong {
-      color: #38bdf8;
+    .hud-topbar__group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: auto;
     }
-    .hud-badge {
+    .hud-badge-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 12px;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 6px;
+      color: #f1f5f9;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+    .hud-badge-title__dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+    .hud-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(15, 23, 42, 0.90);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 6px;
+      color: #38bdf8;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+    .hud-btn:hover, .hud-btn:focus-visible {
+      background: rgba(30, 41, 59, 0.95);
+      border-color: #38bdf8;
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.4);
+      outline: none;
+    }
+    .hud-btn kbd {
       display: inline-block;
-      background: #334155;
       padding: 1px 5px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 3px;
+      font-family: monospace;
+      font-size: 10px;
+      color: #f8fafc;
+    }
+
+    /* Modal Dialog tipo PEC4 con desenfoque de fondo y alto contraste */
+    .hud-modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.78);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .hud-modal-backdrop.is-open {
+      display: flex;
+      animation: modalFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.97); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .hud-modal {
+      width: 100%;
+      max-width: 500px;
+      max-height: 88vh;
+      overflow-y: auto;
+      background: #0f172a;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 12px;
+      padding: 20px 24px;
+      color: #f1f5f9;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(56, 189, 248, 0.15);
+      pointer-events: auto;
+    }
+    .hud-modal__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .hud-modal__title {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      color: #38bdf8;
+      letter-spacing: -0.01em;
+    }
+    .hud-modal__close-icon {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 22px;
+      cursor: pointer;
+      padding: 2px 8px;
+      border-radius: 4px;
+      line-height: 1;
+    }
+    .hud-modal__close-icon:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .hud-modal__section {
+      margin-bottom: 16px;
+    }
+    .hud-modal__section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin: 0 0 8px;
+    }
+    .hud-voice-grid {
+      display: grid;
+      gap: 6px;
+    }
+    .hud-voice-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 10px;
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 6px;
+      font-size: 12px;
+    }
+    .hud-voice-row__label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+    .hud-voice-row__badge {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+    .hud-voice-row__keys {
+      display: flex;
+      gap: 4px;
+    }
+    .hud-voice-row__keys kbd, .hud-controls-list kbd {
+      display: inline-block;
+      padding: 2px 6px;
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 3px;
       font-family: monospace;
       font-size: 11px;
       color: #f8fafc;
-      margin-top: 2px;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.4);
+    }
+    .hud-controls-list {
+      display: grid;
+      gap: 6px;
+      font-size: 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .hud-controls-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 10px;
+      background: rgba(30, 41, 59, 0.4);
+      border-radius: 4px;
+      color: #cbd5e1;
+    }
+    .hud-modal__close-btn {
+      display: block;
+      width: 100%;
+      padding: 9px;
+      margin-top: 14px;
+      background: #0284c7;
+      border: 1px solid #38bdf8;
+      border-radius: 6px;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s ease;
+    }
+    .hud-modal__close-btn:hover {
+      background: #0369a1;
     }
   </style>
 </head>
 <body>
-  <!-- HUD 2D informativo multimodal -->
-  <div class="hud-sequencer">
-    <strong>Escena 2: Secuenciador 4&times;4 Operativo</strong><br>
-    Toca o apunta a los pads para programar pasos. Pulsa <span class="hud-badge">Espacio</span> para Play/Stop.<br>
-    Teclado isomórfico activo: <span class="hud-badge">1-4</span> Crash · <span class="hud-badge">Q-R</span> Hi-Hat · <span class="hud-badge">A-F</span> Snare · <span class="hud-badge">Z-V</span> Kick
+  <!-- Barra superior HUD minimalista (despeja el espacio visual del controlador) -->
+  <header class="hud-topbar" role="banner">
+    <div class="hud-topbar__group">
+      <button id="btnHudBack" class="hud-btn" type="button" title="Volver al Estudio (Escena 1)">
+        <span>&lsaquo;</span> Volver al Estudio
+      </button>
+      <span class="hud-badge-title">
+        <span class="hud-badge-title__dot"></span>
+        02 SECUENCIADOR 4×4
+      </span>
+    </div>
+    <div class="hud-topbar__group">
+      <button id="btnOpenHelp" class="hud-btn" type="button" title="Abrir leyenda de voces y atajos de teclado [H]">
+        <span>ℹ️</span> Guía y Teclas <kbd>H</kbd>
+      </button>
+    </div>
+  </header>
+
+  <!-- Modal Dialog de Información y Leyenda (Inspirado en PEC4) -->
+  <div id="helpModalBackdrop" class="hud-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="hud-modal">
+      <div class="hud-modal__header">
+        <h2 id="modalTitle" class="hud-modal__title">Leyenda y Controles · Secuenciador 4×4</h2>
+        <button id="btnCloseModalIcon" class="hud-modal__close-icon" type="button" title="Cerrar">&times;</button>
+      </div>
+
+      <div class="hud-modal__section">
+        <h3 class="hud-modal__section-title">Matriz de Percusión (Filas del controlador)</h3>
+        <div class="hud-voice-grid">
+          <div class="hud-voice-row">
+            <span class="hud-voice-row__label">
+              <span class="hud-voice-row__badge" style="background: #f59e0b; box-shadow: 0 0 6px #f59e0b;"></span>
+              Fila 0 · CRASH (Plato)
+            </span>
+            <span class="hud-voice-row__keys">
+              <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd><kbd>4</kbd>
+            </span>
+          </div>
+          <div class="hud-voice-row">
+            <span class="hud-voice-row__label">
+              <span class="hud-voice-row__badge" style="background: #10b981; box-shadow: 0 0 6px #10b981;"></span>
+              Fila 1 · HI-HAT (Charles)
+            </span>
+            <span class="hud-voice-row__keys">
+              <kbd>Q</kbd><kbd>W</kbd><kbd>E</kbd><kbd>R</kbd>
+            </span>
+          </div>
+          <div class="hud-voice-row">
+            <span class="hud-voice-row__label">
+              <span class="hud-voice-row__badge" style="background: #38bdf8; box-shadow: 0 0 6px #38bdf8;"></span>
+              Fila 2 · SNARE (Caja)
+            </span>
+            <span class="hud-voice-row__keys">
+              <kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><kbd>F</kbd>
+            </span>
+          </div>
+          <div class="hud-voice-row">
+            <span class="hud-voice-row__label">
+              <span class="hud-voice-row__badge" style="background: #ec4899; box-shadow: 0 0 6px #ec4899;"></span>
+              Fila 3 · KICK (Bombo)
+            </span>
+            <span class="hud-voice-row__keys">
+              <kbd>Z</kbd><kbd>X</kbd><kbd>C</kbd><kbd>V</kbd>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hud-modal__section">
+        <h3 class="hud-modal__section-title">Controles de Transporte Hardware</h3>
+        <ul class="hud-controls-list">
+          <li>
+            <span>Reproducir / Detener secuencia (Play / Stop)</span>
+            <kbd>Espacio</kbd>
+          </li>
+          <li>
+            <span>Cambiar tempo cíclico (90 / 120 / 140 BPM)</span>
+            <kbd>B</kbd>
+          </li>
+          <li>
+            <span>Limpiar patrón completo (Clear)</span>
+            <span><kbd>Shift + C</kbd> o <kbd>Supr</kbd></span>
+          </li>
+          <li>
+            <span>Abrir / Cerrar esta ventana de ayuda</span>
+            <span><kbd>H</kbd> o <kbd>Esc</kbd></span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="hud-modal__section" style="margin-bottom: 0;">
+        <h3 class="hud-modal__section-title">Interacción Multimodal</h3>
+        <p style="margin: 0; font-size: 11px; line-height: 1.55; color: #94a3b8;">
+          • <strong>Ratón / Táctil:</strong> Clic o toque directo sobre cualquiera de los 16 pads físicos de la Maschine MK3.<br>
+          • <strong>Realidad Virtual:</strong> Apunta con el puntero láser WebXR y pulsa el gatillo para activar notas.<br>
+          • <strong>Regreso al Estudio:</strong> Pulsa el botón 3D en la mesa o el botón de cabecera.
+        </p>
+      </div>
+
+      <button id="btnCloseModalBtn" class="hud-modal__close-btn" type="button">Entendido / Cerrar [ESC]</button>
+    </div>
   </div>
 
   <a-scene 
@@ -66,14 +360,14 @@
     vr-mode-ui="enabled: true">
 
     <a-assets timeout="6000">
-      <!-- Modelo 3D Oficial Oversized Drum Pad (lukus1, CC BY 4.0) -->
-      <a-asset-item id="drumpad-model" src="assets/models/oversized_drum_pad.glb"></a-asset-item>
+      <!-- Modelo 3D Oficial Native Instruments Maschine MK3 (jmccopus, CC BY 4.0) -->
+      <a-asset-item id="drumpad-model" src="assets/models/maschine_native_instruments.glb"></a-asset-item>
     </a-assets>
 
     <!-- Iluminación directa y equilibrada sobre el controlador -->
-    <a-light type="ambient" color="#cbd5e1" intensity="1.4"></a-light>
-    <a-light type="directional" color="#ffffff" intensity="1.7" position="0 5 2" target="#drumpad-controller"></a-light>
-    <a-light type="point" color="#93c5fd" intensity="1.2" distance="6" position="0 2.2 0"></a-light>
+    <a-light type="ambient" color="#cbd5e1" intensity="1.2"></a-light>
+    <a-light type="directional" color="#ffffff" intensity="1.6" position="1 4 2" target="#drumpad-controller"></a-light>
+    <a-light type="point" color="#93c5fd" intensity="0.8" distance="5" position="0 2.2 0"></a-light>
 
     <!-- Atmósfera de fondo -->
     <a-sky color="#0f172a"></a-sky>
@@ -91,152 +385,75 @@
 
     <!-- Mesa Soporte del Controlador -->
     <a-box 
-      position="0 0.44 0" 
+      position="0 0.44 -0.05" 
       width="1.8" 
       height="0.88" 
-      depth="1.4" 
+      depth="1.2" 
       color="#1e2229" 
-      roughness="0.6">
+      roughness="0.7">
     </a-box>
 
     <!-- ====================================================================
-         CONTROLADOR OVERSIZED DRUM PAD (MODELO 3D REAL + PADS INTERACTIVOS)
+         CONTROLADOR MASCHINE MK3 (MODELO 3D REAL 100% INTEGRADO)
+         Cero cajas flotantes ni esferas: pads, botones y leds provistos por el modelo
          ==================================================================== -->
     <a-entity 
       id="drumpad-controller" 
-      position="0 0.9 0" 
-      rotation="-12 0 0"
-      step-sequencer="bpm: 120; isPlaying: false; tempoLedsSelector: .tempo-led">
+      position="0 1.05 -0.06" 
+      rotation="-72 0 0"
+      scale="0.20 0.20 0.20"
+      step-sequencer="bpm: 120">
 
-      <!-- MODELO 3D GLTF REAL (lukus1, CC BY 4.0) -->
+      <!-- MODELO 3D GLTF REAL MASCHINE NATIVE INSTRUMENTS (jmccopus, CC BY 4.0) -->
       <a-gltf-model 
         id="gltf-controller"
         class="interactable"
-        src="#drumpad-model" 
-        position="0 0 0" 
-        rotation="0 -90 0" 
-        scale="0.55 0.55 0.55">
+        src="#drumpad-model">
       </a-gltf-model>
 
-      <!-- ==================================================================
-           BOTONES DE TRANSPORTE 3D (PLAY/STOP, BPM, CLEAR)
-           ================================================================== -->
-      <a-entity id="transport-controls" position="-0.08 0.16 -0.48">
-        <!-- Botón Play/Stop -->
-        <a-box 
-          id="btn-play-stop" 
-          class="interactable" 
-          position="-0.20 0 0" 
-          width="0.16" 
-          height="0.028" 
-          depth="0.065" 
-          material="color: #059669; roughness: 0.3">
-          <a-text 
-            id="text-play-val" 
-            value="PLAY" 
-            align="center" 
-            position="0 0.016 0" 
-            rotation="-90 0 0" 
-            scale="0.22 0.22 0.22" 
-            color="#ffffff">
-          </a-text>
-        </a-box>
-
-        <!-- Selector de BPM (90 / 120 / 140) -->
-        <a-box 
-          id="btn-bpm" 
-          class="interactable" 
-          position="-0.02 0 0" 
-          width="0.16" 
-          height="0.028" 
-          depth="0.065" 
-          material="color: #0284c7; roughness: 0.4">
-          <a-text 
-            id="text-bpm-val" 
-            value="120 BPM" 
-            align="center" 
-            position="0 0.016 0" 
-            rotation="-90 0 0" 
-            scale="0.2 0.2 0.2" 
-            color="#ffffff">
-          </a-text>
-        </a-box>
-
-        <!-- Botón Clear (Borrar Patrón) -->
-        <a-box 
-          id="btn-clear" 
-          class="interactable" 
-          position="0.16 0 0" 
-          width="0.16" 
-          height="0.028" 
-          depth="0.065" 
-          material="color: #b91c1c; roughness: 0.4">
-          <a-text 
-            value="CLEAR" 
-            align="center" 
-            position="0 0.016 0" 
-            rotation="-90 0 0" 
-            scale="0.2 0.2 0.2" 
-            color="#ffffff">
-          </a-text>
-        </a-box>
-      </a-entity>
-
-      <!-- ==================================================================
-           LEDS DE TEMPO (INDICADOR DE CABEZAL DE REPRODUCCIÓN EN TIEMPO REAL)
-           Alineados directamente sobre cada columna de pads del modelo 3D
-           ================================================================== -->
-      <a-entity id="tempo-header" position="0 0.13 -0.42">
-        <a-entity position="-0.402 0 0">
-          <a-cylinder id="led-tempo-0" class="tempo-led" data-col="0" radius="0.018" height="0.012" material="color: #334155; emissive: #000000; emissiveIntensity: 0"></a-cylinder>
-          <a-text value="T1" align="center" position="0 0.01 -0.025" rotation="-90 0 0" scale="0.15 0.15 0.15" color="#94a3b8"></a-text>
-        </a-entity>
-        <a-entity position="-0.182 0 0">
-          <a-cylinder id="led-tempo-1" class="tempo-led" data-col="1" radius="0.018" height="0.012" material="color: #334155; emissive: #000000; emissiveIntensity: 0"></a-cylinder>
-          <a-text value="T2" align="center" position="0 0.01 -0.025" rotation="-90 0 0" scale="0.15 0.15 0.15" color="#94a3b8"></a-text>
-        </a-entity>
-        <a-entity position="0.023 0 0">
-          <a-cylinder id="led-tempo-2" class="tempo-led" data-col="2" radius="0.018" height="0.012" material="color: #334155; emissive: #000000; emissiveIntensity: 0"></a-cylinder>
-          <a-text value="T3" align="center" position="0 0.01 -0.025" rotation="-90 0 0" scale="0.15 0.15 0.15" color="#94a3b8"></a-text>
-        </a-entity>
-        <a-entity position="0.228 0 0">
-          <a-cylinder id="led-tempo-3" class="tempo-led" data-col="3" radius="0.018" height="0.012" material="color: #334155; emissive: #000000; emissiveIntensity: 0"></a-cylinder>
-          <a-text value="T4" align="center" position="0 0.01 -0.025" rotation="-90 0 0" scale="0.15 0.15 0.15" color="#94a3b8"></a-text>
-        </a-entity>
-      </a-entity>
-
-      <!-- ==================================================================
-           ETIQUETAS DE FILAS / VOCES TÍMBRICAS (LATERAL IZQUIERDO)
-           Alineadas con la coordenada exacta de profundidad Z de cada voz
-           ================================================================== -->
-      <a-entity id="row-labels" position="-0.56 0.05 0">
-        <a-text value="CRASH [1-4]" position="0 0 -0.38" rotation="-90 0 0" scale="0.16 0.16 0.16" color="#d97706"></a-text>
-        <a-text value="HI-HAT [Q-R]" position="0 0 -0.194" rotation="-90 0 0" scale="0.16 0.16 0.16" color="#059669"></a-text>
-        <a-text value="SNARE [A-F]" position="0 0 -0.009" rotation="-90 0 0" scale="0.16 0.16 0.16" color="#0284c7"></a-text>
-        <a-text value="KICK [Z-V]" position="0 0 0.177" rotation="-90 0 0" scale="0.16 0.16 0.16" color="#db2777"></a-text>
-      </a-entity>
     </a-entity>
 
     <!-- ====================================================================
-         BOTÓN 3D: VOLVER AL ESTUDIO (ACCESIBLE Y CLARO)
+         BOTÓN 3D: VOLVER AL ESTUDIO (MÓDULO DE TALKBACK EN LA MESA)
+         Elevado a la izquierda frontal, en ángulo ergonómico sin tapar el pad
          ==================================================================== -->
     <a-entity 
       id="btn-back-studio" 
       class="interactable" 
-      position="-0.85 1.15 -0.2" 
-      rotation="0 25 0">
+      position="-0.62 1.10 0.15" 
+      rotation="-48 15 0">
       
+      <!-- Chasis biselado grafito estilo consola de estudio -->
       <a-box 
-        width="0.38" 
-        height="0.1" 
-        depth="0.04" 
-        color="#0f172a">
+        width="0.26" 
+        height="0.062" 
+        depth="0.02" 
+        color="#0b0f17" 
+        roughness="0.5"
+        metalness="0.4">
+      </a-box>
+
+      <!-- Placa interactiva pulsable con borde de luz cian -->
+      <a-box 
+        id="btn-back-mesh"
+        class="interactable" 
+        position="0 0 0.012"
+        width="0.245" 
+        height="0.048" 
+        depth="0.01" 
+        color="#1e293b"
+        material="roughness: 0.3; metalness: 0.3; emissive: #0284c7; emissiveIntensity: 0.25">
+        
+        <!-- LED indicador de baliza de retorno -->
+        <a-sphere position="-0.092 0 0.008" radius="0.005" color="#38bdf8" material="emissive: #38bdf8; emissiveIntensity: 1.5"></a-sphere>
+
         <a-text 
-          value="< VOLVER AL ESTUDIO" 
+          value="< ESTUDIO" 
           align="center" 
-          position="0 0 0.025" 
-          scale="0.2 0.2 0.2" 
-          color="#f8fafc">
+          position="0.012 0 0.008" 
+          scale="0.16 0.16 0.16" 
+          color="#38bdf8"
+          font="roboto">
         </a-text>
       </a-box>
     </a-entity>
@@ -244,18 +461,13 @@
     <!-- ====================================================================
          CÁMARA: ERGONÓMICA, FIJA Y ESTABLE (SIN MOVIMIENTOS BRUSCOS DE RATÓN)
          ==================================================================== -->
-    <a-entity id="rig" position="0 0 0.65">
+    <a-entity id="rig" position="0 0 0.92">
       <a-camera 
         id="camera" 
-        position="0 1.55 0"
-        rotation="-32 0 0" 
+        position="0 1.65 0"
+        rotation="-48 0 0" 
         look-controls="enabled: false" 
         wasd-controls="enabled: false">
-        <!-- Raycaster de ratón y pantalla táctil (interacción directa y suave) -->
-        <a-entity 
-          cursor="rayOrigin: mouse"
-          raycaster="objects: .interactable; interval: 30">
-        </a-entity>
       </a-camera>
 
       <!-- Mandos WebXR para Realidad Virtual -->
@@ -264,27 +476,180 @@
     </a-entity>
   </a-scene>
 
-  <!-- Script para la navegación de retorno al estudio -->
+  <!-- Script para la navegación de retorno al estudio y modal dialog de ayuda (inspirado en PEC4) -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const btnBack = document.getElementById('btn-back-studio');
-      if (!btnBack) return;
+      // 1. Gestión del Modal Dialog de Ayuda y Leyenda
+      const modalBackdrop = document.getElementById('helpModalBackdrop');
+      const btnOpenHelp = document.getElementById('btnOpenHelp');
+      const btnCloseIcon = document.getElementById('btnCloseModalIcon');
+      const btnCloseBtn = document.getElementById('btnCloseModalBtn');
 
+      const openModal = () => {
+        if (!modalBackdrop) return;
+        modalBackdrop.classList.add('is-open');
+      };
+
+      const closeModal = () => {
+        if (!modalBackdrop) return;
+        modalBackdrop.classList.remove('is-open');
+      };
+
+      const toggleModal = () => {
+        if (!modalBackdrop) return;
+        if (modalBackdrop.classList.contains('is-open')) {
+          closeModal();
+        } else {
+          openModal();
+        }
+      };
+
+      if (btnOpenHelp) btnOpenHelp.addEventListener('click', openModal);
+      if (btnCloseIcon) btnCloseIcon.addEventListener('click', closeModal);
+      if (btnCloseBtn) btnCloseBtn.addEventListener('click', closeModal);
+
+      if (modalBackdrop) {
+        modalBackdrop.addEventListener('click', (e) => {
+          if (e.target === modalBackdrop) closeModal();
+        });
+      }
+
+      // Exponer funciones globales para el manejador de teclado en step-sequencer.js
+      window.openHelpModal = openModal;
+      window.closeHelpModal = closeModal;
+      window.toggleHelpModal = toggleModal;
+      window.isHelpModalOpen = () => modalBackdrop && modalBackdrop.classList.contains('is-open');
+
+      // 2. Navegación de retorno al Estudio (3D y botón HUD 2D)
+      const btnBack3D = document.getElementById('btn-back-studio');
+      const btnBackMesh = document.getElementById('btn-back-mesh');
+      const btnHudBack = document.getElementById('btnHudBack');
+
+      const playChime = () => {
+        try {
+          const AudioCtxClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtxClass) {
+            const ctx = new AudioCtxClass();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(660, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(330, ctx.currentTime + 0.08);
+            gain.gain.setValueAtTime(0.12, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.1);
+          }
+        } catch (err) {}
+      };
+
+      let isNavigatingBack = false;
       const goBack = (e) => {
-        if (e) e.stopPropagation();
+        if (e && e.stopPropagation) e.stopPropagation();
+        if (isNavigatingBack) return;
+        isNavigatingBack = true;
+        setTimeout(() => { isNavigatingBack = false; }, 500);
+
+        playChime();
+
+        if (window.parent && window.parent !== window) {
+          try {
+            if (typeof window.parent.cambiarEscena === 'function') {
+              window.parent.cambiarEscena(1);
+              return;
+            }
+          } catch (err) {}
+          try {
+            window.parent.postMessage({ action: 'cambiarEscena', escena: 1 }, '*');
+          } catch (err) {}
+          return;
+        }
         window.location.href = 'escena-estudio.html';
       };
 
-      btnBack.addEventListener('click', goBack);
-      btnBack.addEventListener('touchend', goBack);
+      if (btnHudBack) {
+        btnHudBack.addEventListener('click', (e) => {
+          e.stopPropagation();
+          goBack(e);
+        });
+      }
 
-      btnBack.addEventListener('mouseenter', () => {
-        document.body.style.cursor = 'pointer';
+      if (btnBack3D) {
+        btnBack3D.addEventListener('click', goBack);
+      }
+      if (btnBackMesh) {
+        btnBackMesh.addEventListener('click', goBack);
+      }
+
+      const setHoverState = (isHover) => {
+        document.body.style.cursor = isHover ? 'pointer' : 'default';
+        if (btnBackMesh) {
+          const meshObj = btnBackMesh.getObject3D('mesh');
+          if (meshObj && meshObj.material) {
+            meshObj.material.emissiveIntensity = isHover ? 0.75 : 0.25;
+            meshObj.material.color.set(isHover ? '#334155' : '#1e293b');
+          }
+        }
+      };
+
+      if (btnBack3D) {
+        btnBack3D.addEventListener('mouseenter', () => setHoverState(true));
+        btnBack3D.addEventListener('mouseleave', () => setHoverState(false));
+      }
+
+      // Raycasting directo y detección de clic completo (pointerdown -> pointerup) para el botón 3D
+      const raycaster = new THREE.Raycaster();
+      const pointer = new THREE.Vector2();
+      const sceneEl = document.querySelector('a-scene');
+
+      let backDownPos = null;
+
+      window.addEventListener('pointerdown', (e) => {
+        backDownPos = { x: e.clientX, y: e.clientY, time: Date.now() };
+      }, { passive: true });
+
+      window.addEventListener('pointerup', (e) => {
+        if (!backDownPos) return;
+        const dx = e.clientX - backDownPos.x;
+        const dy = e.clientY - backDownPos.y;
+        const dt = Date.now() - backDownPos.time;
+        backDownPos = null;
+
+        if (Math.hypot(dx, dy) > 8 || dt > 600) return;
+        if (e.target && e.target.closest && (e.target.closest('.hud-topbar') || e.target.closest('.hud-modal'))) return;
+
+        if (!btnBack3D || !sceneEl || !sceneEl.camera) return;
+        const canvas = sceneEl.canvas || document.querySelector('canvas');
+        if (!canvas) return;
+        const rect = canvas.getBoundingClientRect();
+        pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+        if (sceneEl.object3D) sceneEl.object3D.updateMatrixWorld(true);
+        raycaster.setFromCamera(pointer, sceneEl.camera);
+
+        const hits = raycaster.intersectObject(btnBack3D.object3D, true);
+        if (hits.length > 0) {
+          goBack(e);
+        }
       });
 
-      btnBack.addEventListener('mouseleave', () => {
-        document.body.style.cursor = 'default';
-      });
+      window.addEventListener('pointermove', (e) => {
+        if (!btnBack3D || !sceneEl || !sceneEl.camera) return;
+        const canvas = sceneEl.canvas || document.querySelector('canvas');
+        if (!canvas) return;
+        const rect = canvas.getBoundingClientRect();
+        pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+        if (sceneEl.object3D) sceneEl.object3D.updateMatrixWorld(true);
+        raycaster.setFromCamera(pointer, sceneEl.camera);
+
+        const hits = raycaster.intersectObject(btnBack3D.object3D, true);
+        setHoverState(hits.length > 0);
+      }, { passive: true });
     });
   </script>
 </body>

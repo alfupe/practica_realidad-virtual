@@ -10,6 +10,35 @@
 
   <!-- Componentes A-Frame registrados en <head> -->
   <script>
+    AFRAME.registerComponent('maschine-studio-model', {
+      init: function () {
+        const applyFiltering = () => {
+          const rootMesh = this.el.getObject3D('mesh');
+          if (!rootMesh) return;
+          const realMeshes = new Set(['Object_6', 'Object_8', 'Object_10', 'Object_12', 'Object_14']);
+          rootMesh.traverse((child) => {
+            if (child.isMesh) {
+              if (!realMeshes.has(child.name)) {
+                child.visible = false;
+              } else {
+                child.visible = true;
+                if (child.material) {
+                  child.material.side = THREE.DoubleSide;
+                }
+              }
+            }
+          });
+          rootMesh.position.set(0, -3.835, 0.636);
+        };
+
+        if (this.el.getObject3D('mesh')) {
+          applyFiltering();
+        } else {
+          this.el.addEventListener('model-loaded', applyFiltering);
+        }
+      }
+    });
+
     AFRAME.registerComponent('studio-navigator', {
       schema: {
         targetUrl: { type: 'string', default: 'escena-secuenciador.html' }
@@ -19,8 +48,12 @@
         const el = this.el;
         const targetUrl = this.data.targetUrl;
 
-        const navigate = (evt) => {
-          if (evt) evt.stopPropagation();
+        let isNavigating = false;
+        this.navigate = (evt) => {
+          if (evt && evt.stopPropagation) evt.stopPropagation();
+          if (isNavigating) return;
+          isNavigating = true;
+          setTimeout(() => { isNavigating = false; }, 500);
 
           // Feedback sonoro sutil con Web Audio API
           try {
@@ -41,11 +74,25 @@
             }
           } catch (err) {}
 
+          // Notificación al marco padre si está embebido en index.html
+          if (window.parent && window.parent !== window) {
+            try {
+              if (typeof window.parent.cambiarEscena === 'function') {
+                window.parent.cambiarEscena(2);
+                return;
+              }
+            } catch (err) {}
+            try {
+              window.parent.postMessage({ action: 'cambiarEscena', escena: 2 }, '*');
+            } catch (err) {}
+            return;
+          }
+
           window.location.href = targetUrl;
         };
 
-        el.addEventListener('click', navigate);
-        el.addEventListener('touchend', navigate);
+        el.addEventListener('click', this.navigate);
+        el.addEventListener('touchend', this.navigate);
 
         el.addEventListener('mouseenter', () => {
           document.body.style.cursor = 'pointer';
@@ -69,31 +116,88 @@
       font-family: Helvetica, Arial, sans-serif;
     }
     
-    .hud-overlay {
+    /* Barra superior HUD minimalista unificada */
+    .hud-topbar {
       position: absolute;
       top: 12px;
       left: 12px;
+      right: 12px;
       z-index: 100;
-      color: #f1f5f9;
-      background: rgba(15, 23, 42, 0.85);
-      padding: 8px 14px;
-      border-radius: 4px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       pointer-events: none;
-      line-height: 1.4;
     }
-    .hud-overlay strong {
+    .hud-topbar__group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: auto;
+    }
+    .hud-badge-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 12px;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 6px;
+      color: #f1f5f9;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+    .hud-badge-title__dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #38bdf8;
+      box-shadow: 0 0 8px #38bdf8;
+    }
+    .hud-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      background: rgba(15, 23, 42, 0.90);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 6px;
       color: #38bdf8;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+    .hud-btn:hover, .hud-btn:focus-visible {
+      background: rgba(30, 41, 59, 0.95);
+      border-color: #38bdf8;
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.4);
+      outline: none;
     }
   </style>
 </head>
 <body>
-  <!-- HUD superpuesto -->
-  <div class="hud-overlay">
-    <strong>Escena 1: Estudio de Producción</strong><br>
-    Toca o apunta al controlador Drum Pad o al panel de acceso para entrar al secuenciador.
-  </div>
+  <!-- Barra superior HUD minimalista unificada -->
+  <header class="hud-topbar" role="banner">
+    <div class="hud-topbar__group">
+      <span class="hud-badge-title">
+        <span class="hud-badge-title__dot"></span>
+        01 ESTUDIO DE PRODUCCIÓN
+      </span>
+    </div>
+    <div class="hud-topbar__group">
+      <button id="btnHudEnter" class="hud-btn" type="button" title="Entrar al Secuenciador 4x4 (Escena 2)">
+        <span>Ir al Secuenciador 4×4</span> &rsaquo;
+      </button>
+    </div>
+  </header>
 
   <a-scene 
     loading-screen="dotsColor: #38bdf8; backgroundColor: #111827"
@@ -102,154 +206,119 @@
     
     <!-- Gestor de Assets -->
     <a-assets timeout="6000">
-      <a-asset-item id="drumpad-model" src="assets/models/oversized_drum_pad.glb"></a-asset-item>
+      <img id="studio-vienna-pano" src="assets/textures/studio_vienna_lab_360.jpg">
+      <a-asset-item id="drumpad-model" src="assets/models/maschine_native_instruments.glb"></a-asset-item>
     </a-assets>
 
-    <!-- Iluminación del estudio -->
-    <a-light type="ambient" color="#cbd5e1" intensity="1.2"></a-light>
-    <a-light type="directional" color="#ffffff" intensity="1.6" position="2 5 3" target="#desk"></a-light>
-    <a-light type="point" color="#93c5fd" intensity="1.2" distance="6" position="0 2.2 -0.2"></a-light>
+    <!-- Entorno 360° Equirrectangular: Sala Acústica y Conservatorio Future-Art-Lab (Andreas Praefcke, CC BY-SA 4.0) -->
+    <!-- Proyección orientada con pared de lamas de madera noble y suelo continuo libre de obstáculos -->
+    <a-sky src="#studio-vienna-pano" rotation="0 -20 0"></a-sky>
 
-    <!-- Fondo / Entorno -->
-    <a-sky color="#0f172a"></a-sky>
+    <!-- Iluminación del estudio armonizada con la acústica de madera cálida e iluminación empotrada -->
+    <a-light type="ambient" color="#fef3c7" intensity="1.2"></a-light>
+    <a-light type="directional" color="#ffffff" intensity="1.4" position="2 4 2" target="#desk"></a-light>
+    <a-light type="point" color="#fbbf24" intensity="0.9" distance="5" position="0 2.0 -0.2"></a-light>
 
-    <!-- Suelo -->
-    <a-plane 
-      position="0 0 0" 
-      rotation="-90 0 0" 
-      width="20" 
-      height="20" 
-      color="#1e293b" 
-      roughness="0.6" 
-      metalness="0.2">
-    </a-plane>
+    <!-- Mesa Central de Trabajo (Estilo Consola de Estudio Profesional) -->
+    <!-- Apoyada sólidamente sobre el suelo de tarima de roble -->
+    <a-entity id="desk" position="0 0.02 -0.05">
+      <!-- Tablero Principal en grafito satinado -->
+      <a-box position="0 0.88 -0.2" width="2.4" height="0.08" depth="1.2" color="#18181b" roughness="0.4" metalness="0.2"></a-box>
+      <!-- Patas de soporte -->
+      <a-cylinder position="-1.05 0.44 0.25" radius="0.035" height="0.88" color="#09090b" metalness="0.8"></a-cylinder>
+      <a-cylinder position="1.05 0.44 0.25" radius="0.035" height="0.88" color="#09090b" metalness="0.8"></a-cylinder>
+      <a-cylinder position="-1.05 0.44 -0.65" radius="0.035" height="0.88" color="#09090b" metalness="0.8"></a-cylinder>
+      <a-cylinder position="1.05 0.44 -0.65" radius="0.035" height="0.88" color="#09090b" metalness="0.8"></a-cylinder>
 
-    <!-- Paredes del estudio -->
-    <a-plane position="0 4 -5" width="16" height="8" color="#1e293b" roughness="0.8"></a-plane>
-    <a-plane position="-8 4 0" rotation="0 90 0" width="16" height="8" color="#1e293b" roughness="0.8"></a-plane>
-    <a-plane position="8 4 0" rotation="0 -90 0" width="16" height="8" color="#1e293b" roughness="0.8"></a-plane>
-
-    <!-- Paneles acústicos diffusers -->
-    <a-entity id="acoustic-panels" position="0 2.6 -4.85">
-      <a-box position="-3 0 0" width="0.8" height="3" depth="0.15" color="#334155"></a-box>
-      <a-box position="-1.5 0 0" width="0.8" height="3" depth="0.15" color="#243044"></a-box>
-      <a-box position="0 0 0" width="1.2" height="3" depth="0.15" color="#334155"></a-box>
-      <a-box position="1.5 0 0" width="0.8" height="3" depth="0.15" color="#243044"></a-box>
-      <a-box position="3 0 0" width="0.8" height="3" depth="0.15" color="#334155"></a-box>
-      <a-box position="0 1.8 0.05" width="7.4" height="0.04" depth="0.04" color="#475569"></a-box>
-    </a-entity>
-
-    <!-- Mesa Central de Trabajo -->
-    <a-entity id="desk" position="0 0 0">
-      <!-- Tablero Principal -->
-      <a-box position="0 0.88 -0.2" width="2.4" height="0.08" depth="1.2" color="#1a202c" roughness="0.5" metalness="0.3"></a-box>
-      <!-- Patas -->
-      <a-cylinder position="-1.05 0.44 0.25" radius="0.035" height="0.88" color="#0f172a" metalness="0.7"></a-cylinder>
-      <a-cylinder position="1.05 0.44 0.25" radius="0.035" height="0.88" color="#0f172a" metalness="0.7"></a-cylinder>
-      <a-cylinder position="-1.05 0.44 -0.65" radius="0.035" height="0.88" color="#0f172a" metalness="0.7"></a-cylinder>
-      <a-cylinder position="1.05 0.44 -0.65" radius="0.035" height="0.88" color="#0f172a" metalness="0.7"></a-cylinder>
-
-      <!-- Monitores de Audio (Altavoces) -->
+      <!-- Monitores de Audio (Altavoces de campo cercano) -->
       <a-entity position="-0.95 1.15 -0.45" rotation="0 25 0">
-        <a-box width="0.25" height="0.42" depth="0.28" color="#111827" roughness="0.6"></a-box>
-        <a-cylinder position="0 -0.06 0.14" rotation="90 0 0" radius="0.08" height="0.02" color="#334155"></a-cylinder>
-        <a-cylinder position="0 0.11 0.14" rotation="90 0 0" radius="0.035" height="0.02" color="#64748b"></a-cylinder>
+        <a-box width="0.25" height="0.42" depth="0.28" color="#18181b" roughness="0.5"></a-box>
+        <a-cylinder position="0 -0.06 0.14" rotation="90 0 0" radius="0.08" height="0.02" color="#3f3f46"></a-cylinder>
+        <a-cylinder position="0 0.11 0.14" rotation="90 0 0" radius="0.035" height="0.02" color="#71717a"></a-cylinder>
       </a-entity>
 
       <a-entity position="0.95 1.15 -0.45" rotation="0 -25 0">
-        <a-box width="0.25" height="0.42" depth="0.28" color="#111827" roughness="0.6"></a-box>
-        <a-cylinder position="0 -0.06 0.14" rotation="90 0 0" radius="0.08" height="0.02" color="#334155"></a-cylinder>
-        <a-cylinder position="0 0.11 0.14" rotation="90 0 0" radius="0.035" height="0.02" color="#64748b"></a-cylinder>
+        <a-box width="0.25" height="0.42" depth="0.28" color="#18181b" roughness="0.5"></a-box>
+        <a-cylinder position="0 -0.06 0.14" rotation="90 0 0" radius="0.08" height="0.02" color="#3f3f46"></a-cylinder>
+        <a-cylinder position="0 0.11 0.14" rotation="90 0 0" radius="0.035" height="0.02" color="#71717a"></a-cylinder>
       </a-entity>
 
-      <!-- Pantalla / Monitor Frontal del DAW -->
+      <!-- Pantalla / Monitor Frontal del DAW (Integración Diegética Profesional) -->
       <a-entity position="0 1.35 -0.65">
-        <a-box width="1.1" height="0.6" depth="0.04" color="#0f172a"></a-box>
-        <a-plane position="0 0 0.025" width="1.04" height="0.54" color="#1e293b"></a-plane>
-        <a-text value="DRUMLAB VR // ESTUDIO DE PRODUCCION" align="center" position="0 0.12 0.03" scale="0.24 0.24 0.24" color="#38bdf8"></a-text>
-        <a-text value="WebXR Spatial Audio Workspace 4/4" align="center" position="0 -0.05 0.03" scale="0.18 0.18 0.18" color="#94a3b8"></a-text>
-        <!-- Soporte pantalla -->
-        <a-box position="0 -0.32 0" width="0.08" height="0.2" depth="0.06" color="#334155"></a-box>
-        <a-box position="0 -0.4 0.05" width="0.3" height="0.02" depth="0.2" color="#334155"></a-box>
+        <!-- Chasis y bisel del monitor -->
+        <a-box width="1.16" height="0.66" depth="0.04" color="#09090b" roughness="0.5" metalness="0.5"></a-box>
+        
+        <!-- Pantalla interactiva del software DAW (sustituye al cartel flotante de forma natural) -->
+        <a-plane 
+          id="daw-screen"
+          class="interactable"
+          studio-navigator
+          position="0 0 0.025" 
+          width="1.10" 
+          height="0.60" 
+          color="#0b1120">
+          
+          <!-- Interfaz gráfica del DAW simulada -->
+          <a-text value="DRUMLAB VR // DIGITAL AUDIO WORKSPACE" align="center" position="0 0.19 0.01" scale="0.22 0.22 0.22" color="#38bdf8"></a-text>
+          <a-text value="Proyecto: Secuenciador Ritmico 4/4  |  120 BPM  |  4 Voces" align="center" position="0 0.10 0.01" scale="0.15 0.15 0.15" color="#94a3b8"></a-text>
+          
+          <!-- Botón de apertura integrado en la pantalla DAW (estilo software de producción) -->
+          <a-plane 
+            id="daw-screen-btn"
+            class="interactable"
+            studio-navigator
+            position="0 -0.08 0.01" 
+            width="0.74" 
+            height="0.15" 
+            color="#1e293b" 
+            material="roughness: 0.3; metalness: 0.2; emissive: #0284c7; emissiveIntensity: 0.25">
+            <a-text value="ABRIR SECUENCIADOR 4x4" align="center" position="0 0.015 0.01" scale="0.22 0.22 0.22" color="#38bdf8"></a-text>
+            <a-text value="[ Haz clic aqui o pulsa sobre la Maschine MK3 ]" align="center" position="0 -0.04 0.01" scale="0.12 0.12 0.12" color="#94a3b8"></a-text>
+          </a-plane>
+        </a-plane>
+
+        <!-- Soporte ergonómico del monitor -->
+        <a-box position="0 -0.34 0" width="0.08" height="0.18" depth="0.06" color="#27272a" roughness="0.5" metalness="0.6"></a-box>
+        <a-box position="0 -0.42 0.05" width="0.32" height="0.02" depth="0.22" color="#27272a" roughness="0.5" metalness="0.6"></a-box>
       </a-entity>
 
       <!-- ================================================================
-           MODELO 3D OFICIAL: Oversized Drum Pad (lukus1, CC BY 4.0)
-           Orientado hacia el usuario (rotation="0 -90 0") sobre la mesa
+           MODELO 3D OFICIAL: Maschine Native Instruments (jmccopus, CC BY 4.0)
+           Orientado hacia el usuario sobre la mesa de trabajo
            ================================================================ -->
       <a-entity 
         id="studio-drumpad"
-        position="0 0.93 -0.1"
-        rotation="-10 0 0">
+        position="0 0.99 -0.15"
+        rotation="-72 0 0"
+        scale="0.16 0.16 0.16">
         
-        <!-- Modelo 3D GLTF oficial cargado directamente sin fallbacks artificiales -->
+        <!-- Modelo 3D GLTF oficial -->
         <a-gltf-model 
           id="drumpad-gltf-node"
-          src="#drumpad-model" 
-          position="0 0 0"
-          rotation="0 -90 0"
-          scale="0.42 0.42 0.42">
+          maschine-studio-model
+          src="#drumpad-model">
         </a-gltf-model>
 
-        <!-- Hitbox interactiva que cubre el drum pad para clic y selección directa -->
+        <!-- Hitbox interactiva que cubre el drum pad para selección directa -->
         <a-box 
           id="drumpad-hitbox"
           class="interactable"
           studio-navigator
-          position="0 0.04 0" 
-          width="0.95" 
-          height="0.12" 
-          depth="0.85" 
+          position="0 0 0" 
+          width="4.8" 
+          height="3.2" 
+          depth="0.8" 
           material="opacity: 0; transparent: true">
         </a-box>
-      </a-entity>
-
-      <!-- Panel de navegación flotante situado sutilmente sobre el monitor (sin tapar el pad) -->
-      <a-entity 
-        id="interactive-marker"
-        position="0 1.8 -0.6"
-        animation="property: position; to: 0 1.84 -0.6; dir: alternate; dur: 1800; loop: true; easing: easeInOutSine">
-        
-        <a-plane 
-          id="marker-clickable-plane"
-          class="interactable"
-          studio-navigator
-          width="1.3" 
-          height="0.32" 
-          color="#0f172a" 
-          material="opacity: 0.95; transparent: true">
-          
-          <a-text 
-            value="ENTRAR AL SECUENCIADOR 4x4" 
-            align="center" 
-            position="0 0.05 0.02" 
-            scale="0.28 0.28 0.28" 
-            color="#ffffff" 
-            font="roboto">
-          </a-text>
-          
-          <a-text 
-            value="[ Tocar o apuntar para abrir el Secuenciador ]" 
-            align="center" 
-            position="0 -0.06 0.02" 
-            scale="0.18 0.18 0.18" 
-            color="#94a3b8" 
-            font="roboto">
-          </a-text>
-        </a-plane>
-
-        <a-box position="0 0.165 0.01" width="1.32" height="0.012" depth="0.01" color="#2b6cb0"></a-box>
-        <a-box position="0 -0.165 0.01" width="1.32" height="0.012" depth="0.01" color="#2b6cb0"></a-box>
       </a-entity>
     </a-entity>
 
     <!-- Sujeto Virtual: Cámara ergonómica estable y controles WebXR -->
     <!-- wasd-controls desactivado para no interferir con las teclas del teclado ni salir volando -->
-    <a-entity id="rig" position="0 0 1.05">
+    <a-entity id="rig" position="0 0 1.35" rotation="-16 0 0">
       <a-camera 
         id="camera" 
-        position="0 1.25 0"
-        rotation="-10 0 0"
+        position="0 1.35 0"
         look-controls="pointerLockEnabled: false" 
         wasd-controls="enabled: false">
         <!-- Raycaster de ratón y pantalla táctil -->
@@ -265,5 +334,115 @@
       <a-entity laser-controls="hand: left" raycaster="objects: .interactable; interval: 30; lineColor: #38bdf8; lineOpacity: 0.8"></a-entity>
     </a-entity>
   </a-scene>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const sceneEl = document.querySelector('a-scene');
+      const raycaster = new THREE.Raycaster();
+      const pointer = new THREE.Vector2();
+
+      let isNavigating = false;
+      const triggerNavigation = () => {
+        if (isNavigating) return;
+        isNavigating = true;
+        setTimeout(() => { isNavigating = false; }, 500);
+
+        const navEl = document.querySelector('[studio-navigator]');
+        if (navEl && navEl.components && navEl.components['studio-navigator']) {
+          navEl.components['studio-navigator'].navigate();
+        } else {
+          if (window.parent && window.parent !== window) {
+            try {
+              if (typeof window.parent.cambiarEscena === 'function') {
+                window.parent.cambiarEscena(2);
+                return;
+              }
+            } catch (err) {}
+            try {
+              window.parent.postMessage({ action: 'cambiarEscena', escena: 2 }, '*');
+            } catch (err) {}
+            return;
+          }
+          window.location.href = 'escena-secuenciador.html';
+        }
+      };
+
+      const btnHudEnter = document.getElementById('btnHudEnter');
+      if (btnHudEnter) {
+        btnHudEnter.addEventListener('click', (e) => {
+          e.stopPropagation();
+          triggerNavigation();
+        });
+      }
+
+      // Registro de inicio de interacción de puntero para distinguir clics de arrastres
+      let pointerDownPos = null;
+
+      window.addEventListener('pointerdown', (e) => {
+        pointerDownPos = { x: e.clientX, y: e.clientY, time: Date.now() };
+      }, { passive: true });
+
+      // Disparo de navegación 3D únicamente en pointerup (clic completado sin arrastre de cámara)
+      window.addEventListener('pointerup', (e) => {
+        if (!pointerDownPos) return;
+        const dx = e.clientX - pointerDownPos.x;
+        const dy = e.clientY - pointerDownPos.y;
+        const dt = Date.now() - pointerDownPos.time;
+        pointerDownPos = null;
+
+        // Si el usuario arrastró el ratón para rotar la cámara o mantuvo pulsado más de 600ms, no es un clic
+        if (Math.hypot(dx, dy) > 8 || dt > 600) return;
+
+        // Si se pulsó sobre la barra superior HTML, el evento click nativo lo gestiona
+        if (e.target && e.target.closest && e.target.closest('.hud-topbar')) return;
+
+        if (!sceneEl || !sceneEl.camera) return;
+        const canvas = sceneEl.canvas || document.querySelector('canvas');
+        if (!canvas) return;
+        const rect = canvas.getBoundingClientRect();
+        pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+        if (sceneEl.object3D) sceneEl.object3D.updateMatrixWorld(true);
+        raycaster.setFromCamera(pointer, sceneEl.camera);
+
+        const interactables = [];
+        const dawScreen = document.getElementById('daw-screen');
+        const dawBtn = document.getElementById('daw-screen-btn');
+        const hitbox = document.getElementById('drumpad-hitbox');
+        if (dawScreen && dawScreen.object3D) interactables.push(dawScreen.object3D);
+        if (dawBtn && dawBtn.object3D) interactables.push(dawBtn.object3D);
+        if (hitbox && hitbox.object3D) interactables.push(hitbox.object3D);
+
+        const hits = raycaster.intersectObjects(interactables, true);
+        if (hits.length > 0) {
+          triggerNavigation();
+        }
+      });
+
+      window.addEventListener('pointermove', (e) => {
+        if (!sceneEl || !sceneEl.camera) return;
+        const canvas = sceneEl.canvas || document.querySelector('canvas');
+        if (!canvas) return;
+        const rect = canvas.getBoundingClientRect();
+        pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+        if (sceneEl.object3D) sceneEl.object3D.updateMatrixWorld(true);
+        raycaster.setFromCamera(pointer, sceneEl.camera);
+
+        const interactables = [];
+        const dawScreen = document.getElementById('daw-screen');
+        const dawBtn = document.getElementById('daw-screen-btn');
+        const hitbox = document.getElementById('drumpad-hitbox');
+        if (dawScreen && dawScreen.object3D) interactables.push(dawScreen.object3D);
+        if (dawBtn && dawBtn.object3D) interactables.push(dawBtn.object3D);
+        if (hitbox && hitbox.object3D) interactables.push(hitbox.object3D);
+
+        const hits = raycaster.intersectObjects(interactables, true);
+        document.body.style.cursor = (hits.length > 0) ? 'pointer' : 'default';
+      }, { passive: true });
+    });
+  </script>
 </body>
 </html>

@@ -17,6 +17,8 @@ Estructura de dos niveles:
    autómata finito de 3 estados (INACTIVO, ACTIVO_ESPERA, DISPARANDO) y doble interfaz física (ratón + teclado isomórfico).
 
 Recursos y licencias de terceros:
-1. Modelo 3D: "Oversized Drum Pad" (https://skfb.ly/6YTGQ) by lukus1 is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
-2. Muestras de audio (kick, snare, hihat, crash): JavaScript Drum Kit by Arun Michael Dsouza (https://github.com/ArunMichaelDsouza/javascript-30-course), licencia MIT.
-3. Framework 3D: A-Frame v1.6.0 (https://github.com/aframevr/aframe), licencia MIT.
+1. Modelo 3D: "Maschine Native Instruments" (https://skfb.ly/oAOvO) by jmccopus is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).
+2. Fotografía panorámica 360° (Escena 1): "Konzertsaal im Future-Art-Lab (Wien)" by Andreas Praefcke, licencia Creative Commons Atribución-CompartirIgual 4.0 Internacional (CC BY-SA 4.0).
+   Fuente: https://commons.wikimedia.org/wiki/File:Konzertsaal_im_Future-Art-Lab_der_mdw_-_Universit%C3%A4t_f%C3%BCr_Musik_und_darstellende_Kunst_Wien,_2021.jpg
+3. Muestras de audio (kick, snare, hihat, crash): JavaScript Drum Kit by Arun Michael Dsouza (https://github.com/ArunMichaelDsouza/javascript-30-course), licencia MIT.
+4. Framework 3D: A-Frame v1.6.0 (https://github.com/aframevr/aframe), licencia MIT.

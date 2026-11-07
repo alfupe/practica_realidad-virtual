@@ -25,3 +25,6 @@ https_server.py
 
 # Logs
 *.log
+
+# Scratch scripts and temporary test files
+scratch/

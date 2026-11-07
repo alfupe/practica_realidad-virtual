@@ -31,7 +31,7 @@ El diseño del proyecto aborda los pilares teóricos fundamentales de la asignat
 2. **Inmersión y Presencia mediante feedback multisensorial:**  
    Se estimulan de forma simultánea el canal visual (iluminación dinámica, destellos emisivos y micro-compresión geométrica de los pads) y el auditivo (motor de percusión de baja latencia <15 ms), reforzando la sensación de presencia y causalidad física del sujeto en el entorno virtual.
 3. **Niveles de interactividad diferenciados:**  
-   * **Nivel 1 — Explorativo ([`recursos/escena-estudio.html`](recursos/escena-estudio.html)):** Entorno sintético de estudio de producción musical low-poly donde el usuario inspecciona el espacio, explora la mesa de mezclas con el modelo 3D *Oversized Drum Pad* y accede al nivel de manipulación.
+   * **Nivel 1 — Explorativo ([`recursos/escena-estudio.html`](recursos/escena-estudio.html)):** Entorno sintético de estudio de producción musical low-poly donde el usuario inspecciona el espacio, explora la mesa de mezclas con el modelo 3D *Maschine Native Instruments* y accede al nivel de manipulación.
    * **Nivel 2 — Manipulativo y Contributivo ([`recursos/escena-secuenciador.html`](recursos/escena-secuenciador.html)):** Cámara ergonómica en plano picado enfocada sobre el controlador matricial 4×4. El usuario no solo acciona los pulsadores, sino que programa secuencias temporales activas que componen un bucle rítmico continuo en compás cuaternario.
 
 ---
@@ -109,7 +109,7 @@ Práctica_Fuentes_Alejandro/
     ├── licencias.html             # Documento normativo de propiedad intelectual
     ├── assets/
     │   ├── audio/                # Muestras WAV de percusión (kick, snare, hihat, crash)
-    │   ├── models/               # Modelo 3D del controlador (oversized_drum_pad.glb)
+    │   ├── models/               # Modelo 3D del controlador (maschine_native_instruments.glb)
     │   └── qr-github-pages.png   # Código QR para acceso móvil
     └── docs/
         ├── Práctica_Fuentes_Alejandro.txt
@@ -139,10 +139,11 @@ Abrir en el navegador: [http://localhost:8080/](http://localhost:8080/)
 
 | Recurso | Archivo / Uso | Autor / Fuente | Licencia | Enlace de referencia |
 | :--- | :--- | :--- | :---: | :--- |
-| **"Oversized Drum Pad"** | `recursos/assets/models/oversized_drum_pad.glb` | **lukus1** | **CC BY 4.0** | [Sketchfab (skfb.ly/6YTGQ)](https://skfb.ly/6YTGQ) |
+| **"Maschine Native Instruments"** | `recursos/assets/models/maschine_native_instruments.glb` | **jmccopus** | **CC BY 4.0** | [Sketchfab (skfb.ly/6YTGQ)](https://skfb.ly/oAOvO) |
+| **"Konzertsaal im Future-Art-Lab"** | `recursos/assets/textures/studio_vienna_lab_360.jpg` (Entorno 360° Escena 1) | **Andreas Praefcke** | **CC BY-SA 4.0** | [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Konzertsaal_im_Future-Art-Lab_der_mdw_-_Universit%C3%A4t_f%C3%BCr_Musik_und_darstellende_Kunst_Wien,_2021.jpg) |
 | **JavaScript Drum Kit** | `recursos/assets/audio/*.wav` (kick, snare, hihat, crash) | **Arun Michael Dsouza** | **MIT License** | [GitHub Repository](https://github.com/ArunMichaelDsouza/javascript-30-course) |
 | **A-Frame WebXR Framework** | Framework 3D / WebXR v1.6.0 | Supermedium, Diego Marcos, Kevin Ngo | **MIT License** | [GitHub (aframevr/aframe)](https://github.com/aframevr/aframe) |
 | **Web Audio & WebXR APIs** | Motor de sonido y renderizado inmersivo | W3C Consortium | **Estándar Abierto W3C** | [W3C Web Audio API](https://www.w3.org/TR/webaudio/) |
 
 > **Atribución CC BY 4.0 requerida:**  
-> *"Oversized Drum Pad" (https://skfb.ly/6YTGQ) by lukus1 is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).*
+> *"Maschine Native Instruments" (https://skfb.ly/oAOvO) by jmccopus is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).*

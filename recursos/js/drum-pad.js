@@ -298,6 +298,8 @@ class PadMeshController {
     this.defaultColor = options.defaultColor || '#334155';
     this.flashColor = options.flashColor || '#ffffff';
     this.state = 'INACTIVO';
+    this.programmed = false;
+    this.lastClickTime = 0;
     this.originalLocalY = this.mesh ? this.mesh.position.y : 0;
     this.flashTimeout = null;
 
@@ -311,15 +313,22 @@ class PadMeshController {
 
   onClick(evt) {
     if (evt && evt.stopPropagation) evt.stopPropagation();
+    const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+    if (this.lastClickTime && (now - this.lastClickTime < 150)) {
+      return; // Prevenir cualquier rebote accidental o evento duplicado menor a 150ms
+    }
+    this.lastClickTime = now;
+
     if (window.DrumLabAudio) {
       window.DrumLabAudio.unlock();
     }
-    const nextState = (this.state === 'INACTIVO') ? 'ACTIVO_ESPERA' : 'INACTIVO';
+    this.programmed = !this.programmed;
+    const nextState = this.programmed ? 'ACTIVO_ESPERA' : 'INACTIVO';
     this.triggerDisparo(nextState);
   }
 
   triggerDisparo(returnState = null) {
-    const finalState = returnState || ((this.state === 'INACTIVO') ? 'INACTIVO' : 'ACTIVO_ESPERA');
+    const finalState = returnState || (this.programmed ? 'ACTIVO_ESPERA' : 'INACTIVO');
     this.state = 'DISPARANDO';
 
     if (window.DrumLabAudio) {
@@ -370,6 +379,7 @@ class PadMeshController {
       this.flashTimeout = null;
     }
     this.state = newState;
+    this.programmed = (newState === 'ACTIVO_ESPERA');
     if (this.mesh) {
       this.mesh.position.y = this.originalLocalY;
     }
@@ -377,7 +387,7 @@ class PadMeshController {
   }
 
   isStepActive() {
-    return this.state === 'ACTIVO_ESPERA';
+    return this.programmed;
   }
 }
 
