@@ -70,7 +70,7 @@ Fila 3: KICK │    Pad 12    │    Pad 13    │    Pad 14    │    Pad 15   
 ### 2. Autómata Finito de 3 Estados (`drum-pad`)
 Cada pulsador de la matriz se gestiona mediante un autómata finito formal:
 * **`INACTIVO`:** Pad en reposo (color pizarra oscuro, escala en Z = 1).
-* **`ACTIVO_ESPERA`:** Pad programado en el secuenciador; emite brillo tímbrico característico (Ámbar, Esmeralda, Cian o Magenta) a la espera del pulso del reloj.
+* **`ACTIVO_ESPERA`:** Pad programado en el secuenciador; emite brillo tímbrico característico (Ámbar, Verde, Azul o Magenta) a la espera del pulso del reloj.
 * **`DISPARANDO`:** Disparo percusivo inmediato. Produce un destello blanco emisivo intenso, compresión física en el eje Z (escala = 0.4) durante 100 ms y reproducción acústica instantánea.
 
 ### 3. Doble Interfaz Física de Entrada

@@ -131,7 +131,7 @@ AFRAME.registerComponent('step-sequencer', {
     // Configuración tímbrica por fila (0..3 de atrás hacia adelante en la superficie)
     const voiceConfigs = [
       { voice: 'crash', color: '#f59e0b' },  // Fila 0: Crash (Ámbar)
-      { voice: 'hihat', color: '#10b981' },  // Fila 1: Hi-Hat (Esmeralda)
+      { voice: 'hihat', color: '#22c55e' },  // Fila 1: Hi-Hat (Verde brillante)
       { voice: 'snare', color: '#38bdf8' },  // Fila 2: Snare (Azul Cobalto)
       { voice: 'kick',  color: '#ec4899' }   // Fila 3: Kick (Magenta/Rosa)
     ];
