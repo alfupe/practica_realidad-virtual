@@ -101,6 +101,7 @@ Práctica_Fuentes_Alejandro/
     ├── css/
     │   └── styles.css            # Estilos BEM, maquetación adaptativa y temas
     ├── js/
+    │   ├── app.js                # Orquestador del visor, sincronización de escenas y telemetría
     │   ├── drum-pad.js           # Motor Web Audio y autómata de 3 estados
     │   └── step-sequencer.js     # Secuenciador 4/4, reloj y teclado isomórfico
     ├── escena-estudio.html        # Nivel 1: Estudio explorativo (A-Frame)
