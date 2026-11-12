@@ -140,10 +140,11 @@ Abrir en el navegador: [http://localhost:8080/](http://localhost:8080/)
 
 | Recurso | Archivo / Uso | Autor / Fuente | Licencia | Enlace de referencia |
 | :--- | :--- | :--- | :---: | :--- |
-| **"Oversized Drum Pad"** | `recursos/assets/models/oversized_drum_pad.glb` | **lukus1** | **CC BY 4.0** | [Sketchfab (skfb.ly/6YTGQ)](https://skfb.ly/6YTGQ) |
+| **"Maschine Native Instruments"** | `recursos/assets/models/maschine_native_instruments.glb` | **jmccopus** | **CC BY 4.0** | [Sketchfab](https://skfb.ly/oAOvO) |
+| **"Neon Photostudio"** | `recursos/assets/textures/studio_neon_360.jpg` (Entorno 360° Escena 1) | **Sergej Majboroda** | **CC0 1.0** | [Poly Haven](https://polyhaven.com/a/neon_photostudio) |
 | **JavaScript Drum Kit** | `recursos/assets/audio/*.wav` (kick, snare, hihat, crash) | **Arun Michael Dsouza** | **MIT License** | [GitHub Repository](https://github.com/ArunMichaelDsouza/javascript-30-course) |
 | **A-Frame WebXR Framework** | Framework 3D / WebXR v1.6.0 | Supermedium, Diego Marcos, Kevin Ngo | **MIT License** | [GitHub (aframevr/aframe)](https://github.com/aframevr/aframe) |
 | **Web Audio & WebXR APIs** | Motor de sonido y renderizado inmersivo | W3C Consortium | **Estándar Abierto W3C** | [W3C Web Audio API](https://www.w3.org/TR/webaudio/) |
 
 > **Atribución CC BY 4.0 requerida:**  
-> *"Oversized Drum Pad" (https://skfb.ly/6YTGQ) by lukus1 is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).*
+> *"Maschine Native Instruments" (https://skfb.ly/oAOvO) by jmccopus is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).*

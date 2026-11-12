@@ -6,10 +6,10 @@
  * Responsabilidades:
  * - Integración física nativa sobre el modelo 3D GLTF de Native Instruments Maschine MK3 (jmccopus, CC BY 4.0).
  * - Descomposición de la malla de pads (Object_12) en 16 pulsadores interactivos (4 voces x 4 pasos) con PadMeshController.
- * - Descomposición de la botonera táctil (Object_8) en pulsadores físicos para Transporte (Play/Stop, BPM, Clear) y LEDs de compás.
- * - Pantalla LCD retroiluminada interactiva sobre Object_10 con textura dinámica en tiempo real.
+ * - Descomposición de la botonera táctil (Object_8) en Transporte (Play/Stop, BPM, Clear), LEDs de compás y 8 botones de gestión multi-compás (4 Loop ON/OFF + 4 Edit Bar 1-4).
+ * - Pantalla LCD central retroiluminada encajada en el bisel del chasis con BPM, estado, compás y pasos en tiempo real.
  * - Doble Interfaz Física: Entrada isomórfica de teclado (1-4, Q-R, A-F, Z-V) + Espacio + Clic nativo Three.js / WebXR.
- * - Reloj métrico cuaternario (4 tiempos por compás) con tempo seleccionable (90 / 120 / 140 BPM).
+ * - Reloj métrico cuaternario de hasta 4 compases con loop dinámico y tempo seleccionable (90 / 120 / 140 BPM).
  * - Cero cajas flotantes o interfaces artificiales: 100% integrado en la anatomía del hardware.
  */
 
@@ -24,10 +24,21 @@ AFRAME.registerComponent('step-sequencer', {
     this.timerId = null;
     this.bpmOptions = [90, 120, 140];
     this.currentBpmIndex = 1;                  // 120 BPM por defecto
+
+    // Secuenciador multi-compás (4 compases x 4 voces x 4 pasos)
+    this.patterns = Array.from({ length: 4 }, () =>
+      Array.from({ length: 4 }, () => [false, false, false, false])
+    );
+    this.enabledBars = [true, false, false, false]; // Por defecto, Compás 1 activo en loop
+    this.editBar = 0;                               // Compás visible/editable en los 16 pads (0..3)
+    this.playBar = 0;                               // Compás en reproducción actual (0..3)
+
     this.padMatrix = new Map();                // Clave: "row_col", Valor: PadMeshController
     this.padMeshes = [];                       // Array de Three.js Mesh de los pads para raycasting directo
-    this.hardwareButtonMeshes = [];            // Array de Three.js Mesh de los botones físicos (Play, Clear, BPM)
+    this.hardwareButtonMeshes = [];            // Array de Three.js Mesh de los botones físicos
     this.tempoLedMeshes = [];                  // Array con los 4 LEDs físicos sobre las columnas (0..3)
+    this.loopBarButtonMeshes = [null, null, null, null]; // Fila superior LCD: activar/desactivar compás en loop
+    this.editBarButtonMeshes = [null, null, null, null]; // Fila inferior LCD: seleccionar compás a editar
     this.btnPlayMesh = null;
     this.btnStopMesh = null;
     this.btnClearMesh = null;
@@ -42,6 +53,9 @@ AFRAME.registerComponent('step-sequencer', {
     // Bindings de contexto
     this.onTick = this.onTick.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
+    this.onPadToggled = this.onPadToggled.bind(this);
+    this.selectEditBar = this.selectEditBar.bind(this);
+    this.toggleLoopBar = this.toggleLoopBar.bind(this);
     this.togglePlay = this.togglePlay.bind(this);
     this.startPlayback = this.startPlayback.bind(this);
     this.stopPlayback = this.stopPlayback.bind(this);
@@ -51,7 +65,9 @@ AFRAME.registerComponent('step-sequencer', {
     this.setupDirectRaycasting = this.setupDirectRaycasting.bind(this);
     this.updateScreenDisplay = this.updateScreenDisplay.bind(this);
     this.updatePlayButtonVisual = this.updatePlayButtonVisual.bind(this);
+    this.updateBarButtonsVisual = this.updateBarButtonsVisual.bind(this);
     this.updateTempoLeds = this.updateTempoLeds.bind(this);
+    this.updateHudTelemetry = this.updateHudTelemetry.bind(this);
 
     // Mapeo isomórfico del teclado físico
     this.buildKeyMapping();
@@ -254,7 +270,8 @@ AFRAME.registerComponent('step-sequencer', {
           activeColor: voiceCfg.color,
           defaultColor: '#334155',
           flashColor: '#ffffff',
-          mesh: padMesh
+          mesh: padMesh,
+          onToggle: this.onPadToggled
         });
 
         padMesh.userData = {
@@ -325,6 +342,15 @@ AFRAME.registerComponent('step-sequencer', {
 
       this.hardwareButtonMeshes = [];
       this.tempoLedMeshes = [null, null, null, null];
+      this.loopBarButtonMeshes = [null, null, null, null];
+      this.editBarButtonMeshes = [null, null, null, null];
+
+      const mapButtonCol = (lzVal) => {
+        if (lzVal < -1.25) return 0;
+        if (lzVal < -0.75) return 1;
+        if (lzVal < -0.20) return 2;
+        return 3;
+      };
 
       btnComponents.forEach((comp, bIdx) => {
         let sx = 0, sy = 0, sz = 0, count = 0;
@@ -349,6 +375,14 @@ AFRAME.registerComponent('step-sequencer', {
         const isLed2 = (lx < -10.5 && lz > 2.0 && lz < 2.4);
         const isLed3 = (lx < -10.5 && lz > 2.7 && lz < 3.1);
         const isLed4 = (lx < -10.5 && lz > 3.3 && lz < 3.8);
+
+        // Botones sobre la pantalla LCD: Activar/Desactivar Compás 1..4 en el Loop
+        const isLoopBar = (lx > -1.8 && lx < -0.5 && lz < 0.3);
+        const loopBarIdx = isLoopBar ? mapButtonCol(lz) : -1;
+
+        // Botones bajo la pantalla LCD: Seleccionar Compás 1..4 a editar en los 16 pads
+        const isEditBar = (lx > 6.0 && lx < 7.4 && lz < 0.3);
+        const editBarIdx = isEditBar ? mapButtonCol(lz) : -1;
 
         const subGeom = new THREE.BufferGeometry();
         const oldToNew = new Map();
@@ -400,6 +434,10 @@ AFRAME.registerComponent('step-sequencer', {
           color = '#0284c7';
           emissive = '#38bdf8';
           emissiveIntensity = 0.4;
+        } else if (isLoopBar) {
+          role = `loop_bar_${loopBarIdx}`;
+        } else if (isEditBar) {
+          role = `edit_bar_${editBarIdx}`;
         } else if (isLed1) {
           role = 'led_0';
           color = '#334155';
@@ -444,6 +482,14 @@ AFRAME.registerComponent('step-sequencer', {
           this.btnBpmMesh = capMesh;
           capMesh.userData = { isButton: true, action: 'bpm' };
           this.hardwareButtonMeshes.push(capMesh);
+        } else if (isLoopBar && loopBarIdx >= 0) {
+          this.loopBarButtonMeshes[loopBarIdx] = capMesh;
+          capMesh.userData = { isButton: true, action: 'toggleLoopBar', barIndex: loopBarIdx };
+          this.hardwareButtonMeshes.push(capMesh);
+        } else if (isEditBar && editBarIdx >= 0) {
+          this.editBarButtonMeshes[editBarIdx] = capMesh;
+          capMesh.userData = { isButton: true, action: 'selectEditBar', barIndex: editBarIdx };
+          this.hardwareButtonMeshes.push(capMesh);
         } else if (isLed1) {
           this.tempoLedMeshes[0] = capMesh;
         } else if (isLed2) {
@@ -455,6 +501,8 @@ AFRAME.registerComponent('step-sequencer', {
         }
       });
 
+      this.updateBarButtonsVisual();
+
       // Eliminamos la malla combinada de botones para que no interfiera en la interacción
       btnMesh.raycast = () => {};
       if (btnMesh.parent) {
@@ -462,24 +510,41 @@ AFRAME.registerComponent('step-sequencer', {
       }
     }
 
-    // 5. Pantalla LCD dinámica en Object_10
-    const screenMesh = rootMesh.getObjectByName('Object_10');
-    if (screenMesh) {
-      screenMesh.visible = true;
-      this.screenMesh = screenMesh;
-      this.screenCanvas = document.createElement('canvas');
-      this.screenCanvas.width = 512;
-      this.screenCanvas.height = 128;
-      this.screenContext = this.screenCanvas.getContext('2d');
-      this.screenTexture = new THREE.CanvasTexture(this.screenCanvas);
-
-      screenMesh.material = new THREE.MeshBasicMaterial({
-        map: this.screenTexture,
+    // 5. Pantalla LCD central de alta resolución encajada en el bisel de Object_6
+    // Nota: Object_10 en el GLB es el indicador superior izquierdo; la pantalla dual central está en [-2.718..-0.752, 3.378..4.012]
+    const miniStripMesh = rootMesh.getObjectByName('Object_10');
+    if (miniStripMesh) {
+      miniStripMesh.visible = true;
+      miniStripMesh.material = new THREE.MeshStandardMaterial({
+        color: '#0ea5e9',
+        emissive: '#0284c7',
+        emissiveIntensity: 0.65,
+        roughness: 0.25,
         side: THREE.DoubleSide
       });
-
-      this.updateScreenDisplay();
     }
+
+    this.screenCanvas = document.createElement('canvas');
+    this.screenCanvas.width = 680;
+    this.screenCanvas.height = 204;
+    this.screenContext = this.screenCanvas.getContext('2d');
+    this.screenTexture = new THREE.CanvasTexture(this.screenCanvas);
+    this.screenTexture.anisotropy = 4;
+
+    const lcdGeom = new THREE.PlaneGeometry(1.88, 0.50);
+    const lcdMat = new THREE.MeshBasicMaterial({
+      map: this.screenTexture,
+      side: THREE.DoubleSide
+    });
+    this.screenMesh = new THREE.Mesh(lcdGeom, lcdMat);
+    this.screenMesh.name = 'maschine_central_lcd';
+    // Posicionada a ras sobre el rebaje del chasis (+2.3 deg sigue la inclinación real del panel frontal hacia arriba)
+    this.screenMesh.position.set(-1.735, 3.69, -0.540);
+    this.screenMesh.rotation.x = THREE.MathUtils.degToRad(2.3);
+    rootMesh.add(this.screenMesh);
+
+    this.updateScreenDisplay();
+    this.updateHudTelemetry();
 
     // 6. Configuración de Raycasting Directo Three.js (Ratón, Pantalla Táctil y Láser VR)
     this.setupDirectRaycasting(modelEl);
@@ -489,52 +554,217 @@ AFRAME.registerComponent('step-sequencer', {
   },
 
   /**
-   * Actualiza la pantalla digital LCD del controlador con estilo retro-futurista
+   * Sincroniza cualquier cambio manual en un pad hacia el compás en edición actual
+   */
+  onPadToggled: function (row, col, isProgrammed) {
+    if (row >= 0 && row < 4 && col >= 0 && col < 4) {
+      this.patterns[this.editBar][row][col] = !!isProgrammed;
+    }
+  },
+
+  /**
+   * Retorna el índice del primer compás habilitado en el loop (0..3)
+   */
+  getFirstEnabledBar: function () {
+    const idx = this.enabledBars.findIndex(Boolean);
+    return idx >= 0 ? idx : 0;
+  },
+
+  /**
+   * Retorna el siguiente compás habilitado en el loop circular
+   */
+  getNextEnabledBar: function (currentBar) {
+    for (let offset = 1; offset <= 4; offset++) {
+      const candidate = (currentBar + offset) % 4;
+      if (this.enabledBars[candidate]) {
+        return candidate;
+      }
+    }
+    return currentBar;
+  },
+
+  /**
+   * Activa o desactiva un compás (0..3) dentro del bucle de reproducción
+   */
+  toggleLoopBar: function (barIndex) {
+    if (barIndex < 0 || barIndex > 3) return;
+    const activeCount = this.enabledBars.filter(Boolean).length;
+    // Garantizar que siempre quede al menos 1 compás activo para el bucle
+    if (this.enabledBars[barIndex] && activeCount <= 1) {
+      return;
+    }
+    this.enabledBars[barIndex] = !this.enabledBars[barIndex];
+
+    // Si se desactivó el compás que estaba sonando, saltar limpiamente al primero activo
+    if (this.isSequencerRunning && !this.enabledBars[this.playBar]) {
+      this.playBar = this.getFirstEnabledBar();
+    }
+
+    this.updateBarButtonsVisual();
+    this.updateScreenDisplay();
+    this.updateHudTelemetry();
+  },
+
+  /**
+   * Cambia el compás visible y editable en los 16 pads físicos de la Maschine
+   */
+  selectEditBar: function (barIndex) {
+    if (barIndex < 0 || barIndex > 3) return;
+    this.editBar = barIndex;
+
+    // Reflejar inmediatamente el patrón guardado de ese compás en la matriz 4x4 sin disparar audio
+    for (let r = 0; r < 4; r++) {
+      for (let c = 0; c < 4; c++) {
+        const pad = this.padMatrix.get(`${r}_${c}`);
+        if (pad) {
+          pad.setState(this.patterns[this.editBar][r][c] ? 'ACTIVO_ESPERA' : 'INACTIVO');
+        }
+      }
+    }
+
+    this.updateBarButtonsVisual();
+    this.updateScreenDisplay();
+    this.updateHudTelemetry();
+  },
+
+  /**
+   * Actualiza los colores emisivos de las dos filas de botones multi-compás
+   */
+  updateBarButtonsVisual: function () {
+    for (let i = 0; i < 4; i++) {
+      // Fila superior LCD: Estado ON/OFF de cada compás en el Loop
+      const loopMesh = this.loopBarButtonMeshes[i];
+      if (loopMesh && loopMesh.material) {
+        const isPlayingThis = this.isSequencerRunning && (this.playBar === i);
+        if (this.enabledBars[i]) {
+          loopMesh.material.color.set(isPlayingThis ? '#4ade80' : '#16a34a');
+          loopMesh.material.emissive.set('#22c55e');
+          loopMesh.material.emissiveIntensity = isPlayingThis ? 1.5 : 0.75;
+        } else {
+          loopMesh.material.color.set('#2c333f');
+          loopMesh.material.emissive.set('#000000');
+          loopMesh.material.emissiveIntensity = 0;
+        }
+      }
+
+      // Fila inferior LCD (círculo verde): Compás actualmente seleccionado para editar
+      const editMesh = this.editBarButtonMeshes[i];
+      if (editMesh && editMesh.material) {
+        if (this.editBar === i) {
+          editMesh.material.color.set('#38bdf8');
+          editMesh.material.emissive.set('#38bdf8');
+          editMesh.material.emissiveIntensity = 1.25;
+        } else if (this.enabledBars[i]) {
+          editMesh.material.color.set('#334155');
+          editMesh.material.emissive.set('#0284c7');
+          editMesh.material.emissiveIntensity = 0.22;
+        } else {
+          editMesh.material.color.set('#2c333f');
+          editMesh.material.emissive.set('#000000');
+          editMesh.material.emissiveIntensity = 0;
+        }
+      }
+    }
+  },
+
+  /**
+   * Actualiza la pantalla digital LCD central del controlador (BPM, Loop, Compás y Step)
    */
   updateScreenDisplay: function () {
     if (!this.screenContext || !this.screenTexture) return;
     const ctx = this.screenContext;
+    const W = this.screenCanvas.width;
+    const H = this.screenCanvas.height;
 
-    ctx.fillStyle = '#090d16';
-    ctx.fillRect(0, 0, 512, 128);
+    // Fondo OLED profundo
+    ctx.fillStyle = '#050a14';
+    ctx.fillRect(0, 0, W, H);
 
-    // Líneas de trama LCD sutiles
+    // Marco interior sutil
     ctx.strokeStyle = '#1e293b';
-    ctx.lineWidth = 1;
-    for (let y = 0; y < 128; y += 16) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(512, y);
-      ctx.stroke();
+    ctx.lineWidth = 2;
+    ctx.strokeRect(1, 1, W - 2, H - 2);
+
+    const colW = (W - 24) / 4;
+
+    // 1. Tira superior: Estado LOOP 1..4 (alineada bajo los 4 botones superiores)
+    for (let i = 0; i < 4; i++) {
+      const x = 12 + i * colW + 4;
+      const w = colW - 8;
+      const isEnabled = this.enabledBars[i];
+      const isPlayingBar = this.isSequencerRunning && (this.playBar === i);
+
+      ctx.fillStyle = isEnabled ? (isPlayingBar ? '#22c55e' : '#14532d') : '#0f172a';
+      ctx.fillRect(x, 8, w, 34);
+      ctx.strokeStyle = isPlayingBar ? '#ffffff' : (isEnabled ? '#22c55e' : '#334155');
+      ctx.lineWidth = isPlayingBar ? 2.5 : 1.5;
+      ctx.strokeRect(x, 8, w, 34);
+
+      ctx.fillStyle = isEnabled ? '#ffffff' : '#64748b';
+      ctx.font = 'bold 17px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`LOOP ${i + 1}`, x + w / 2, 25);
     }
 
-    // Cabecera institucional
-    ctx.fillStyle = '#38bdf8';
-    ctx.font = 'bold 24px monospace';
-    ctx.fillText('DRUMLAB VR // MASCHINE MK3', 20, 36);
-
-    // Estado de Reproducción
-    ctx.font = 'bold 42px monospace';
+    // 2. Franja central: PLAY/STOP + STEP + BPM GRANDE
+    ctx.textAlign = 'left';
+    ctx.font = 'bold 40px monospace';
     if (this.isSequencerRunning) {
-      ctx.fillStyle = '#10b981';
-      ctx.fillText('PLAY', 20, 96);
+      ctx.fillStyle = '#22c55e';
+      ctx.fillText('PLAY', 18, 102);
     } else {
       ctx.fillStyle = '#64748b';
-      ctx.fillText('STOP', 20, 96);
+      ctx.fillText('STOP', 18, 102);
     }
 
-    // Tempo BPM
-    ctx.fillStyle = '#38bdf8';
-    ctx.font = 'bold 36px monospace';
-    ctx.fillText(`${this.data.bpm} BPM`, 175, 96);
-
-    // Paso activo del compás
+    // Compás en reproducción y paso
     ctx.fillStyle = this.isSequencerRunning ? '#f59e0b' : '#475569';
-    ctx.font = 'bold 28px monospace';
-    const stepText = (this.currentStep >= 0) ? `STEP ${this.currentStep + 1}/4` : 'STEP --/4';
-    ctx.fillText(stepText, 365, 96);
+    ctx.font = 'bold 26px monospace';
+    const barStepText = this.isSequencerRunning && this.currentStep >= 0
+      ? `B${this.playBar + 1}:S${this.currentStep + 1}`
+      : `BAR ${this.editBar + 1}`;
+    ctx.fillText(barStepText, 160, 102);
+
+    // BPM grande de altísimo contraste a la derecha
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#38bdf8';
+    ctx.font = 'bold 48px monospace';
+    ctx.fillText(`${this.data.bpm} BPM`, W - 18, 102);
+
+    // 3. Tira inferior: Selector EDIT 1..4 (alineada sobre los 4 botones del círculo verde)
+    for (let i = 0; i < 4; i++) {
+      const x = 12 + i * colW + 4;
+      const w = colW - 8;
+      const isEditing = (this.editBar === i);
+
+      ctx.fillStyle = isEditing ? '#0284c7' : '#0f172a';
+      ctx.fillRect(x, H - 42, w, 34);
+      ctx.strokeStyle = isEditing ? '#7dd3fc' : '#334155';
+      ctx.lineWidth = isEditing ? 2.5 : 1.5;
+      ctx.strokeRect(x, H - 42, w, 34);
+
+      ctx.fillStyle = isEditing ? '#ffffff' : '#94a3b8';
+      ctx.font = 'bold 17px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(`EDIT ${i + 1}`, x + w / 2, H - 25);
+    }
 
     this.screenTexture.needsUpdate = true;
+  },
+
+  /**
+   * Sincroniza la lectura de BPM y compás en la barra HUD HTML superior
+   */
+  updateHudTelemetry: function () {
+    const hudBpmEl = document.getElementById('hudBpmBadge');
+    if (hudBpmEl) {
+      const activeBars = this.enabledBars
+        .map((on, idx) => (on ? idx + 1 : null))
+        .filter(Boolean)
+        .join(',');
+      hudBpmEl.textContent = `${this.data.bpm} BPM · Edit B${this.editBar + 1} · Loop [${activeBars}]`;
+    }
   },
 
   /**
@@ -566,13 +796,14 @@ AFRAME.registerComponent('step-sequencer', {
         return { type: 'pad', target: padHits[0].object.userData?.pad || null };
       }
 
-      // 2. Probar con los botones de hardware de transporte
+      // 2. Probar con los botones de hardware (Transporte y Compases)
       const btnHits = raycaster.intersectObjects(this.hardwareButtonMeshes, false);
       if (btnHits.length > 0) {
-        return { type: 'button', target: btnHits[0].object.userData?.action || null };
+        const ud = btnHits[0].object.userData || {};
+        return { type: 'button', target: ud.action || null, barIndex: ud.barIndex };
       }
 
-      // 3. Probar con el botón 3D de retorno al estudio
+      // 3. Probar con el botón 3D de retorno al estudio (solo para estado hover de cursor; el clic se procesa en pointerup)
       const backBtnEl = document.getElementById('btn-back-studio');
       if (backBtnEl && backBtnEl.object3D) {
         const backHits = raycaster.intersectObject(backBtnEl.object3D, true);
@@ -585,8 +816,16 @@ AFRAME.registerComponent('step-sequencer', {
     };
 
     this.lastBtnTime = 0;
-    this.lastNavTime = 0;
     let lastPointerHandledTime = 0;
+
+    const dispatchHardwareAction = (action, barIndex) => {
+      if (action === 'togglePlay') this.togglePlay();
+      else if (action === 'stop') this.stopPlayback();
+      else if (action === 'clear') this.clearPattern();
+      else if (action === 'bpm') this.cycleBpm();
+      else if (action === 'toggleLoopBar') this.toggleLoopBar(barIndex);
+      else if (action === 'selectEditBar') this.selectEditBar(barIndex);
+    };
 
     const handleAction = (hit) => {
       if (!hit) return;
@@ -597,14 +836,7 @@ AFRAME.registerComponent('step-sequencer', {
       } else if (hit.type === 'button') {
         if (now - this.lastBtnTime < 140) return;
         this.lastBtnTime = now;
-        if (hit.target === 'togglePlay') this.togglePlay();
-        else if (hit.target === 'stop') this.stopPlayback();
-        else if (hit.target === 'clear') this.clearPattern();
-        else if (hit.target === 'bpm') this.cycleBpm();
-      } else if (hit.type === 'backToStudio') {
-        if (now - this.lastNavTime < 350) return;
-        this.lastNavTime = now;
-        this.navigateBackToStudio();
+        dispatchHardwareAction(hit.target, hit.barIndex);
       }
     };
 
@@ -614,7 +846,7 @@ AFRAME.registerComponent('step-sequencer', {
         return;
       }
       const hit = getHitTarget(evt.clientX, evt.clientY);
-      if (hit) {
+      if (hit && hit.type !== 'backToStudio') {
         if (evt.stopPropagation) evt.stopPropagation();
         lastPointerHandledTime = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
         handleAction(hit);
@@ -655,11 +887,7 @@ AFRAME.registerComponent('step-sequencer', {
       } else if (hitMesh.userData?.action) {
         if (now - this.lastBtnTime < 140) return;
         this.lastBtnTime = now;
-        const action = hitMesh.userData.action;
-        if (action === 'togglePlay') this.togglePlay();
-        else if (action === 'stop') this.stopPlayback();
-        else if (action === 'clear') this.clearPattern();
-        else if (action === 'bpm') this.cycleBpm();
+        dispatchHardwareAction(hitMesh.userData.action, hitMesh.userData.barIndex);
       }
     };
 
@@ -749,8 +977,10 @@ AFRAME.registerComponent('step-sequencer', {
     }
 
     this.isSequencerRunning = true;
+    this.playBar = this.getFirstEnabledBar();
     this.currentStep = -1;
     this.updatePlayButtonVisual(true);
+    this.updateBarButtonsVisual();
     this.updateScreenDisplay();
 
     const stepIntervalMs = (60 / this.data.bpm) * 1000;
@@ -770,28 +1000,44 @@ AFRAME.registerComponent('step-sequencer', {
     this.currentStep = -1;
     this.updateTempoLeds(-1);
     this.updatePlayButtonVisual(false);
+    this.updateBarButtonsVisual();
     this.updateScreenDisplay();
   },
 
   /**
-   * Pulso del reloj secuenciador: avanza la columna activa y dispara los pads activos
+   * Pulso del reloj secuenciador: avanza por los pasos 1-4 y salta entre compases habilitados en loop
    */
   onTick: function () {
-    // Avanza cíclicamente a través de los 4 tiempos (0, 1, 2, 3)
+    const prevStep = this.currentStep;
     this.currentStep = (this.currentStep + 1) % 4;
 
-    // Actualiza los LEDs de paso y la pantalla LCD
+    // Al completar el paso 4 del compás actual, avanzar al siguiente compás activo en el bucle
+    if (prevStep === 3 && this.currentStep === 0) {
+      this.playBar = this.getNextEnabledBar(this.playBar);
+    }
+
+    // Actualiza LEDs de paso, iluminación de compases y pantalla LCD
     this.updateTempoLeds(this.currentStep);
+    this.updateBarButtonsVisual();
     this.updateScreenDisplay();
 
-    // Dispara todos los pads programados en esta columna (0 a 3)
+    // Dispara todas las voces programadas en la columna actual del compás en reproducción
+    const barPattern = this.patterns[this.playBar];
+    if (!barPattern) return;
+
     for (let row = 0; row < 4; row++) {
+      if (!barPattern[row][this.currentStep]) continue;
+
       const key = `${row}_${this.currentStep}`;
       const pad = this.padMatrix.get(key);
       if (!pad) continue;
 
-      if (pad.isStepActive()) {
+      if (this.playBar === this.editBar) {
+        // El compás en reproducción coincide con el visible en los pads: destello físico + audio
         pad.triggerDisparo('ACTIVO_ESPERA');
+      } else if (window.DrumLabAudio) {
+        // El usuario está editando otro compás distinto: reproducir audio sin destellar pads ajenos
+        window.DrumLabAudio.play(pad.voice);
       }
     }
   },
@@ -834,6 +1080,7 @@ AFRAME.registerComponent('step-sequencer', {
     }
 
     this.updateScreenDisplay();
+    this.updateHudTelemetry();
 
     if (this.isSequencerRunning) {
       clearInterval(this.timerId);
@@ -843,9 +1090,15 @@ AFRAME.registerComponent('step-sequencer', {
   },
 
   /**
-   * Borra la programación de todos los pads (reseteo a INACTIVO)
+   * Borra la programación del compás en edición actual (reseteo a INACTIVO)
    */
   clearPattern: function () {
+    for (let r = 0; r < 4; r++) {
+      for (let c = 0; c < 4; c++) {
+        this.patterns[this.editBar][r][c] = false;
+      }
+    }
+
     this.padMatrix.forEach((pad) => {
       pad.setState('INACTIVO');
     });
@@ -861,6 +1114,7 @@ AFRAME.registerComponent('step-sequencer', {
     }
 
     this.updateScreenDisplay();
+    this.updateHudTelemetry();
 
     try {
       if (window.DrumLabAudio) {

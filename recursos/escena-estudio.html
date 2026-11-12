@@ -39,6 +39,185 @@
       }
     });
 
+    AFRAME.registerComponent('daw-screen-ui', {
+      init: function () {
+        this.canvas = document.createElement('canvas');
+        this.canvas.width = 1024;
+        this.canvas.height = 560;
+        this.ctx = this.canvas.getContext('2d');
+        this.texture = new THREE.CanvasTexture(this.canvas);
+        this.texture.anisotropy = 4;
+        this.isHovered = false;
+
+        this.applyTexture = () => {
+          const mesh = this.el.getObject3D('mesh');
+          if (!mesh) return;
+          mesh.material = new THREE.MeshBasicMaterial({
+            map: this.texture,
+            side: THREE.DoubleSide
+          });
+          this.draw();
+        };
+
+        if (this.el.getObject3D('mesh')) {
+          this.applyTexture();
+        } else {
+          this.el.addEventListener('object3dset', this.applyTexture);
+        }
+
+        this.el.addEventListener('mouseenter', () => {
+          this.isHovered = true;
+          this.draw();
+        });
+        this.el.addEventListener('mouseleave', () => {
+          this.isHovered = false;
+          this.draw();
+        });
+      },
+
+      drawRoundedRect: function (ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+      },
+
+      draw: function () {
+        const ctx = this.ctx;
+        const W = this.canvas.width;
+        const H = this.canvas.height;
+
+        // Fondo de interfaz DAW oscura de alta densidad
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+        bgGrad.addColorStop(0, '#090e1a');
+        bgGrad.addColorStop(1, '#050811');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, W, H);
+
+        // Barra superior del DAW
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(0, 0, W, 64);
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, 64);
+        ctx.lineTo(W, 64);
+        ctx.stroke();
+
+        // LED de estado y título del proyecto
+        ctx.fillStyle = '#22c55e';
+        ctx.beginPath();
+        ctx.arc(36, 32, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = 'bold 22px system-ui, -apple-system, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('DRUMLAB VR', 56, 32);
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = '600 18px monospace';
+        ctx.fillText('// STUDIO WORKSPACE', 208, 33);
+
+        // Pastillas de telemetría a la derecha de la cabecera DAW
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 18px monospace';
+        ctx.fillText('120 BPM  ·  4/4  ·  4 BARS', W - 32, 32);
+
+        // Pistas rítmicas visuales (vista previa estilizada de las 4 voces)
+        const tracks = [
+          { name: '01 CRASH',  color: '#f59e0b', hits: [1, 0, 0, 0, 0, 0, 0, 0] },
+          { name: '02 HI-HAT', color: '#22c55e', hits: [1, 1, 1, 1, 1, 1, 1, 1] },
+          { name: '03 SNARE',  color: '#38bdf8', hits: [0, 0, 1, 0, 0, 0, 1, 0] },
+          { name: '04 KICK',   color: '#ec4899', hits: [1, 0, 0, 1, 1, 0, 0, 0] }
+        ];
+
+        const gridX = 44;
+        const gridY = 98;
+        const labelW = 148;
+        const cellW = (W - 88 - labelW - 56) / 8;
+        const rowH = 48;
+
+        tracks.forEach((tr, rIdx) => {
+          const y = gridY + rIdx * (rowH + 10);
+
+          // Etiqueta de pista
+          this.drawRoundedRect(ctx, gridX, y, labelW, rowH, 6);
+          ctx.fillStyle = '#0f172a';
+          ctx.fill();
+          ctx.strokeStyle = '#1e293b';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+
+          ctx.fillStyle = tr.color;
+          ctx.fillRect(gridX + 6, y + 10, 4, rowH - 20);
+
+          ctx.fillStyle = '#cbd5e1';
+          ctx.font = 'bold 16px monospace';
+          ctx.textAlign = 'left';
+          ctx.fillText(tr.name, gridX + 20, y + rowH / 2 + 1);
+
+          // Celdas de pasos
+          tr.hits.forEach((hit, cIdx) => {
+            const cx = gridX + labelW + 14 + cIdx * (cellW + 6);
+            this.drawRoundedRect(ctx, cx, y, cellW, rowH, 6);
+            if (hit) {
+              ctx.fillStyle = tr.color + '33';
+              ctx.fill();
+              ctx.strokeStyle = tr.color;
+              ctx.lineWidth = 1.5;
+              ctx.stroke();
+            } else {
+              ctx.fillStyle = '#0b1220';
+              ctx.fill();
+              ctx.strokeStyle = '#1e293b';
+              ctx.lineWidth = 1;
+              ctx.stroke();
+            }
+          });
+        });
+
+        // Botón principal integrado (hardware/DAW launch bar)
+        const btnW = 540;
+        const btnH = 86;
+        const btnX = (W - btnW) / 2;
+        const btnY = H - btnH - 42;
+
+        this.drawRoundedRect(ctx, btnX, btnY, btnW, btnH, 12);
+        const btnGrad = ctx.createLinearGradient(btnX, btnY, btnX + btnW, btnY + btnH);
+        if (this.isHovered) {
+          btnGrad.addColorStop(0, '#0284c7');
+          btnGrad.addColorStop(1, '#0369a1');
+        } else {
+          btnGrad.addColorStop(0, '#0f172a');
+          btnGrad.addColorStop(1, '#1e293b');
+        }
+        ctx.fillStyle = btnGrad;
+        ctx.fill();
+
+        ctx.strokeStyle = this.isHovered ? '#7dd3fc' : '#38bdf8';
+        ctx.lineWidth = this.isHovered ? 3 : 2;
+        ctx.stroke();
+
+        // Texto principal del botón
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 24px system-ui, -apple-system, sans-serif';
+        ctx.fillText('ABRIR SECUENCIADOR 4×4  ›', W / 2, btnY + 33);
+
+        ctx.fillStyle = this.isHovered ? '#e0f2fe' : '#94a3b8';
+        ctx.font = '500 15px system-ui, -apple-system, sans-serif';
+        ctx.fillText('Haz clic aquí o pulsa directamente sobre la Maschine MK3', W / 2, btnY + 61);
+
+        this.texture.needsUpdate = true;
+      }
+    });
+
     AFRAME.registerComponent('studio-navigator', {
       schema: {
         targetUrl: { type: 'string', default: 'escena-secuenciador.html' }
@@ -206,21 +385,21 @@
     
     <!-- Gestor de Assets -->
     <a-assets timeout="6000">
-      <img id="studio-vienna-pano" src="assets/textures/studio_vienna_lab_360.jpg">
+      <img id="studio-neon-pano" src="assets/textures/studio_neon_360.jpg">
       <a-asset-item id="drumpad-model" src="assets/models/maschine_native_instruments.glb"></a-asset-item>
     </a-assets>
 
-    <!-- Entorno 360° Equirrectangular: Sala Acústica y Conservatorio Future-Art-Lab (Andreas Praefcke, CC BY-SA 4.0) -->
-    <!-- Proyección orientada con pared de lamas de madera noble y suelo continuo libre de obstáculos -->
-    <a-sky src="#studio-vienna-pano" rotation="0 -20 0"></a-sky>
+    <!-- Entorno 360° Equirrectangular: Neon Photostudio (Sergej Majboroda / Poly Haven, CC0) -->
+    <!-- Ambiente oscuro de estudio con pared acústica negra mate, neones LED y suelo de madera despejado -->
+    <a-sky src="#studio-neon-pano" rotation="0 -90 0" color="#d4d4d8"></a-sky>
 
-    <!-- Iluminación del estudio armonizada con la acústica de madera cálida e iluminación empotrada -->
-    <a-light type="ambient" color="#fef3c7" intensity="1.2"></a-light>
-    <a-light type="directional" color="#ffffff" intensity="1.4" position="2 4 2" target="#desk"></a-light>
-    <a-light type="point" color="#fbbf24" intensity="0.9" distance="5" position="0 2.0 -0.2"></a-light>
+    <!-- Iluminación del estudio equilibrada para entorno oscuro profesional -->
+    <a-light type="ambient" color="#cbd5e1" intensity="1.05"></a-light>
+    <a-light type="directional" color="#ffffff" intensity="1.35" position="2 4 2" target="#desk"></a-light>
+    <a-light type="point" color="#93c5fd" intensity="0.7" distance="5" position="0 2.0 -0.2"></a-light>
 
     <!-- Mesa Central de Trabajo (Estilo Consola de Estudio Profesional) -->
-    <!-- Apoyada sólidamente sobre el suelo de tarima de roble -->
+    <!-- Apoyada sólidamente sobre el suelo de madera -->
     <a-entity id="desk" position="0 0.02 -0.05">
       <!-- Tablero Principal en grafito satinado -->
       <a-box position="0 0.88 -0.2" width="2.4" height="0.08" depth="1.2" color="#18181b" roughness="0.4" metalness="0.2"></a-box>
@@ -243,38 +422,20 @@
         <a-cylinder position="0 0.11 0.14" rotation="90 0 0" radius="0.035" height="0.02" color="#71717a"></a-cylinder>
       </a-entity>
 
-      <!-- Pantalla / Monitor Frontal del DAW (Integración Diegética Profesional) -->
+      <!-- Pantalla / Monitor Frontal del DAW (Interfaz HiDPI CanvasTexture) -->
       <a-entity position="0 1.35 -0.65">
         <!-- Chasis y bisel del monitor -->
         <a-box width="1.16" height="0.66" depth="0.04" color="#09090b" roughness="0.5" metalness="0.5"></a-box>
         
-        <!-- Pantalla interactiva del software DAW (sustituye al cartel flotante de forma natural) -->
+        <!-- Pantalla interactiva DAW renderizada en Canvas HiDPI 1024x560 -->
         <a-plane 
           id="daw-screen"
           class="interactable"
           studio-navigator
+          daw-screen-ui
           position="0 0 0.025" 
           width="1.10" 
-          height="0.60" 
-          color="#0b1120">
-          
-          <!-- Interfaz gráfica del DAW simulada -->
-          <a-text value="DRUMLAB VR // DIGITAL AUDIO WORKSPACE" align="center" position="0 0.19 0.01" scale="0.22 0.22 0.22" color="#38bdf8"></a-text>
-          <a-text value="Proyecto: Secuenciador Ritmico 4/4  |  120 BPM  |  4 Voces" align="center" position="0 0.10 0.01" scale="0.15 0.15 0.15" color="#94a3b8"></a-text>
-          
-          <!-- Botón de apertura integrado en la pantalla DAW (estilo software de producción) -->
-          <a-plane 
-            id="daw-screen-btn"
-            class="interactable"
-            studio-navigator
-            position="0 -0.08 0.01" 
-            width="0.74" 
-            height="0.15" 
-            color="#1e293b" 
-            material="roughness: 0.3; metalness: 0.2; emissive: #0284c7; emissiveIntensity: 0.25">
-            <a-text value="ABRIR SECUENCIADOR 4x4" align="center" position="0 0.015 0.01" scale="0.22 0.22 0.22" color="#38bdf8"></a-text>
-            <a-text value="[ Haz clic aqui o pulsa sobre la Maschine MK3 ]" align="center" position="0 -0.04 0.01" scale="0.12 0.12 0.12" color="#94a3b8"></a-text>
-          </a-plane>
+          height="0.60">
         </a-plane>
 
         <!-- Soporte ergonómico del monitor -->

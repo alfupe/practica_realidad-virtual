@@ -297,6 +297,7 @@ class PadMeshController {
     this.activeColor = options.activeColor;
     this.defaultColor = options.defaultColor || '#334155';
     this.flashColor = options.flashColor || '#ffffff';
+    this.onToggle = (typeof options.onToggle === 'function') ? options.onToggle : null;
     this.state = 'INACTIVO';
     this.programmed = false;
     this.lastClickTime = 0;
@@ -323,6 +324,9 @@ class PadMeshController {
       window.DrumLabAudio.unlock();
     }
     this.programmed = !this.programmed;
+    if (this.onToggle) {
+      this.onToggle(this.row, this.col, this.programmed);
+    }
     const nextState = this.programmed ? 'ACTIVO_ESPERA' : 'INACTIVO';
     this.triggerDisparo(nextState);
   }

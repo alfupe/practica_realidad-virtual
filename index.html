@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="dark light">
   <title>DrumLab VR — Secuenciador Rítmico Espacial 4/4 (UOC Realidad Virtual)</title>
   <meta name="description" content="Práctica final de Realidad Virtual: DrumLab VR, secuenciador rítmico espacial 4/4 con WebXR y Web Audio API. Grado en Multimedia, UOC.">
-  <link rel="stylesheet" href="recursos/css/styles.css?v=3.1">
+  <link rel="stylesheet" href="recursos/css/styles.css?v=3.2">
 </head>
 <body>
   <!-- Enlace de accesibilidad para saltar al contenido principal -->
@@ -78,7 +78,7 @@
           <iframe 
             id="frame-scene1" 
             class="page__frame" 
-            src="recursos/escena-estudio.html?v=3.1" 
+            src="recursos/escena-estudio.html?v=3.2" 
             title="Escena 1: Estudio de Producción" 
             allow="accelerometer; gyroscope; xr-spatial-tracking; fullscreen" 
             allowfullscreen="true">
@@ -88,7 +88,7 @@
           <iframe 
             id="frame-scene2" 
             class="page__frame" 
-            src="recursos/escena-secuenciador.html?v=3.1" 
+            src="recursos/escena-secuenciador.html?v=3.2" 
             title="Escena 2: Secuenciador 4x4" 
             allow="autoplay; accelerometer; gyroscope; xr-spatial-tracking; fullscreen" 
             allowfullscreen="true">
@@ -232,7 +232,7 @@
           <div class="instructions__content">
             <strong>Arquitectura en dos niveles espaciales complementarios</strong>
             <span class="instructions__note">
-              Nivel 1 (Estudio de producción en sala acústica 360° Future-Art-Lab, tarima de roble, consola y monitores) y Nivel 2 (Secuenciador 4&times;4 operativo y contributivo en primer plano), con transiciones bidireccionales 3D fluidas y consistentes.
+              Nivel 1 (Estudio de producción 360° Neon Photostudio, consola con monitor DAW HiDPI y altavoces) y Nivel 2 (Secuenciador multi-compás de hasta 4 compases en bucle con pantalla LCD integrada de BPM y pasos), con transiciones bidireccionales 3D fluidas.
             </span>
           </div>
         </li>
@@ -241,7 +241,7 @@
           <div class="instructions__content">
             <strong>Modelo 3D externo integrado y descompuesto</strong>
             <span class="instructions__note">
-              Integración nativa del modelo <code>maschine_native_instruments.glb</code> de jmccopus (licencia CC BY 4.0). Descomposición de los 16 pads, botones de transporte Play/Stop/Clear/BPM, 4 LEDs de compás y pantalla LCD digital en Three.js.
+              Integración nativa del modelo <code>maschine_native_instruments.glb</code> de jmccopus (licencia CC BY 4.0). Descomposición de los 16 pads, transporte Play/Stop/Clear/BPM, 8 botones multi-compás (4 Loop + 4 Edit), 4 LEDs de paso y pantalla LCD central en Three.js.
             </span>
           </div>
         </li>
@@ -391,6 +391,6 @@
   </main>
 
   <!-- Orquestador modular de la aplicación y sincronización de escenas WebXR (Clean Code) -->
-  <script src="recursos/js/app.js?v=3.1"></script>
+  <script src="recursos/js/app.js?v=3.2"></script>
 </body>
 </html>

@@ -9,8 +9,96 @@
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
   
   <!-- Módulos de Sonido y Lógica de Componentes -->
-  <script src="js/drum-pad.js?v=3.1"></script>
-  <script src="js/step-sequencer.js?v=3.1"></script>
+  <script src="js/drum-pad.js?v=3.2"></script>
+  <script src="js/step-sequencer.js?v=3.2"></script>
+
+  <!-- Componente HiDPI CanvasTexture para el botón físico 3D de regreso al estudio -->
+  <script>
+    AFRAME.registerComponent('back-button-ui', {
+      init: function () {
+        this.canvas = document.createElement('canvas');
+        this.canvas.width = 512;
+        this.canvas.height = 128;
+        this.ctx = this.canvas.getContext('2d');
+        this.texture = new THREE.CanvasTexture(this.canvas);
+        this.texture.anisotropy = 4;
+        this.isHovered = false;
+
+        this.applyTexture = () => {
+          const mesh = this.el.getObject3D('mesh');
+          if (!mesh) return;
+          mesh.material = new THREE.MeshBasicMaterial({
+            map: this.texture,
+            side: THREE.DoubleSide
+          });
+          this.draw();
+        };
+
+        if (this.el.getObject3D('mesh')) {
+          this.applyTexture();
+        } else {
+          this.el.addEventListener('object3dset', this.applyTexture);
+        }
+      },
+
+      setHovered: function (hovered) {
+        if (this.isHovered === hovered) return;
+        this.isHovered = hovered;
+        this.draw();
+      },
+
+      drawRoundedRect: function (ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+      },
+
+      draw: function () {
+        const ctx = this.ctx;
+        const W = this.canvas.width;
+        const H = this.canvas.height;
+
+        ctx.fillStyle = '#070b14';
+        ctx.fillRect(0, 0, W, H);
+
+        // Marco hardware biselado
+        this.drawRoundedRect(ctx, 8, 8, W - 16, H - 16, 18);
+        const grad = ctx.createLinearGradient(0, 8, 0, H - 8);
+        if (this.isHovered) {
+          grad.addColorStop(0, '#0369a1');
+          grad.addColorStop(1, '#0c4a6e');
+        } else {
+          grad.addColorStop(0, '#1e293b');
+          grad.addColorStop(1, '#0f172a');
+        }
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        ctx.strokeStyle = this.isHovered ? '#7dd3fc' : '#38bdf8';
+        ctx.lineWidth = this.isHovered ? 4 : 2.5;
+        ctx.stroke();
+
+        // LED de estado izquierdo
+        ctx.fillStyle = this.isHovered ? '#ffffff' : '#38bdf8';
+        ctx.beginPath();
+        ctx.arc(54, H / 2, 10, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Flecha y texto vectoriales nítidos
+        ctx.fillStyle = this.isHovered ? '#ffffff' : '#e0f2fe';
+        ctx.font = 'bold 34px system-ui, -apple-system, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('‹   ESTUDIO', W / 2 + 20, H / 2 + 2);
+
+        this.texture.needsUpdate = true;
+      }
+    });
+  </script>
   
   <style>
     html, body {
@@ -261,6 +349,9 @@
         <span class="hud-badge-title__dot"></span>
         02 SECUENCIADOR 4×4
       </span>
+      <span id="hudBpmBadge" class="hud-badge-title" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.28); font-family: monospace;">
+        120 BPM · Edit B1 · Loop [1]
+      </span>
     </div>
     <div class="hud-topbar__group">
       <button id="btnOpenHelp" class="hud-btn" type="button" title="Abrir leyenda de voces y atajos de teclado [H]">
@@ -320,8 +411,16 @@
       </div>
 
       <div class="hud-modal__section">
-        <h3 class="hud-modal__section-title">Controles de Transporte Hardware</h3>
+        <h3 class="hud-modal__section-title">Gestión Multi-Compás (Hasta 4 Compases) &amp; Transporte</h3>
         <ul class="hud-controls-list">
+          <li>
+            <span>Activar/desactivar compás 1–4 en el bucle (Loop)</span>
+            <span>Botones sobre LCD</span>
+          </li>
+          <li>
+            <span>Seleccionar compás 1–4 para editar en los pads</span>
+            <span>Botones bajo LCD</span>
+          </li>
           <li>
             <span>Reproducir / Detener secuencia (Play / Stop)</span>
             <kbd>Espacio</kbd>
@@ -331,7 +430,7 @@
             <kbd>B</kbd>
           </li>
           <li>
-            <span>Limpiar patrón completo (Clear)</span>
+            <span>Limpiar el compás en edición actual (Clear)</span>
             <span><kbd>Shift + C</kbd> o <kbd>Supr</kbd></span>
           </li>
           <li>
@@ -414,48 +513,34 @@
     </a-entity>
 
     <!-- ====================================================================
-         BOTÓN 3D: VOLVER AL ESTUDIO (MÓDULO DE TALKBACK EN LA MESA)
-         Elevado a la izquierda frontal, en ángulo ergonómico sin tapar el pad
+         BOTÓN 3D: VOLVER AL ESTUDIO (PLACA DE MESA FRONTAL IZQUIERDA HiDPI)
+         Ubicado en el borde frontal izquierdo de la mesa, totalmente libre
          ==================================================================== -->
     <a-entity 
       id="btn-back-studio" 
       class="interactable" 
-      position="-0.62 1.10 0.15" 
-      rotation="-48 15 0">
+      position="-0.45 0.905 0.36" 
+      rotation="-55 8 0">
       
-      <!-- Chasis biselado grafito estilo consola de estudio -->
+      <!-- Chasis biselado grafito estilo módulo de escritorio -->
       <a-box 
-        width="0.26" 
-        height="0.062" 
-        depth="0.02" 
-        color="#0b0f17" 
-        roughness="0.5"
-        metalness="0.4">
+        width="0.264" 
+        height="0.074" 
+        depth="0.018" 
+        color="#090d16" 
+        roughness="0.45"
+        metalness="0.5">
       </a-box>
 
-      <!-- Placa interactiva pulsable con borde de luz cian -->
-      <a-box 
+      <!-- Pantalla / Botón vectorial HiDPI 512x128 -->
+      <a-plane 
         id="btn-back-mesh"
         class="interactable" 
-        position="0 0 0.012"
-        width="0.245" 
-        height="0.048" 
-        depth="0.01" 
-        color="#1e293b"
-        material="roughness: 0.3; metalness: 0.3; emissive: #0284c7; emissiveIntensity: 0.25">
-        
-        <!-- LED indicador de baliza de retorno -->
-        <a-sphere position="-0.092 0 0.008" radius="0.005" color="#38bdf8" material="emissive: #38bdf8; emissiveIntensity: 1.5"></a-sphere>
-
-        <a-text 
-          value="< ESTUDIO" 
-          align="center" 
-          position="0.012 0 0.008" 
-          scale="0.16 0.16 0.16" 
-          color="#38bdf8"
-          font="roboto">
-        </a-text>
-      </a-box>
+        back-button-ui
+        position="0 0 0.010"
+        width="0.25" 
+        height="0.062">
+      </a-plane>
     </a-entity>
 
     <!-- ====================================================================
@@ -584,19 +669,20 @@
       }
 
       const setHoverState = (isHover) => {
-        document.body.style.cursor = isHover ? 'pointer' : 'default';
-        if (btnBackMesh) {
-          const meshObj = btnBackMesh.getObject3D('mesh');
-          if (meshObj && meshObj.material) {
-            meshObj.material.emissiveIntensity = isHover ? 0.75 : 0.25;
-            meshObj.material.color.set(isHover ? '#334155' : '#1e293b');
-          }
+        if (btnBackMesh && btnBackMesh.components && btnBackMesh.components['back-button-ui']) {
+          btnBackMesh.components['back-button-ui'].setHovered(isHover);
+        }
+        if (isHover) {
+          document.body.style.cursor = 'pointer';
         }
       };
 
       if (btnBack3D) {
         btnBack3D.addEventListener('mouseenter', () => setHoverState(true));
-        btnBack3D.addEventListener('mouseleave', () => setHoverState(false));
+        btnBack3D.addEventListener('mouseleave', () => {
+          setHoverState(false);
+          document.body.style.cursor = 'default';
+        });
       }
 
       // Raycasting directo y detección de clic completo (pointerdown -> pointerup) para el botón 3D
