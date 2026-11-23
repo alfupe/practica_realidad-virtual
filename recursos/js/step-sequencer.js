@@ -1073,6 +1073,8 @@ AFRAME.registerComponent('step-sequencer', {
     // 6. Teclas isomórficas de la matriz 4x4 (1-4, Q-R, A-F, Z-V)
     // Fila 0 Crash (1-4) | Fila 1 Hi-Hat (Q-R) | Fila 2 Snare (A-F) | Fila 3 Kick (Z, X, C, V)
     if (this.keyMap.has(key)) {
+      evt.preventDefault();
+      evt.stopPropagation();
       const coords = this.keyMap.get(key);
       const pad = this.padMatrix.get(coords);
       if (!pad) return;

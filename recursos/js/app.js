@@ -201,10 +201,15 @@ class KeyboardBridgeController {
       return;
     }
 
-    // Prevenir desplazamiento (scroll) en la página anfitriona o contenedor al operar el secuenciador
-    const isNavOrPlayKey = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space'].includes(event.key) || event.code === 'Space';
-    if (isNavOrPlayKey && this.navigation.activeScene === SCENE_CONFIG.SEQUENCER) {
+    // Prevenir desplazamiento (scroll) o acciones globales no deseadas (como pantalla completa al pulsar 'f')
+    const keyLower = event.key ? event.key.toLowerCase() : '';
+    const isSequencerKey = ['arrowleft', 'arrowright', 'arrowup', 'arrowdown', ' '].includes(keyLower)
+      || event.code === 'Space'
+      || ['1', '2', '3', '4', 'q', 'w', 'e', 'r', 'a', 's', 'd', 'f', 'z', 'x', 'c', 'v', 'b', 'm', 'h'].includes(keyLower);
+
+    if (isSequencerKey && this.navigation.activeScene === SCENE_CONFIG.SEQUENCER) {
       event.preventDefault();
+      event.stopPropagation();
     }
 
     const frame2 = document.getElementById('frame-scene2');
