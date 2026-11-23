@@ -175,6 +175,16 @@
       box-shadow: 0 0 14px rgba(56, 189, 248, 0.4);
       outline: none;
     }
+    .hud-btn--mode {
+      border-color: rgba(56, 189, 248, 0.4);
+      color: #7dd3fc;
+    }
+    .hud-btn--mode.mode-free {
+      border-color: rgba(245, 158, 11, 0.7);
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+      box-shadow: 0 0 14px rgba(245, 158, 11, 0.4);
+    }
     .hud-btn kbd {
       display: inline-block;
       padding: 1px 5px;
@@ -350,8 +360,11 @@
         02 SECUENCIADOR 4×4
       </span>
       <span id="hudBpmBadge" class="hud-badge-title" style="color: #38bdf8; border-color: rgba(56, 189, 248, 0.28); font-family: monospace;">
-        120 BPM · Edit B1 · Loop [1]
+        120 BPM · [STEP] · Edit B1 · Loop [1]
       </span>
+      <button id="hudBtnModeToggle" class="hud-btn hud-btn--mode" type="button" title="Alternar Modo de Interpretación (Secuenciador / Modo Libre) [M]" aria-pressed="false">
+        <span>⚡</span> <span id="hudModeText">Modo: STEP</span> <kbd>M</kbd>
+      </button>
     </div>
     <div class="hud-topbar__group">
       <button id="btnOpenHelp" class="hud-btn" type="button" title="Abrir leyenda de voces y atajos de teclado [H]">
@@ -411,15 +424,19 @@
       </div>
 
       <div class="hud-modal__section">
-        <h3 class="hud-modal__section-title">Gestión Multi-Compás (Hasta 4 Compases) &amp; Transporte</h3>
+        <h3 class="hud-modal__section-title">Gestión Multi-Compás (4 Compases) &amp; Interpretación</h3>
         <ul class="hud-controls-list">
           <li>
-            <span>Activar/desactivar compás 1–4 en el bucle (Loop)</span>
-            <span>Botones sobre LCD</span>
+            <span>Cambiar compás en edición (cíclico 1–4)</span>
+            <span><kbd>&larr;</kbd> / <kbd>&rarr;</kbd> o Botones bajo LCD</span>
           </li>
           <li>
-            <span>Seleccionar compás 1–4 para editar en los pads</span>
-            <span>Botones bajo LCD</span>
+            <span>Activar / Desactivar compás en bucle (Loop)</span>
+            <span><kbd>&uarr;</kbd> / <kbd>&darr;</kbd> o Botones sobre LCD</span>
+          </li>
+          <li>
+            <span>Alternar Modo Libre (Live) / Secuenciador</span>
+            <span><kbd>M</kbd> o Botón 3D PAD MODE</span>
           </li>
           <li>
             <span>Reproducir / Detener secuencia (Play / Stop)</span>
@@ -441,11 +458,12 @@
       </div>
 
       <div class="hud-modal__section" style="margin-bottom: 0;">
-        <h3 class="hud-modal__section-title">Interacción Multimodal</h3>
+        <h3 class="hud-modal__section-title">Modos de Interpretación y Control</h3>
         <p style="margin: 0; font-size: 11px; line-height: 1.55; color: #94a3b8;">
-          • <strong>Ratón / Táctil:</strong> Clic o toque directo sobre cualquiera de los 16 pads físicos de la Maschine MK3.<br>
-          • <strong>Realidad Virtual:</strong> Apunta con el puntero láser WebXR y pulsa el gatillo para activar notas.<br>
-          • <strong>Regreso al Estudio:</strong> Pulsa el botón 3D en la mesa o el botón de cabecera.
+          • <strong>Modo Secuenciador (STEP):</strong> Clic o pulsación programa o desprograma el paso en el compás actual.<br>
+          • <strong>Modo Libre (FREE):</strong> Dispara el sonido al instante (&lt;15ms) para solear e improvisar en directo sobre el bucle sin alterar el patrón guardado.<br>
+          • <strong>Navegación por Cursores:</strong> Usa <kbd>&larr;</kbd> / <kbd>&rarr;</kbd> para conmutar de compás y <kbd>&uarr;</kbd> / <kbd>&darr;</kbd> para activar en bucle.<br>
+          • <strong>VR y Retorno:</strong> Apunta con el puntero láser WebXR o pulsa el botón 3D &lt; ESTUDIO para volver.
         </p>
       </div>
 
@@ -658,6 +676,17 @@
         btnHudBack.addEventListener('click', (e) => {
           e.stopPropagation();
           goBack(e);
+        });
+      }
+
+      const btnHudMode = document.getElementById('hudBtnModeToggle');
+      if (btnHudMode) {
+        btnHudMode.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const seq = document.getElementById('drumpad-controller')?.components?.['step-sequencer'];
+          if (seq && typeof seq.toggleMode === 'function') {
+            seq.toggleMode();
+          }
         });
       }
 

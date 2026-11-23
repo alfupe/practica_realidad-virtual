@@ -192,9 +192,19 @@ class KeyboardBridgeController {
    * @param {KeyboardEvent} event 
    */
   handleKeydown(event) {
+    if (event.target && (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA')) {
+      return;
+    }
+
     // Preservar atajos del navegador con modificadores (Ctrl, Cmd, Alt)
     if (event.ctrlKey || event.metaKey || event.altKey) {
       return;
+    }
+
+    // Prevenir desplazamiento (scroll) en la página anfitriona o contenedor al operar el secuenciador
+    const isNavOrPlayKey = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space'].includes(event.key) || event.code === 'Space';
+    if (isNavOrPlayKey && this.navigation.activeScene === SCENE_CONFIG.SEQUENCER) {
+      event.preventDefault();
     }
 
     const frame2 = document.getElementById('frame-scene2');
@@ -266,6 +276,123 @@ class SpatialMessagingBridge {
 }
 
 /**
+ * Controlador del modal dialog HTML5 nativo para la reproducción de vídeos oficiales
+ * Cumple con directrices modernas: showModal(), light-dismiss, overscroll containment y limpieza de iframe
+ */
+class VideoModalController {
+  constructor(navigationController) {
+    this.navigation = navigationController;
+    this.dialog = document.getElementById('videoDialog');
+    this.iframe = document.getElementById('videoIframe');
+    this.titleEl = document.getElementById('videoDialogTitle');
+    this.btnClose = document.getElementById('btnVideoDialogClose');
+
+    this.init();
+  }
+
+  init() {
+    if (!this.dialog) return;
+
+    // 1. Escuchar eventos postMessage de DrumLab
+    window.addEventListener('message', (event) => {
+      if (!event.data || typeof event.data !== 'object') return;
+      if (event.data.type === 'drumlab:open-video') {
+        this.openVideo(event.data.videoId, event.data.title);
+      }
+    });
+
+    // 2. Botón de cierre accesible
+    if (this.btnClose) {
+      this.btnClose.addEventListener('click', () => this.closeVideo());
+    }
+
+    // 3. Limpieza inmediata de src al cerrar o cancelar el dialog (Esc, clic fuera o programmatic)
+    this.dialog.addEventListener('close', () => {
+      this.cleanupIframe();
+    });
+    this.dialog.addEventListener('cancel', () => {
+      this.cleanupIframe();
+    });
+
+    // 4. Fallback de light-dismiss si closedBy no está en el prototipo
+    if (!('closedBy' in HTMLDialogElement.prototype)) {
+      this.dialog.addEventListener('click', (event) => {
+        if (event.target !== this.dialog) return;
+        const rect = this.dialog.getBoundingClientRect();
+        const isDialogContent = (
+          rect.top <= event.clientY &&
+          event.clientY <= rect.top + rect.height &&
+          rect.left <= event.clientX &&
+          event.clientX <= rect.left + rect.width
+        );
+        if (!isDialogContent) {
+          this.closeVideo();
+        }
+      });
+    }
+  }
+
+  openVideo(videoId, title) {
+    if (!this.dialog || !this.iframe) return;
+
+    // Pausar audio del secuenciador si estuviera activo
+    this.pauseSequencerPlayback();
+
+    // Salir del modo WebXR si estuviera inmerso
+    this.exitWebXR();
+
+    if (this.titleEl && title) {
+      this.titleEl.textContent = title;
+    }
+
+    // Embed accesible con autoplay controlado
+    const embedUrl = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}?autoplay=1&rel=0&modestbranding=1`;
+    this.iframe.src = embedUrl;
+
+    if (typeof this.dialog.showModal === 'function') {
+      this.dialog.showModal();
+    } else {
+      this.dialog.setAttribute('open', '');
+    }
+  }
+
+  closeVideo() {
+    if (!this.dialog) return;
+    this.cleanupIframe();
+    if (typeof this.dialog.close === 'function') {
+      this.dialog.close();
+    } else {
+      this.dialog.removeAttribute('open');
+    }
+  }
+
+  cleanupIframe() {
+    if (this.iframe) {
+      this.iframe.src = 'about:blank';
+      this.iframe.removeAttribute('src');
+    }
+  }
+
+  pauseSequencerPlayback() {
+    const frame2 = document.getElementById('frame-scene2');
+    if (!frame2 || !frame2.contentWindow) return;
+    try {
+      frame2.contentWindow.postMessage({ action: 'stopPlayback' }, '*');
+    } catch (e) {}
+  }
+
+  exitWebXR() {
+    try {
+      const activeFrame = this.navigation.getActiveIframe();
+      const sceneEl = activeFrame?.contentDocument?.querySelector('a-scene');
+      if (sceneEl && sceneEl.is('vr-mode') && typeof sceneEl.exitVR === 'function') {
+        sceneEl.exitVR();
+      }
+    } catch (e) {}
+  }
+}
+
+/**
  * Fachada principal de la aplicación DrumLab VR
  */
 class DrumLabApp {
@@ -275,6 +402,15 @@ class DrumLabApp {
     this.keyboard = new KeyboardBridgeController(this.navigation);
     this.urlHistory = new UrlHistoryManager(this.navigation);
     this.messaging = new SpatialMessagingBridge(this.navigation);
+    this.videoModal = new VideoModalController(this.navigation);
+
+    // Enlace directo del botón "Probar Secuenciador" en la barra de acciones
+    const btnActionSeq = document.getElementById('btn-action-sequencer');
+    if (btnActionSeq) {
+      btnActionSeq.addEventListener('click', () => {
+        this.navigation.switchScene(SCENE_CONFIG.SEQUENCER, true);
+      });
+    }
   }
 
   /**

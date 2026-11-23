@@ -282,6 +282,320 @@
         });
       }
     });
+
+    AFRAME.registerComponent('video-monitor-screen', {
+      schema: {
+        videoId: { type: 'string', default: '' },
+        title: { type: 'string', default: '' },
+        tag: { type: 'string', default: 'VÍDEO OFICIAL' },
+        thumbSrc: { type: 'string', default: '' }
+      },
+
+      init: function () {
+        this.canvas = document.createElement('canvas');
+        this.canvas.width = 640;
+        this.canvas.height = 360;
+        this.ctx = this.canvas.getContext('2d');
+        this.texture = new THREE.CanvasTexture(this.canvas);
+        this.texture.anisotropy = 4;
+        this.isHovered = false;
+
+        this.thumbImg = new Image();
+        this.thumbLoaded = false;
+        this.thumbImg.onload = () => {
+          this.thumbLoaded = true;
+          this.draw();
+        };
+        if (this.data.thumbSrc) {
+          this.thumbImg.src = this.data.thumbSrc;
+        }
+
+        this.applyTexture = () => {
+          const mesh = this.el.getObject3D('mesh');
+          if (!mesh) return;
+          mesh.material = new THREE.MeshBasicMaterial({
+            map: this.texture,
+            side: THREE.DoubleSide
+          });
+          this.draw();
+        };
+
+        if (this.el.getObject3D('mesh')) {
+          this.applyTexture();
+        } else {
+          this.el.addEventListener('object3dset', this.applyTexture);
+        }
+
+        this.openVideo = () => {
+          const msg = {
+            type: 'drumlab:open-video',
+            videoId: this.data.videoId,
+            title: this.data.title
+          };
+          window.postMessage(msg, '*');
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage(msg, '*');
+          }
+        };
+
+        this.el.addEventListener('click', (e) => {
+          if (e && e.stopPropagation) e.stopPropagation();
+          this.openVideo();
+        });
+
+        this.el.addEventListener('mouseenter', () => {
+          this.isHovered = true;
+          document.body.style.cursor = 'pointer';
+          this.draw();
+        });
+
+        this.el.addEventListener('mouseleave', () => {
+          this.isHovered = false;
+          document.body.style.cursor = 'default';
+          this.draw();
+        });
+
+        this.draw();
+      },
+
+      draw: function () {
+        const ctx = this.ctx;
+        const W = this.canvas.width;
+        const H = this.canvas.height;
+
+        ctx.fillStyle = '#050914';
+        ctx.fillRect(0, 0, W, H);
+
+        if (this.thumbLoaded) {
+          ctx.drawImage(this.thumbImg, 0, 0, W, H);
+          const overlay = ctx.createLinearGradient(0, 0, 0, H);
+          overlay.addColorStop(0, 'rgba(5, 9, 20, 0.45)');
+          overlay.addColorStop(0.65, 'rgba(5, 9, 20, 0.35)');
+          overlay.addColorStop(1, 'rgba(5, 9, 20, 0.92)');
+          ctx.fillStyle = overlay;
+          ctx.fillRect(0, 0, W, H);
+        }
+
+        ctx.strokeStyle = this.isHovered ? '#38bdf8' : 'rgba(255, 255, 255, 0.22)';
+        ctx.lineWidth = this.isHovered ? 8 : 4;
+        ctx.strokeRect(4, 4, W - 8, H - 8);
+
+        ctx.fillStyle = this.isHovered ? '#38bdf8' : '#e2e8f0';
+        ctx.font = 'bold 15px monospace';
+        ctx.textAlign = 'left';
+        ctx.fillText(`▶ ${this.data.tag}`, 20, 32);
+
+        const cx = W / 2;
+        const cy = H / 2 - 8;
+        const btnR = this.isHovered ? 38 : 32;
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, btnR + 8, 0, Math.PI * 2);
+        ctx.fillStyle = this.isHovered ? 'rgba(56, 189, 248, 0.45)' : 'rgba(0, 0, 0, 0.4)';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, btnR, 0, Math.PI * 2);
+        ctx.fillStyle = this.isHovered ? '#0284c7' : 'rgba(15, 23, 42, 0.88)';
+        ctx.fill();
+        ctx.strokeStyle = this.isHovered ? '#38bdf8' : '#ffffff';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.beginPath();
+        const triSize = this.isHovered ? 16 : 13;
+        ctx.moveTo(cx - triSize * 0.6, cy - triSize);
+        ctx.lineTo(cx + triSize * 1.1, cy);
+        ctx.lineTo(cx - triSize * 0.6, cy + triSize);
+        ctx.closePath();
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 20px system-ui, -apple-system, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(this.data.title, W / 2, H - 42);
+
+        ctx.fillStyle = this.isHovered ? '#7dd3fc' : '#94a3b8';
+        ctx.font = '14px system-ui, -apple-system, sans-serif';
+        ctx.fillText(this.isHovered ? 'Clic para reproducir en pantalla completa ›' : 'Pulsa para ver demostración oficial', W / 2, H - 18);
+
+        this.texture.needsUpdate = true;
+      }
+    });
+
+    AFRAME.registerComponent('studio-stand-ui', {
+      init: function () {
+        this.canvas = document.createElement('canvas');
+        this.canvas.width = 512;
+        this.canvas.height = 640;
+        this.ctx = this.canvas.getContext('2d');
+        this.texture = new THREE.CanvasTexture(this.canvas);
+        this.texture.anisotropy = 4;
+        this.hoveredIndex = -1;
+
+        this.buttons = [
+          {
+            id: 'web',
+            title: 'WEB OFICIAL MASCHINE',
+            sub: 'Especificaciones y hardware NI ↗',
+            color: '#0284c7',
+            action: () => {
+              window.open('https://www.native-instruments.com/es/products/maschine/production-systems/maschine/', '_blank', 'noopener,noreferrer');
+            }
+          },
+          {
+            id: 'guide',
+            title: 'GUÍA RÍTMICA 4/4',
+            sub: 'Didáctica del compás cuaternario ›',
+            color: '#10b981',
+            action: () => {
+              if (window.parent && window.parent !== window) {
+                try {
+                  window.parent.location.href = 'recursos/guia-ritmica.html';
+                  return;
+                } catch (e) {}
+              }
+              window.location.href = 'guia-ritmica.html';
+            }
+          },
+          {
+            id: 'sequencer',
+            title: 'PROBAR SECUENCIADOR',
+            sub: 'Entrar al plano operativo 4x4 ›',
+            color: '#f59e0b',
+            action: () => {
+              if (typeof window.triggerNavigationGlobal === 'function') {
+                window.triggerNavigationGlobal();
+              } else {
+                window.location.href = 'escena-secuenciador.html';
+              }
+            }
+          }
+        ];
+
+        this.applyTexture = () => {
+          const mesh = this.el.getObject3D('mesh');
+          if (!mesh) return;
+          mesh.material = new THREE.MeshBasicMaterial({
+            map: this.texture,
+            side: THREE.DoubleSide
+          });
+          this.draw();
+        };
+
+        if (this.el.getObject3D('mesh')) {
+          this.applyTexture();
+        } else {
+          this.el.addEventListener('object3dset', this.applyTexture);
+        }
+
+        this.getButtonIndexFromUV = (uv) => {
+          if (!uv) return -1;
+          const canvasY = (1 - uv.y) * 640;
+          if (canvasY >= 130 && canvasY <= 250) return 0;
+          if (canvasY >= 270 && canvasY <= 390) return 1;
+          if (canvasY >= 410 && canvasY <= 530) return 2;
+          return -1;
+        };
+
+        this.setHoveredIndex = (idx) => {
+          if (this.hoveredIndex === idx) return;
+          this.hoveredIndex = idx;
+          this.draw();
+        };
+
+        this.handleClick = (uv) => {
+          const idx = this.getButtonIndexFromUV(uv);
+          if (idx >= 0 && this.buttons[idx]) {
+            this.buttons[idx].action();
+          }
+        };
+
+        this.el.addEventListener('click', (evt) => {
+          const uv = evt.detail?.intersection?.uv;
+          this.handleClick(uv);
+        });
+
+        this.el.addEventListener('mouseleave', () => {
+          this.setHoveredIndex(-1);
+        });
+
+        this.draw();
+      },
+
+      drawRoundedRect: function (ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+      },
+
+      draw: function () {
+        const ctx = this.ctx;
+        const W = this.canvas.width;
+        const H = this.canvas.height;
+
+        ctx.fillStyle = '#0b1120';
+        ctx.fillRect(0, 0, W, H);
+
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(0, 0, W, 100);
+        ctx.strokeStyle = '#1e293b';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(2, 2, W - 4, H - 4);
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 24px system-ui, -apple-system, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('RECURSOS & ENLACES', W / 2, 45);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '600 15px monospace';
+        ctx.fillText('MASCHINE MK3 · ECOSYSTEM', W / 2, 75);
+
+        const btnYCoords = [135, 275, 415];
+        const btnH = 115;
+        const btnW = W - 40;
+        const btnX = 20;
+
+        this.buttons.forEach((btn, idx) => {
+          const y = btnYCoords[idx];
+          const isHover = (this.hoveredIndex === idx);
+
+          this.drawRoundedRect(ctx, btnX, y, btnW, btnH, 12);
+          ctx.fillStyle = isHover ? 'rgba(30, 41, 59, 0.95)' : 'rgba(15, 23, 42, 0.85)';
+          ctx.fill();
+
+          ctx.strokeStyle = isHover ? btn.color : 'rgba(255, 255, 255, 0.15)';
+          ctx.lineWidth = isHover ? 3 : 1.5;
+          ctx.stroke();
+
+          ctx.fillStyle = btn.color;
+          this.drawRoundedRect(ctx, btnX + 4, y + 8, 8, btnH - 16, 4);
+          ctx.fill();
+
+          ctx.fillStyle = isHover ? '#ffffff' : '#f1f5f9';
+          ctx.font = 'bold 20px system-ui, -apple-system, sans-serif';
+          ctx.textAlign = 'left';
+          ctx.fillText(btn.title, btnX + 26, y + 48);
+
+          ctx.fillStyle = isHover ? '#cbd5e1' : '#94a3b8';
+          ctx.font = '14px system-ui, -apple-system, sans-serif';
+          ctx.fillText(btn.sub, btnX + 26, y + 82);
+        });
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = '500 14px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText('• WebXR Native Instruments •', W / 2, H - 25);
+
+        this.texture.needsUpdate = true;
+      }
+    });
   </script>
 
   <style>
@@ -443,6 +757,51 @@
         <a-box position="0 -0.42 0.05" width="0.32" height="0.02" depth="0.22" color="#27272a" roughness="0.5" metalness="0.6"></a-box>
       </a-entity>
 
+      <!-- Monitor de Vídeo Izquierdo: Maschine MK3 Masterclass y Flujo de Trabajo -->
+      <a-entity position="-0.60 1.30 -0.56" rotation="0 18 0">
+        <a-box width="0.46" height="0.29" depth="0.025" color="#090d16" roughness="0.5" metalness="0.5"></a-box>
+        <a-plane 
+          id="video-monitor-left"
+          class="interactable"
+          video-monitor-screen="videoId: prEuh1P6-JM; title: Masterclass Oficial Maschine; tag: WORKFLOW &amp; SETUP; thumbSrc: assets/textures/video_thumb_overview.jpg"
+          position="0 0 0.015"
+          width="0.44"
+          height="0.27">
+        </a-plane>
+        <a-cylinder position="0 -0.19 -0.01" radius="0.012" height="0.18" color="#27272a" metalness="0.7"></a-cylinder>
+        <a-cylinder position="0 -0.28 0" radius="0.06" height="0.015" color="#18181b" metalness="0.7"></a-cylinder>
+      </a-entity>
+
+      <!-- Monitor de Vídeo Derecho: Demostración de Beatmaking y Performance -->
+      <a-entity position="0.60 1.30 -0.56" rotation="0 -18 0">
+        <a-box width="0.46" height="0.29" depth="0.025" color="#090d16" roughness="0.5" metalness="0.5"></a-box>
+        <a-plane 
+          id="video-monitor-right"
+          class="interactable"
+          video-monitor-screen="videoId: YTCVW9wS-Qk; title: Beatmaking y Live Performance; tag: DEMO EN DIRECTO; thumbSrc: assets/textures/video_thumb_performance.jpg"
+          position="0 0 0.015"
+          width="0.44"
+          height="0.27">
+        </a-plane>
+        <a-cylinder position="0 -0.19 -0.01" radius="0.012" height="0.18" color="#27272a" metalness="0.7"></a-cylinder>
+        <a-cylinder position="0 -0.28 0" radius="0.06" height="0.015" color="#18181b" metalness="0.7"></a-cylinder>
+      </a-entity>
+
+      <!-- Atril / Consola de Enlaces y Recursos (Lateral derecho de la mesa) -->
+      <a-entity position="0.86 1.05 -0.02" rotation="-32 -18 0">
+        <a-box width="0.34" height="0.42" depth="0.025" color="#0f172a" roughness="0.4" metalness="0.5"></a-box>
+        <a-box position="0 0.205 0.005" width="0.34" height="0.01" depth="0.025" color="#38bdf8" material="emissive: #38bdf8; emissiveIntensity: 0.6"></a-box>
+        <a-plane
+          id="studio-stand"
+          class="interactable"
+          studio-stand-ui
+          position="0 0 0.015"
+          width="0.32"
+          height="0.40">
+        </a-plane>
+        <a-box position="0 -0.16 -0.05" width="0.20" height="0.06" depth="0.10" color="#1e293b" metalness="0.6"></a-box>
+      </a-entity>
+
       <!-- ================================================================
            MODELO 3D OFICIAL: Maschine Native Instruments (jmccopus, CC BY 4.0)
            Orientado hacia el usuario sobre la mesa de trabajo
@@ -528,6 +887,8 @@
         }
       };
 
+      window.triggerNavigationGlobal = triggerNavigation;
+
       const btnHudEnter = document.getElementById('btnHudEnter');
       if (btnHudEnter) {
         btnHudEnter.addEventListener('click', (e) => {
@@ -571,12 +932,35 @@
         const dawScreen = document.getElementById('daw-screen');
         const dawBtn = document.getElementById('daw-screen-btn');
         const hitbox = document.getElementById('drumpad-hitbox');
+        const videoLeft = document.getElementById('video-monitor-left');
+        const videoRight = document.getElementById('video-monitor-right');
+        const stand = document.getElementById('studio-stand');
         if (dawScreen && dawScreen.object3D) interactables.push(dawScreen.object3D);
         if (dawBtn && dawBtn.object3D) interactables.push(dawBtn.object3D);
         if (hitbox && hitbox.object3D) interactables.push(hitbox.object3D);
+        if (videoLeft && videoLeft.object3D) interactables.push(videoLeft.object3D);
+        if (videoRight && videoRight.object3D) interactables.push(videoRight.object3D);
+        if (stand && stand.object3D) interactables.push(stand.object3D);
 
         const hits = raycaster.intersectObjects(interactables, true);
         if (hits.length > 0) {
+          const hitObj = hits[0].object;
+          let hitEl = hitObj.el;
+          let curr = hitObj;
+          while (!hitEl && curr.parent) {
+            curr = curr.parent;
+            if (curr.el) hitEl = curr.el;
+          }
+
+          if (hitEl && hitEl.components && hitEl.components['video-monitor-screen']) {
+            hitEl.components['video-monitor-screen'].openVideo();
+            return;
+          }
+          if (hitEl && hitEl.components && hitEl.components['studio-stand-ui']) {
+            hitEl.components['studio-stand-ui'].handleClick(hits[0].uv);
+            return;
+          }
+
           triggerNavigation();
         }
       });
@@ -596,9 +980,44 @@
         const dawScreen = document.getElementById('daw-screen');
         const dawBtn = document.getElementById('daw-screen-btn');
         const hitbox = document.getElementById('drumpad-hitbox');
+        const videoLeft = document.getElementById('video-monitor-left');
+        const videoRight = document.getElementById('video-monitor-right');
+        const stand = document.getElementById('studio-stand');
         if (dawScreen && dawScreen.object3D) interactables.push(dawScreen.object3D);
         if (dawBtn && dawBtn.object3D) interactables.push(dawBtn.object3D);
         if (hitbox && hitbox.object3D) interactables.push(hitbox.object3D);
+        if (videoLeft && videoLeft.object3D) interactables.push(videoLeft.object3D);
+        if (videoRight && videoRight.object3D) interactables.push(videoRight.object3D);
+        if (stand && stand.object3D) interactables.push(stand.object3D);
+
+        const hits = raycaster.intersectObjects(interactables, true);
+        if (hits.length > 0) {
+          document.body.style.cursor = 'pointer';
+          const hitObj = hits[0].object;
+          let hitEl = hitObj.el;
+          let curr = hitObj;
+          while (!hitEl && curr.parent) {
+            curr = curr.parent;
+            if (curr.el) hitEl = curr.el;
+          }
+          if (hitEl && hitEl.components && hitEl.components['studio-stand-ui']) {
+            hitEl.components['studio-stand-ui'].setHoveredIndex(
+              hitEl.components['studio-stand-ui'].getButtonIndexFromUV(hits[0].uv)
+            );
+          } else {
+            const standEl = document.getElementById('studio-stand');
+            if (standEl?.components?.['studio-stand-ui']) {
+              standEl.components['studio-stand-ui'].setHoveredIndex(-1);
+            }
+          }
+        } else {
+          document.body.style.cursor = 'default';
+          const standEl = document.getElementById('studio-stand');
+          if (standEl?.components?.['studio-stand-ui']) {
+            standEl.components['studio-stand-ui'].setHoveredIndex(-1);
+          }
+        }
+      }, { passive: true });
 
         const hits = raycaster.intersectObjects(interactables, true);
         document.body.style.cursor = (hits.length > 0) ? 'pointer' : 'default';

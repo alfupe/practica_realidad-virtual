@@ -105,6 +105,22 @@
           <span>WebXR / Web Audio / Three.js</span>
         </div>
       </div>
+
+      <!-- Barra de Enlaces de Recursos y Acceso Rápido (WCAG 2.1) -->
+      <nav class="console-actions-bar" aria-label="Recursos oficiales y accesos directos">
+        <a href="https://www.native-instruments.com/es/products/maschine/production-systems/maschine/" class="action-pill action-pill--external" target="_blank" rel="noopener noreferrer" aria-label="Visitar la web oficial de Native Instruments Maschine MK3 (se abre en pestaña nueva)">
+          <span class="action-pill__icon" aria-hidden="true">↗</span>
+          <span>Web Oficial Maschine</span>
+        </a>
+        <a href="recursos/guia-ritmica.html" class="action-pill" aria-label="Consultar la guía didáctica sobre métrica 4/4">
+          <span class="action-pill__icon" aria-hidden="true">📖</span>
+          <span>Guía Rítmica 4/4</span>
+        </a>
+        <button type="button" class="action-pill action-pill--primary" id="btn-action-sequencer" aria-label="Ir directamente al Secuenciador 4x4 (Escena 2)">
+          <span class="action-pill__icon" aria-hidden="true">⚡</span>
+          <span>Probar Secuenciador</span>
+        </button>
+      </nav>
     </div>
 
     <!-- Mapa Arquitectónico de la Matriz 4x4 (16 Pads) -->
@@ -194,7 +210,7 @@
             <h3 class="control-card__title">Interacción Puntero / WebXR</h3>
           </div>
           <p class="control-card__text">
-            Haz clic o toca directamente sobre los pads y botones de hardware para alternar estados. En cascos VR, apunta con el mando láser y pulsa el gatillo.
+            Haz clic o toca directamente sobre los pads y botones de hardware 3D. En cascos VR (Meta Quest), apunta con el mando láser y pulsa el gatillo.
           </p>
         </div>
 
@@ -204,17 +220,27 @@
             <h3 class="control-card__title">Teclado Isomórfico</h3>
           </div>
           <p class="control-card__text">
-            Las 4 filas del teclado físico corresponden a las 4 voces tímbricas: <kbd>1-4</kbd> Crash, <kbd>Q-R</kbd> Hi-Hat, <kbd>A-F</kbd> Snare y <kbd>Z-V</kbd> Kick.
+            Las 4 filas del teclado corresponden a las 4 voces tímbricas: <kbd>1-4</kbd> Crash, <kbd>Q-R</kbd> Hi-Hat, <kbd>A-F</kbd> Snare y <kbd>Z-V</kbd> Kick.
           </p>
         </div>
 
         <div class="control-card">
           <div class="control-card__header">
-            <span class="control-card__icon">TRANSPORT</span>
-            <h3 class="control-card__title">Transporte Global</h3>
+            <span class="control-card__icon">COMPASES</span>
+            <h3 class="control-card__title">Cursores Multi-Compás</h3>
           </div>
           <p class="control-card__text">
-            Pulsa <kbd>Espacio</kbd> para Play/Stop, <kbd>B</kbd> para alternar el tempo (90, 120 o 140 BPM) y <kbd>C</kbd> para limpiar todos los pasos activos.
+            Usa <kbd>&larr;</kbd> / <kbd>&rarr;</kbd> para alternar el compás en edición (1–4 cíclico) y <kbd>&uarr;</kbd> / <kbd>&darr;</kbd> para activar/desactivar su inclusión en el bucle continuo (Loop).
+          </p>
+        </div>
+
+        <div class="control-card">
+          <div class="control-card__header">
+            <span class="control-card__icon">MODO &amp; PLAY</span>
+            <h3 class="control-card__title">Modo Libre &amp; Transporte</h3>
+          </div>
+          <p class="control-card__text">
+            Pulsa <kbd>M</kbd> para alternar entre Secuenciador y Modo Libre (*Live Perform*), <kbd>Espacio</kbd> Play/Stop, <kbd>B</kbd> BPM (90/120/140) y <kbd>Shift+C</kbd> Clear.
           </p>
         </div>
       </div>
@@ -388,6 +414,35 @@
         <strong>DrumLab VR</strong> &copy; 2026 Alex Fuentes · Práctica de Realidad Virtual · Grado en Multimedia (UOC)
       </p>
     </footer>
+    <!-- Modal Dialog nativo HTML5 para visualización de vídeo demostrativo de Maschine MK3 -->
+    <dialog id="videoDialog" class="video-modal" closedby="any" aria-labelledby="videoDialogTitle">
+      <div class="video-modal__content">
+        <div class="video-modal__header">
+          <div class="video-modal__header-info">
+            <span class="video-modal__badge">DEMO OFICIAL</span>
+            <h2 id="videoDialogTitle" class="video-modal__title">Demostración Maschine MK3</h2>
+          </div>
+          <button id="btnVideoDialogClose" class="video-modal__close" type="button" aria-label="Cerrar reproductor de vídeo">&times;</button>
+        </div>
+        <div class="video-modal__player-wrapper">
+          <iframe 
+            id="videoIframe" 
+            class="video-modal__iframe" 
+            src="" 
+            title="Vídeo demostrativo Native Instruments Maschine MK3" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            allowfullscreen 
+            loading="lazy">
+          </iframe>
+        </div>
+        <div class="video-modal__footer">
+          <p class="video-modal__caption">
+            Recurso audiovisual emitido desde los monitores 3D de la Escena 1 (Estudio de Producción).
+            Pulsa <kbd>ESC</kbd> o haz clic fuera del recuadro para volver a la experiencia.
+          </p>
+        </div>
+      </div>
+    </dialog>
   </main>
 
   <!-- Orquestador modular de la aplicación y sincronización de escenas WebXR (Clean Code) -->

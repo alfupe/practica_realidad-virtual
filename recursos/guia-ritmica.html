@@ -152,6 +152,35 @@
       </div>
     </section>
 
+    <!-- Sección 4: Navegación Multi-Compás y Modo Libre -->
+    <section class="instructions" aria-labelledby="modos-title">
+      <h2 id="modos-title" class="instructions__title">4. Navegación de compases por cursores y Modo Libre (Live Perform)</h2>
+      <p style="margin: 0 0 0.75rem; font-size: 0.95rem; line-height: 1.5;">
+        DrumLab VR permite extender la composición percusiva hasta <strong>4 compases completos</strong> con alternancia entre programación fija e improvisación en tiempo real:
+      </p>
+
+      <ul class="instructions__list">
+        <li class="instructions__item">
+          <strong>Navegación de compases en edición (<kbd>&larr;</kbd> / <kbd>&rarr;</kbd>)</strong>:
+          <span class="instructions__note">
+            Las flechas izquierda y derecha del teclado desplazan de forma cíclica el compás activo en edición (1 &rarr; 2 &rarr; 3 &rarr; 4 &rarr; 1). Los 16 pads físicos de la Maschine MK3 y la pantalla LCD digital Three.js reflejan al instante las notas programadas en dicho compás.
+          </span>
+        </li>
+        <li class="instructions__item">
+          <strong>Activación del compás en bucle (<kbd>&uarr;</kbd> / <kbd>&darr;</kbd>)</strong>:
+          <span class="instructions__note">
+            Las flechas arriba y abajo conmutan (toggle) la inclusión del compás que estás editando dentro del bucle de reproducción continua (Loop). Los botones hardware y los indicadores LCD superiores muestran en verde los compases activos en el bucle.
+          </span>
+        </li>
+        <li class="instructions__item">
+          <strong>Modo Libre (*Live Perform*) vs Modo Secuenciador (<kbd>M</kbd> o botón 3D PAD MODE)</strong>:
+          <span class="instructions__note">
+            En <strong>Modo Secuenciador (STEP)</strong>, tocar un pad programa o borra la nota en el tiempo correspondiente. En <strong>Modo Libre (FREE)</strong>, golpear cualquier pad dispara el motor Web Audio API inmediatamente (&lt;15 ms) con su animación física de contracción y flash, <strong>sin alterar ni borrar las notas programadas en la matriz</strong>. Esto permite improvisar rellenos y percusiones solistas encima de un ritmo en bucle.
+          </span>
+        </li>
+      </ul>
+    </section>
+
     <!-- Pie de página -->
     <footer class="site-footer">
       <p>

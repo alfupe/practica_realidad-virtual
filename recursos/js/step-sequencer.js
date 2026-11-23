@@ -32,6 +32,8 @@ AFRAME.registerComponent('step-sequencer', {
     this.enabledBars = [true, false, false, false]; // Por defecto, Compás 1 activo en loop
     this.editBar = 0;                               // Compás visible/editable en los 16 pads (0..3)
     this.playBar = 0;                               // Compás en reproducción actual (0..3)
+    this.playMode = 'STEP';                         // Modo operativo: 'STEP' (secuenciador) | 'FREE' (live perform)
+    this.lastArrowNavTime = 0;                      // Control de cadencia para navegación por cursores
 
     this.padMatrix = new Map();                // Clave: "row_col", Valor: PadMeshController
     this.padMeshes = [];                       // Array de Three.js Mesh de los pads para raycasting directo
@@ -43,6 +45,7 @@ AFRAME.registerComponent('step-sequencer', {
     this.btnStopMesh = null;
     this.btnClearMesh = null;
     this.btnBpmMesh = null;
+    this.btnModeMesh = null;
     this.screenMesh = null;
     this.screenCanvas = null;
     this.screenContext = null;
@@ -61,6 +64,9 @@ AFRAME.registerComponent('step-sequencer', {
     this.stopPlayback = this.stopPlayback.bind(this);
     this.clearPattern = this.clearPattern.bind(this);
     this.cycleBpm = this.cycleBpm.bind(this);
+    this.toggleMode = this.toggleMode.bind(this);
+    this.updateModeVisuals = this.updateModeVisuals.bind(this);
+    this.triggerPadInteraction = this.triggerPadInteraction.bind(this);
     this.initModelPads = this.initModelPads.bind(this);
     this.setupDirectRaycasting = this.setupDirectRaycasting.bind(this);
     this.updateScreenDisplay = this.updateScreenDisplay.bind(this);
@@ -85,6 +91,13 @@ AFRAME.registerComponent('step-sequencer', {
 
     // Escucha de eventos de teclado físico
     window.addEventListener('keydown', this.onKeyDown);
+
+    // Escucha de mensajes externos (p. ej. parada al abrir modal de vídeo en la app anfitriona)
+    window.addEventListener('message', (evt) => {
+      if (evt.data && evt.data.action === 'stopPlayback') {
+        this.stopPlayback();
+      }
+    });
   },
 
   /**
@@ -369,6 +382,7 @@ AFRAME.registerComponent('step-sequencer', {
         // Roles de botones por coordenadas exactas del hardware Maschine MK3
         const isPlay = (lx > 13.0 && lz < -1.4 && lz > -1.7);
         const isStop = (lx > 13.0 && lz < -0.3 && lz > -0.7);
+        const isMode = (lx > 13.0 && lz > -0.15 && lz < 0.25); // Botón físico PAD MODE (Modo Libre / Step)
         const isClear = (lx > 10.5 && lx < 11.5 && lz < -1.4 && lz > -1.7);
         const isBpm = (lx > 10.5 && lx < 11.5 && lz < -0.8 && lz > -1.2);
         const isLed1 = (lx < -10.5 && lz > 1.3 && lz < 1.7);
@@ -424,6 +438,11 @@ AFRAME.registerComponent('step-sequencer', {
         } else if (isStop) {
           role = 'stop';
           color = '#334155';
+        } else if (isMode) {
+          role = 'mode';
+          color = (this.playMode === 'FREE') ? '#f59e0b' : '#334155';
+          emissive = (this.playMode === 'FREE') ? '#d97706' : '#000000';
+          emissiveIntensity = (this.playMode === 'FREE') ? 0.8 : 0;
         } else if (isClear) {
           role = 'clear';
           color = '#b91c1c';
@@ -473,6 +492,10 @@ AFRAME.registerComponent('step-sequencer', {
         } else if (isStop) {
           this.btnStopMesh = capMesh;
           capMesh.userData = { isButton: true, action: 'stop' };
+          this.hardwareButtonMeshes.push(capMesh);
+        } else if (isMode) {
+          this.btnModeMesh = capMesh;
+          capMesh.userData = { isButton: true, action: 'toggleMode' };
           this.hardwareButtonMeshes.push(capMesh);
         } else if (isClear) {
           this.btnClearMesh = capMesh;
@@ -668,7 +691,36 @@ AFRAME.registerComponent('step-sequencer', {
   },
 
   /**
-   * Actualiza la pantalla digital LCD central del controlador (BPM, Loop, Compás y Step)
+   * Alterna entre el modo secuenciador por pasos (STEP) y el modo libre en directo (FREE)
+   * En Modo Libre, los pads suenan al instante (<15ms) sin alterar el patrón programado en los compases.
+   * @param {'STEP'|'FREE'} [forcedMode]
+   */
+  toggleMode: function (forcedMode) {
+    if (forcedMode && (forcedMode === 'STEP' || forcedMode === 'FREE')) {
+      this.playMode = forcedMode;
+    } else {
+      this.playMode = (this.playMode === 'STEP') ? 'FREE' : 'STEP';
+    }
+
+    this.updateModeVisuals();
+    this.updateScreenDisplay();
+    this.updateHudTelemetry();
+  },
+
+  /**
+   * Actualiza el aspecto emisivo del botón de hardware físico PAD MODE
+   */
+  updateModeVisuals: function () {
+    if (this.btnModeMesh && this.btnModeMesh.material) {
+      const isFree = (this.playMode === 'FREE');
+      this.btnModeMesh.material.color.set(isFree ? '#f59e0b' : '#334155');
+      this.btnModeMesh.material.emissive.set(isFree ? '#d97706' : '#000000');
+      this.btnModeMesh.material.emissiveIntensity = isFree ? 0.85 : 0;
+    }
+  },
+
+  /**
+   * Actualiza la pantalla digital LCD central del controlador (BPM, Loop, Compás, Step y Modo)
    */
   updateScreenDisplay: function () {
     if (!this.screenContext || !this.screenTexture) return;
@@ -707,30 +759,45 @@ AFRAME.registerComponent('step-sequencer', {
       ctx.fillText(`LOOP ${i + 1}`, x + w / 2, 25);
     }
 
-    // 2. Franja central: PLAY/STOP + STEP + BPM GRANDE
+    // 2. Franja central: PLAY/STOP + STEP + MODO OPERATIVO + BPM GRANDE
     ctx.textAlign = 'left';
-    ctx.font = 'bold 40px monospace';
+    ctx.font = 'bold 38px monospace';
+    ctx.textBaseline = 'middle';
     if (this.isSequencerRunning) {
       ctx.fillStyle = '#22c55e';
-      ctx.fillText('PLAY', 18, 102);
+      ctx.fillText('PLAY', 18, 98);
     } else {
       ctx.fillStyle = '#64748b';
-      ctx.fillText('STOP', 18, 102);
+      ctx.fillText('STOP', 18, 98);
     }
 
     // Compás en reproducción y paso
     ctx.fillStyle = this.isSequencerRunning ? '#f59e0b' : '#475569';
-    ctx.font = 'bold 26px monospace';
+    ctx.font = 'bold 22px monospace';
     const barStepText = this.isSequencerRunning && this.currentStep >= 0
       ? `B${this.playBar + 1}:S${this.currentStep + 1}`
       : `BAR ${this.editBar + 1}`;
-    ctx.fillText(barStepText, 160, 102);
+    ctx.fillText(barStepText, 142, 98);
+
+    // Indicador del Modo Activo: STEP vs FREE (Live Perform)
+    const modeX = 278;
+    const isFree = (this.playMode === 'FREE');
+    ctx.fillStyle = isFree ? 'rgba(245, 158, 11, 0.22)' : 'rgba(56, 189, 248, 0.16)';
+    ctx.fillRect(modeX, 76, 168, 38);
+    ctx.strokeStyle = isFree ? '#f59e0b' : '#38bdf8';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(modeX, 76, 168, 38);
+
+    ctx.fillStyle = isFree ? '#fbbf24' : '#7dd3fc';
+    ctx.font = 'bold 18px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(isFree ? 'MODE: FREE' : 'MODE: STEP', modeX + 84, 98);
 
     // BPM grande de altísimo contraste a la derecha
     ctx.textAlign = 'right';
     ctx.fillStyle = '#38bdf8';
-    ctx.font = 'bold 48px monospace';
-    ctx.fillText(`${this.data.bpm} BPM`, W - 18, 102);
+    ctx.font = 'bold 44px monospace';
+    ctx.fillText(`${this.data.bpm} BPM`, W - 18, 98);
 
     // 3. Tira inferior: Selector EDIT 1..4 (alineada sobre los 4 botones del círculo verde)
     for (let i = 0; i < 4; i++) {
@@ -754,7 +821,7 @@ AFRAME.registerComponent('step-sequencer', {
   },
 
   /**
-   * Sincroniza la lectura de BPM y compás en la barra HUD HTML superior
+   * Sincroniza la lectura de BPM, compás y modo en la barra HUD HTML superior
    */
   updateHudTelemetry: function () {
     const hudBpmEl = document.getElementById('hudBpmBadge');
@@ -763,7 +830,17 @@ AFRAME.registerComponent('step-sequencer', {
         .map((on, idx) => (on ? idx + 1 : null))
         .filter(Boolean)
         .join(',');
-      hudBpmEl.textContent = `${this.data.bpm} BPM · Edit B${this.editBar + 1} · Loop [${activeBars}]`;
+      hudBpmEl.textContent = `${this.data.bpm} BPM · [${this.playMode}] · Edit B${this.editBar + 1} · Loop [${activeBars}]`;
+    }
+
+    const hudModeBtn = document.getElementById('hudBtnModeToggle');
+    const hudModeText = document.getElementById('hudModeText');
+    if (hudModeBtn) {
+      hudModeBtn.classList.toggle('mode-free', this.playMode === 'FREE');
+      hudModeBtn.setAttribute('aria-pressed', this.playMode === 'FREE' ? 'true' : 'false');
+    }
+    if (hudModeText) {
+      hudModeText.textContent = `Modo: ${this.playMode}`;
     }
   },
 
@@ -823,6 +900,7 @@ AFRAME.registerComponent('step-sequencer', {
       else if (action === 'stop') this.stopPlayback();
       else if (action === 'clear') this.clearPattern();
       else if (action === 'bpm') this.cycleBpm();
+      else if (action === 'toggleMode') this.toggleMode();
       else if (action === 'toggleLoopBar') this.toggleLoopBar(barIndex);
       else if (action === 'selectEditBar') this.selectEditBar(barIndex);
     };
@@ -832,7 +910,7 @@ AFRAME.registerComponent('step-sequencer', {
       const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
 
       if (hit.type === 'pad' && hit.target) {
-        hit.target.onClick();
+        this.triggerPadInteraction(hit.target);
       } else if (hit.type === 'button') {
         if (now - this.lastBtnTime < 140) return;
         this.lastBtnTime = now;
@@ -883,7 +961,7 @@ AFRAME.registerComponent('step-sequencer', {
       if (!hitMesh) return;
 
       if (hitMesh.userData?.pad) {
-        hitMesh.userData.pad.onClick(evt);
+        this.triggerPadInteraction(hitMesh.userData.pad, evt);
       } else if (hitMesh.userData?.action) {
         if (now - this.lastBtnTime < 140) return;
         this.lastBtnTime = now;
@@ -893,6 +971,22 @@ AFRAME.registerComponent('step-sequencer', {
 
     modelEl.addEventListener('click', onAFrameClick);
     modelEl.addEventListener('touchend', onAFrameClick);
+  },
+
+  /**
+   * Enruta la interacción con un pad físico según el modo activo:
+   * - En 'FREE': dispara el audio instantáneo y la animación física sin alterar el patrón programado
+   * - En 'STEP': conmuta el estado programado en la matriz 4x4
+   * @param {PadMeshController} pad 
+   * @param {Event} [evt] 
+   */
+  triggerPadInteraction: function (pad, evt) {
+    if (!pad) return;
+    if (this.playMode === 'FREE') {
+      pad.triggerFreeHit(evt);
+    } else {
+      pad.onClick(evt);
+    }
   },
 
   /**
@@ -926,21 +1020,49 @@ AFRAME.registerComponent('step-sequencer', {
       return;
     }
 
-    // 1. Barra espaciadora: Play / Stop
+    // 1. Navegación y conmutación de compases con teclas de flecha
+    if (evt.key === 'ArrowLeft' || evt.key === 'ArrowRight' || evt.key === 'ArrowUp' || evt.key === 'ArrowDown') {
+      evt.preventDefault();
+      const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+      if (this.lastArrowNavTime && (now - this.lastArrowNavTime < 180)) {
+        return; // Prevenir saltos erráticos por autorepetición rápida
+      }
+      this.lastArrowNavTime = now;
+
+      if (evt.key === 'ArrowLeft') {
+        const prevBar = (this.editBar + 3) % 4; // Cíclico: 1 -> 4 -> 3 -> 2 -> 1
+        this.selectEditBar(prevBar);
+      } else if (evt.key === 'ArrowRight') {
+        const nextBar = (this.editBar + 1) % 4; // Cíclico: 1 -> 2 -> 3 -> 4 -> 1
+        this.selectEditBar(nextBar);
+      } else if (evt.key === 'ArrowUp' || evt.key === 'ArrowDown') {
+        this.toggleLoopBar(this.editBar); // Activa / Desactiva el compás actualmente seleccionado en edición
+      }
+      return;
+    }
+
+    // 2. Conmutación de Modo Libre / Secuenciador con tecla 'M'
+    if (key === 'm') {
+      evt.preventDefault();
+      this.toggleMode();
+      return;
+    }
+
+    // 3. Barra espaciadora: Play / Stop
     if (evt.code === 'Space' || key === ' ') {
       evt.preventDefault();
       this.togglePlay();
       return;
     }
 
-    // 2. Tecla 'b': Conmutar BPM cíclico (90 -> 120 -> 140)
+    // 4. Tecla 'b': Conmutar BPM cíclico (90 -> 120 -> 140)
     if (key === 'b') {
       evt.preventDefault();
       this.cycleBpm();
       return;
     }
 
-    // 3. Limpiar patrón (Clear): Delete, Backspace o Shift + C
+    // 5. Limpiar patrón (Clear): Delete, Backspace o Shift + C
     // Resuelve el conflicto: 'c' sola ahora activa el Bombo (Kick paso 3)
     if (key === 'delete' || key === 'backspace' || (key === 'c' && evt.shiftKey)) {
       evt.preventDefault();
@@ -948,13 +1070,13 @@ AFRAME.registerComponent('step-sequencer', {
       return;
     }
 
-    // 4. Teclas isomórficas de la matriz 4x4 (1-4, Q-R, A-F, Z-V)
+    // 6. Teclas isomórficas de la matriz 4x4 (1-4, Q-R, A-F, Z-V)
     // Fila 0 Crash (1-4) | Fila 1 Hi-Hat (Q-R) | Fila 2 Snare (A-F) | Fila 3 Kick (Z, X, C, V)
     if (this.keyMap.has(key)) {
       const coords = this.keyMap.get(key);
       const pad = this.padMatrix.get(coords);
       if (!pad) return;
-      pad.onClick();
+      this.triggerPadInteraction(pad, evt);
     }
   },
 

@@ -305,6 +305,7 @@ class PadMeshController {
     this.flashTimeout = null;
 
     this.onClick = this.onClick.bind(this);
+    this.triggerFreeHit = this.triggerFreeHit.bind(this);
     this.triggerDisparo = this.triggerDisparo.bind(this);
     this.resetFromDisparo = this.resetFromDisparo.bind(this);
     this.applyStateVisuals = this.applyStateVisuals.bind(this);
@@ -329,6 +330,28 @@ class PadMeshController {
     }
     const nextState = this.programmed ? 'ACTIVO_ESPERA' : 'INACTIVO';
     this.triggerDisparo(nextState);
+  }
+
+  /**
+   * Dispara el sonido de percusión y la animación física del pad de forma instantánea
+   * en "Modo Libre" (Live Perform) SIN alterar el estado programado en la matriz.
+   * @param {Event} [evt]
+   */
+  triggerFreeHit(evt) {
+    if (evt && evt.stopPropagation) evt.stopPropagation();
+    const now = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+    if (this.lastClickTime && (now - this.lastClickTime < 60)) {
+      return; // Permite rolls rápidos en directo (<60ms) evitando rebotes duplicados
+    }
+    this.lastClickTime = now;
+
+    if (window.DrumLabAudio) {
+      window.DrumLabAudio.unlock();
+    }
+
+    // Mantiene ACTIVO_ESPERA si ya estaba programado, o INACTIVO si no lo estaba
+    const returnState = this.programmed ? 'ACTIVO_ESPERA' : 'INACTIVO';
+    this.triggerDisparo(returnState);
   }
 
   triggerDisparo(returnState = null) {
@@ -427,6 +450,7 @@ AFRAME.registerComponent('drum-pad', {
 
     // Vinculación de métodos
     this.onClick = this.onClick.bind(this);
+    this.triggerFreeHit = this.triggerFreeHit.bind(this);
     this.triggerDisparo = this.triggerDisparo.bind(this);
     this.resetFromDisparo = this.resetFromDisparo.bind(this);
     this.applyStateVisuals = this.applyStateVisuals.bind(this);

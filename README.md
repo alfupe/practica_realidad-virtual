@@ -73,16 +73,31 @@ Cada pulsador de la matriz se gestiona mediante un autómata finito formal:
 * **`ACTIVO_ESPERA`:** Pad programado en el secuenciador; emite brillo tímbrico característico (Ámbar, Verde, Azul o Magenta) a la espera del pulso del reloj.
 * **`DISPARANDO`:** Disparo percusivo inmediato. Produce un destello blanco emisivo intenso, compresión física en el eje Z (escala = 0.4) durante 100 ms y reproducción acústica instantánea.
 
-### 3. Doble Interfaz Física de Entrada
+### 3. Doble Interfaz Física de Entrada, Cursores y Modos de Interpretación
 * **Ratón y Raycaster WebXR:** Clic interactivo sobre los pulsadores para programar/desprogramar y reproducir en tiempo real.
 * **Teclado Isomórfico (mapeo ergonómico de 4 filas):**
   * Fila 0 (Crash): Teclas `1`, `2`, `3`, `4`
   * Fila 1 (Hi-Hat): Teclas `Q`, `W`, `E`, `R`
   * Fila 2 (Snare): Teclas `A`, `S`, `D`, `F`
   * Fila 3 (Kick): Teclas `Z`, `X`, `C`, `V`
-  * Transporte: `Espacio` (Play/Stop), `B` (Ciclo de BPM), `Shift + C` o `Supr` (Borrar patrón).
+* **Navegación de compases por cursores (4 compases):**
+  * `←` / `→`: Desplaza el compás activo en edición (`Edit`) de forma cíclica (1 &rarr; 2 &rarr; 3 &rarr; 4 &rarr; 1), actualizando al instante los botones hardware, los 16 pads y la pantalla LCD.
+  * `↑` / `↓`: Conmuta (`toggle`) la inclusión en reproducción continua (`Loop`) del compás que esté actualmente en edición.
+* **Modo Libre (*Live Perform*) vs Modo Secuenciador (`M` o botón físico PAD MODE):**
+  * **Modo Secuenciador (`STEP`):** Clic o tecla conmuta el paso programado en el compás actual.
+  * **Modo Libre (`FREE`):** Disparo instantáneo (&lt;15 ms) del motor Web Audio y compresión física del pad sin alterar el patrón guardado en la memoria de los 4 compases.
+* **Transporte global y funciones auxiliares:**
+  * `Espacio`: Play / Stop (con prevención de scroll del documento).
+  * `B`: Alternar tempo cíclico (90 BPM &rarr; 120 BPM &rarr; 140 BPM).
+  * `Shift + C` o `Supr`: Limpiar compás en edición (`Clear`).
+  * `H` o `?`: Abrir / Cerrar guía de atajos HUD.
 
-### 4. Motor de Audio Híbrido (`Web Audio API`)
+### 4. Showroom Promocional Native Instruments y Vídeos en Modal Dialog
+* **Pantallas diegéticas 3D en el Estudio (Escena 1):** Dos monitores virtuales colocados a los lados de la consola DAW que exhiben fotogramas clave ligeros de demostraciones oficiales de Maschine MK3.
+* **Apertura de vídeo embebido mediante `<dialog>` HTML5 nativo:** Al pulsar sobre cualquiera de las pantallas virtuales, se emite un mensaje `postMessage` (`{ type: 'drumlab:open-video' }`), la app anfitriona detiene la reproducción del secuenciador si sonaba, sale del modo WebXR y abre el `<dialog>` modal nativo con un reproductor YouTube oficial. Al cerrar con `Esc`, botón o clic exterior, se limpia el `src` del iframe evitando sonido residual.
+* **Atril de enlaces 3D y réplica accesible WCAG 2.1:** Consola lateral derecha con 3 botones interactivos (`WEB OFICIAL MASCHINE`, `GUÍA RÍTMICA 4/4`, `PROBAR SECUENCIADOR`) replicados en una barra de acciones accesible en `index.html`.
+
+### 5. Motor de Audio Híbrido (`Web Audio API`)
 * **Muestras de percusión WAV:** Carga de muestras acústicas y electrónicas de alta fidelidad alojadas en `recursos/assets/audio/`.
 * **Síntesis procedural nativa de respaldo:** Algoritmos procedurales puros con osciladores y filtros en tiempo real, garantizando que el secuenciador funcione con latencia imperceptible (<15 ms) incluso si los archivos externos no estuvieran disponibles.
 
