@@ -16,6 +16,7 @@ Icon
 
 # Zip / Delivery files
 *.zip
+Práctica_Fuentes_Alejandro.zip
 *.tar.gz
 
 # Local dev HTTPS certs and scripts
