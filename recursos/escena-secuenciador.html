@@ -219,8 +219,8 @@
     }
     .hud-modal {
       width: 100%;
-      max-width: 500px;
-      max-height: 88vh;
+      max-width: 720px;
+      max-height: 90vh;
       overflow-y: auto;
       background: #0f172a;
       border: 1px solid rgba(56, 189, 248, 0.4);
@@ -229,6 +229,18 @@
       color: #f1f5f9;
       box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(56, 189, 248, 0.15);
       pointer-events: auto;
+    }
+    .hud-keymap-box {
+      background: #060b16;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-radius: 10px;
+      padding: 10px;
+      margin-bottom: 4px;
+    }
+    .hud-keymap-svg {
+      display: block;
+      width: 100%;
+      height: auto;
     }
     .hud-modal__header {
       display: flex;
@@ -379,6 +391,196 @@
       <div class="hud-modal__header">
         <h2 id="modalTitle" class="hud-modal__title">Leyenda y Controles · Secuenciador 4×4</h2>
         <button id="btnCloseModalIcon" class="hud-modal__close-icon" type="button" title="Cerrar">&times;</button>
+      </div>
+
+      <div class="hud-modal__section">
+        <h3 class="hud-modal__section-title">Mapa Visual de Teclado Isomórfico y Ratón</h3>
+        <div class="hud-keymap-box">
+          <svg class="hud-keymap-svg" viewBox="0 0 730 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Esquema visual de teclado y ratón de DrumLab VR">
+            <style>
+              .k-base { fill: #111827; stroke: #334155; stroke-width: 1.1; }
+              .k-txt { fill: #64748b; font-family: monospace; font-size: 9px; font-weight: 700; text-anchor: middle; dominant-baseline: central; }
+              .k-act-txt { fill: #020617; font-family: monospace; font-size: 10px; font-weight: 800; text-anchor: middle; dominant-baseline: central; }
+              .k-ctrl-txt { fill: #f8fafc; font-family: monospace; font-size: 9.5px; font-weight: 800; text-anchor: middle; dominant-baseline: central; }
+              .c-line { fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+              .c-lbl { font-family: system-ui, -apple-system, sans-serif; font-size: 10.5px; font-weight: 700; }
+              .c-sub { font-family: system-ui, -apple-system, sans-serif; font-size: 9px; fill: #94a3b8; }
+            </style>
+
+            <!-- Callouts Superiores -->
+            <!-- Crash 1-4 -->
+            <polyline class="c-line" stroke="#f59e0b" points="103,64 103,24 124,24"/>
+            <text x="129" y="21" class="c-lbl" fill="#fbbf24">Crash (T1–T4)</text>
+            <text x="129" y="33" class="c-sub">1 · 2 · 3 · 4</text>
+
+            <!-- H: Guía (centro tecla H = 210) -->
+            <polyline class="c-line" stroke="#94a3b8" points="210,118 210,48 224,48"/>
+            <text x="229" y="51" class="c-lbl" fill="#cbd5e1">Guía [H]</text>
+
+            <!-- M: Modo STEP/FREE (centro tecla M = 249) -->
+            <polyline class="c-line" stroke="#a855f7" points="249,145 249,24 274,24"/>
+            <text x="279" y="21" class="c-lbl" fill="#c084fc">Modo STEP / FREE [M]</text>
+            <text x="279" y="33" class="c-sub">Alternar Live Perform</text>
+
+            <!-- Supr: Limpiar (a la derecha de Supr, cero solapes) -->
+            <polyline class="c-line" stroke="#ef4444" points="458,64 458,24 472,24"/>
+            <text x="477" y="21" class="c-lbl" fill="#f87171">Limpiar [Supr]</text>
+            <text x="477" y="33" class="c-sub">o Shift + C</text>
+
+            <!-- ================= TECLADO QWERTY ================= -->
+            <!-- Fila 1: Esc + Números (1-4 iluminados en Ámbar Crash) -->
+            <rect class="k-base" x="16" y="64" width="24" height="22" rx="4"/>
+            <text class="k-txt" x="28" y="75">Esc</text>
+
+            <rect x="44" y="64" width="24" height="22" rx="4" fill="#f59e0b" stroke="#fbbf24" stroke-width="1.3"/>
+            <text class="k-act-txt" x="56" y="75">1</text>
+            <rect x="71" y="64" width="24" height="22" rx="4" fill="#f59e0b" stroke="#fbbf24" stroke-width="1.3"/>
+            <text class="k-act-txt" x="83" y="75">2</text>
+            <rect x="98" y="64" width="24" height="22" rx="4" fill="#f59e0b" stroke="#fbbf24" stroke-width="1.3"/>
+            <text class="k-act-txt" x="110" y="75">3</text>
+            <rect x="125" y="64" width="24" height="22" rx="4" fill="#f59e0b" stroke="#fbbf24" stroke-width="1.3"/>
+            <text class="k-act-txt" x="137" y="75">4</text>
+
+            <rect class="k-base" x="152" y="64" width="24" height="22" rx="4"/><text class="k-txt" x="164" y="75">5</text>
+            <rect class="k-base" x="179" y="64" width="24" height="22" rx="4"/><text class="k-txt" x="191" y="75">6</text>
+            <rect class="k-base" x="206" y="64" width="24" height="22" rx="4"/><text class="k-txt" x="218" y="75">7</text>
+            <rect class="k-base" x="233" y="64" width="24" height="22" rx="4"/><text class="k-txt" x="245" y="75">8</text>
+            <rect class="k-base" x="260" y="64" width="24" height="22" rx="4"/><text class="k-txt" x="272" y="75">9</text>
+            <rect class="k-base" x="287" y="64" width="24" height="22" rx="4"/><text class="k-txt" x="299" y="75">0</text>
+            <rect class="k-base" x="314" y="64" width="24" height="22" rx="4"/>
+            <rect class="k-base" x="341" y="64" width="24" height="22" rx="4"/>
+            <rect class="k-base" x="368" y="64" width="44" height="22" rx="4"/><text class="k-txt" x="390" y="75">⌫</text>
+
+            <!-- Supr / Del -->
+            <rect x="436" y="64" width="44" height="22" rx="4" fill="#7f1d1d" stroke="#ef4444" stroke-width="1.3"/>
+            <text class="k-ctrl-txt" x="458" y="75">Supr</text>
+
+            <!-- Fila 2: Tab + Q-R (Verde Hi-Hat) -->
+            <rect class="k-base" x="16" y="91" width="36" height="22" rx="4"/><text class="k-txt" x="34" y="102">Tab</text>
+            <rect x="55" y="91" width="24" height="22" rx="4" fill="#22c55e" stroke="#4ade80" stroke-width="1.3"/>
+            <text class="k-act-txt" x="67" y="102">Q</text>
+            <rect x="82" y="91" width="24" height="22" rx="4" fill="#22c55e" stroke="#4ade80" stroke-width="1.3"/>
+            <text class="k-act-txt" x="94" y="102">W</text>
+            <rect x="109" y="91" width="24" height="22" rx="4" fill="#22c55e" stroke="#4ade80" stroke-width="1.3"/>
+            <text class="k-act-txt" x="121" y="102">E</text>
+            <rect x="136" y="91" width="24" height="22" rx="4" fill="#22c55e" stroke="#4ade80" stroke-width="1.3"/>
+            <text class="k-act-txt" x="148" y="102">R</text>
+            <rect class="k-base" x="163" y="91" width="24" height="22" rx="4"/><text class="k-txt" x="175" y="102">T</text>
+            <rect class="k-base" x="190" y="91" width="24" height="22" rx="4"/><text class="k-txt" x="202" y="102">Y</text>
+            <rect class="k-base" x="217" y="91" width="24" height="22" rx="4"/><text class="k-txt" x="229" y="102">U</text>
+            <rect class="k-base" x="244" y="91" width="24" height="22" rx="4"/><text class="k-txt" x="256" y="102">I</text>
+            <rect class="k-base" x="271" y="91" width="24" height="22" rx="4"/><text class="k-txt" x="283" y="102">O</text>
+            <rect class="k-base" x="298" y="91" width="24" height="22" rx="4"/><text class="k-txt" x="310" y="102">P</text>
+            <rect class="k-base" x="325" y="91" width="24" height="22" rx="4"/>
+            <rect class="k-base" x="352" y="91" width="24" height="22" rx="4"/>
+            <rect class="k-base" x="379" y="91" width="33" height="49" rx="4"/><text class="k-txt" x="395" y="115">⏎</text>
+
+            <!-- Fila 3: Bloq + A-F (Cian Snare) + H (Ayuda) -->
+            <rect class="k-base" x="16" y="118" width="44" height="22" rx="4"/><text class="k-txt" x="38" y="129">Mayús</text>
+            <rect x="63" y="118" width="24" height="22" rx="4" fill="#38bdf8" stroke="#7dd3fc" stroke-width="1.3"/>
+            <text class="k-act-txt" x="75" y="129">A</text>
+            <rect x="90" y="118" width="24" height="22" rx="4" fill="#38bdf8" stroke="#7dd3fc" stroke-width="1.3"/>
+            <text class="k-act-txt" x="102" y="129">S</text>
+            <rect x="117" y="118" width="24" height="22" rx="4" fill="#38bdf8" stroke="#7dd3fc" stroke-width="1.3"/>
+            <text class="k-act-txt" x="129" y="129">D</text>
+            <rect x="144" y="118" width="24" height="22" rx="4" fill="#38bdf8" stroke="#7dd3fc" stroke-width="1.3"/>
+            <text class="k-act-txt" x="156" y="129">F</text>
+            <rect class="k-base" x="171" y="118" width="24" height="22" rx="4"/><text class="k-txt" x="183" y="129">G</text>
+            <rect x="198" y="118" width="24" height="22" rx="4" fill="#334155" stroke="#94a3b8" stroke-width="1.3"/>
+            <text class="k-ctrl-txt" x="210" y="129">H</text>
+            <rect class="k-base" x="225" y="118" width="24" height="22" rx="4"/><text class="k-txt" x="237" y="129">J</text>
+            <rect class="k-base" x="252" y="118" width="24" height="22" rx="4"/><text class="k-txt" x="264" y="129">K</text>
+            <rect class="k-base" x="279" y="118" width="24" height="22" rx="4"/><text class="k-txt" x="291" y="129">L</text>
+            <rect class="k-base" x="306" y="118" width="24" height="22" rx="4"/><text class="k-txt" x="318" y="129">Ñ</text>
+            <rect class="k-base" x="333" y="118" width="42" height="22" rx="4"/>
+
+            <!-- Fila 4: Shift + Z-V (Rosa Kick) + B (BPM) + M (Modo) -->
+            <rect x="16" y="145" width="56" height="22" rx="4" fill="#1e293b" stroke="#64748b" stroke-width="1.2"/>
+            <text class="k-ctrl-txt" x="44" y="156">Shift</text>
+            <rect x="75" y="145" width="24" height="22" rx="4" fill="#ec4899" stroke="#f472b6" stroke-width="1.3"/>
+            <text class="k-act-txt" x="87" y="156">Z</text>
+            <rect x="102" y="145" width="24" height="22" rx="4" fill="#ec4899" stroke="#f472b6" stroke-width="1.3"/>
+            <text class="k-act-txt" x="114" y="156">X</text>
+            <rect x="129" y="145" width="24" height="22" rx="4" fill="#ec4899" stroke="#f472b6" stroke-width="1.3"/>
+            <text class="k-act-txt" x="141" y="156">C</text>
+            <rect x="156" y="145" width="24" height="22" rx="4" fill="#ec4899" stroke="#f472b6" stroke-width="1.3"/>
+            <text class="k-act-txt" x="168" y="156">V</text>
+            <rect x="183" y="145" width="24" height="22" rx="4" fill="#0284c7" stroke="#38bdf8" stroke-width="1.3"/>
+            <text class="k-ctrl-txt" x="195" y="156">B</text>
+            <rect class="k-base" x="210" y="145" width="24" height="22" rx="4"/><text class="k-txt" x="222" y="156">N</text>
+            <rect x="237" y="145" width="24" height="22" rx="4" fill="#7e22ce" stroke="#c084fc" stroke-width="1.3"/>
+            <text class="k-ctrl-txt" x="249" y="156">M</text>
+            <rect class="k-base" x="264" y="145" width="24" height="22" rx="4"/>
+            <rect class="k-base" x="291" y="145" width="24" height="22" rx="4"/>
+            <rect class="k-base" x="318" y="145" width="24" height="22" rx="4"/>
+            <rect class="k-base" x="345" y="145" width="67" height="22" rx="4"/><text class="k-txt" x="378" y="156">Shift</text>
+
+            <!-- Fila 5: Espacio (Play/Stop) -->
+            <rect class="k-base" x="16" y="172" width="32" height="22" rx="4"/><text class="k-txt" x="32" y="183">Ctrl</text>
+            <rect class="k-base" x="51" y="172" width="30" height="22" rx="4"/><text class="k-txt" x="66" y="183">Alt</text>
+            <rect x="84" y="172" width="186" height="22" rx="4" fill="#059669" stroke="#34d399" stroke-width="1.4"/>
+            <text class="k-ctrl-txt" x="177" y="183">ESPACIO · PLAY / STOP</text>
+            <rect class="k-base" x="273" y="172" width="32" height="22" rx="4"/><text class="k-txt" x="289" y="183">Alt</text>
+            <rect class="k-base" x="308" y="172" width="32" height="22" rx="4"/>
+            <rect class="k-base" x="343" y="172" width="69" height="22" rx="4"/><text class="k-txt" x="377" y="183">Ctrl</text>
+
+            <!-- Bloque de Cursores (Flechas) -->
+            <rect x="462" y="145" width="26" height="22" rx="4" fill="#1e3a8a" stroke="#60a5fa" stroke-width="1.3"/>
+            <text class="k-ctrl-txt" x="475" y="156">↑</text>
+            <rect x="433" y="172" width="26" height="22" rx="4" fill="#0f766e" stroke="#2dd4bf" stroke-width="1.3"/>
+            <text class="k-ctrl-txt" x="446" y="183">←</text>
+            <rect x="462" y="172" width="26" height="22" rx="4" fill="#1e3a8a" stroke="#60a5fa" stroke-width="1.3"/>
+            <text class="k-ctrl-txt" x="475" y="183">↓</text>
+            <rect x="491" y="172" width="26" height="22" rx="4" fill="#0f766e" stroke="#2dd4bf" stroke-width="1.3"/>
+            <text class="k-ctrl-txt" x="504" y="183">→</text>
+
+            <!-- Callouts Inferiores -->
+            <!-- Hi-Hat Q-R (pasa por la izquierda limpia de Tab) -->
+            <polyline class="c-line" stroke="#22c55e" points="67,113 67,140 8,140 8,214 24,214"/>
+            <text x="29" y="217" class="c-lbl" fill="#4ade80">Hi-Hat (Q–R)</text>
+            <!-- Snare A-F -->
+            <polyline class="c-line" stroke="#38bdf8" points="75,140 12,140 12,232 24,232"/>
+            <text x="29" y="235" class="c-lbl" fill="#7dd3fc">Snare (A–F)</text>
+            <!-- Kick Z-V -->
+            <polyline class="c-line" stroke="#ec4899" points="87,167 87,252 106,252"/>
+            <text x="111" y="255" class="c-lbl" fill="#f472b6">Kick (Z–V)</text>
+
+            <!-- B: BPM -->
+            <polyline class="c-line" stroke="#38bdf8" points="195,167 195,216 212,216"/>
+            <text x="217" y="219" class="c-lbl" fill="#38bdf8">BPM 90/120/140 [B]</text>
+
+            <!-- Espacio -->
+            <polyline class="c-line" stroke="#34d399" points="225,194 225,252 242,252"/>
+            <text x="247" y="255" class="c-lbl" fill="#34d399">Play / Stop</text>
+
+            <!-- Cursores (etiquetas a la derecha sin tocar el ratón) -->
+            <polyline class="c-line" stroke="#2dd4bf" points="504,194 504,218 516,218"/>
+            <text x="521" y="221" class="c-lbl" fill="#2dd4bf">Edit [←/→]</text>
+            <polyline class="c-line" stroke="#60a5fa" points="475,194 475,246 516,246"/>
+            <text x="521" y="249" class="c-lbl" fill="#60a5fa">Loop [↑/↓]</text>
+
+            <!-- ================= RATÓN / PUNTERO 3D ================= -->
+            <g transform="translate(606, 78)">
+              <!-- Cuerpo del ratón -->
+              <rect x="16" y="18" width="68" height="106" rx="34" fill="#111827" stroke="#475569" stroke-width="1.6"/>
+              <!-- Botón Izquierdo (Activo) -->
+              <path d="M 16 52 C 16 28, 30 18, 48 18 L 48 64 L 16 64 Z" fill="#0284c7" stroke="#38bdf8" stroke-width="1.3"/>
+              <!-- Botón Derecho -->
+              <path d="M 52 18 C 70 18, 84 28, 84 52 L 84 64 L 52 64 Z" fill="#1e293b" stroke="#475569" stroke-width="1.2"/>
+              <!-- Rueda scroll -->
+              <rect x="46" y="30" width="8" height="20" rx="4" fill="#f8fafc"/>
+
+              <!-- Callouts Ratón -->
+              <polyline class="c-line" stroke="#38bdf8" points="26,22 26,-10 38,-10"/>
+              <text x="43" y="-12" class="c-lbl" fill="#38bdf8">Clic Izquierdo</text>
+              <text x="43" y="0" class="c-sub">Pad / Botón 3D</text>
+
+              <polyline class="c-line" stroke="#94a3b8" points="50,124 50,148"/>
+              <text x="50" y="162" class="c-lbl" fill="#e2e8f0" text-anchor="middle">Arrastrar</text>
+              <text x="50" y="174" class="c-sub" text-anchor="middle">Rotar cámara 3D</text>
+            </g>
+          </svg>
+        </div>
       </div>
 
       <div class="hud-modal__section">

@@ -450,13 +450,14 @@
             sub: 'Didáctica del compás cuaternario ›',
             color: '#10b981',
             action: () => {
+              const targetUrl = new URL('guia-ritmica.html', window.location.href).href;
               if (window.parent && window.parent !== window) {
                 try {
-                  window.parent.location.href = 'recursos/guia-ritmica.html';
+                  window.parent.location.href = targetUrl;
                   return;
                 } catch (e) {}
               }
-              window.location.href = 'guia-ritmica.html';
+              window.location.href = targetUrl;
             }
           },
           {
